@@ -1,0 +1,127 @@
+<?php
+require_once '../includes/auth.php';
+require_once '../includes/config.php';
+
+header('Content-Type: application/json');
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+    exit;
+}
+
+$action = $_REQUEST['action'] ?? '';
+
+if ($action === 'fetch') {
+    $search = $_GET['search'] ?? '';
+    $date = $_GET['date'] ?? '';
+    
+    $query = "SELECT s.*, c.name as cust_name, c.contact as cust_contact 
+              FROM sales s 
+              LEFT JOIN customers c ON s.customer_id = c.id 
+              WHERE 1=1 ";
+    $params = [];
+    
+    if ($search) {
+        $query .= " AND (s.id LIKE ? OR c.name LIKE ? OR s.payment_method LIKE ?) ";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+    }
+    
+    if ($date) {
+        $query .= " AND DATE(s.created_at) = ? ";
+        $params[] = $date;
+    }
+    
+    $query .= " ORDER BY s.created_at DESC LIMIT 100";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
+    echo json_encode(['success' => true, 'sales' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    exit;
+}
+
+if ($action === 'edit') {
+    $sale_id = $_POST['sale_id'];
+    $amount = $_POST['total_amount'];
+    $method = $_POST['payment_method'];
+    $status = $_POST['payment_status'];
+    $reason = $_POST['reason'];
+    $admin_id = $_SESSION['user_id'];
+
+    if (empty($reason)) {
+        echo json_encode(['success' => false, 'message' => 'Reason is required']);
+        exit;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Get Old Data
+        $old_stmt = $pdo->prepare("SELECT * FROM sales WHERE id = ?");
+        $old_stmt->execute([$sale_id]);
+        $old_data = $old_stmt->fetch(PDO::FETCH_ASSOC);
+
+        // 2. Update Sale
+        $update_stmt = $pdo->prepare("UPDATE sales SET final_amount = ?, payment_method = ?, payment_status = ? WHERE id = ?");
+        $update_stmt->execute([$amount, $method, $status, $sale_id]);
+
+        // 3. Log into Audit
+        $audit_stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, action_type, table_name, record_id, reason, old_data, new_data) 
+                                    VALUES (?, 'edit', 'sales', ?, ?, ?, ?)");
+        $audit_stmt->execute([
+            $admin_id, 
+            $sale_id, 
+            $reason, 
+            json_encode($old_data), 
+            json_encode(['final_amount' => $amount, 'payment_method' => $method, 'payment_status' => $status])
+        ]);
+
+        $pdo->commit();
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+if ($action === 'delete') {
+    $sale_id = $_POST['sale_id'];
+    $reason = $_POST['reason'];
+    $admin_id = $_SESSION['user_id'];
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Get Old Data
+        $old_stmt = $pdo->prepare("SELECT * FROM sales WHERE id = ?");
+        $old_stmt->execute([$sale_id]);
+        $old_data = $old_stmt->fetch(PDO::FETCH_ASSOC);
+
+        // 2. Reverse Inventory
+        $items_stmt = $pdo->prepare("SELECT * FROM sale_items WHERE sale_id = ?");
+        $items_stmt->execute([$sale_id]);
+        $items = $items_stmt->fetchAll();
+
+        foreach ($items as $item) {
+            $update_inventory = $pdo->prepare("UPDATE batches SET current_qty = current_qty + ? WHERE id = ?");
+            $update_inventory->execute([$item['qty'], $item['batch_id']]);
+        }
+
+        // 3. Delete from tables
+        $pdo->prepare("DELETE FROM sale_items WHERE sale_id = ?")->execute([$sale_id]);
+        $pdo->prepare("DELETE FROM sales WHERE id = ?")->execute([$sale_id]);
+
+        // 4. Log into Audit
+        $audit_stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, action_type, table_name, record_id, reason, old_data, new_data) 
+                                    VALUES (?, 'delete', 'sales', ?, ?, ?, NULL)");
+        $audit_stmt->execute([$admin_id, $sale_id, $reason, json_encode($old_data)]);
+
+        $pdo->commit();
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
