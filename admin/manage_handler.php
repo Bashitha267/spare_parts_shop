@@ -13,13 +13,26 @@ if ($action === 'fetch_inventory') {
     $search = $_GET['search'] ?? '';
     $type = $_GET['type'] ?? '';
     $low_stock = isset($_GET['low_stock']) && $_GET['low_stock'] === 'active';
+    $status_filter = $_GET['status'] ?? 'all'; // all, active, out_of_stock
 
     $whereClause = "WHERE 1=1";
     $params = [];
     
+    if ($status_filter === 'active') {
+        $whereClause .= " AND p.is_active = 1";
+    } else if ($status_filter === 'out_of_stock') {
+        $whereClause .= " AND p.is_active = 0";
+    }
+
     if (!empty($type)) {
         $whereClause .= " AND p.type = ?";
         $params[] = $type;
+    }
+
+    $oil_type = $_GET['oil_type'] ?? '';
+    if (!empty($oil_type)) {
+        $whereClause .= " AND p.oil_type = ?";
+        $params[] = $oil_type;
     }
 
     if (!empty($search)) {
@@ -50,8 +63,21 @@ if ($action === 'fetch_inventory') {
     $totalProducts = $countStmt->fetchColumn();
     $totalPages = ceil($totalProducts / $limit);
 
-    // Fetch Products with Stock Levels
-    $sql = "SELECT p.*, COALESCE(SUM(b.current_qty), 0) as total_stock 
+    // Fetch Grand Total Inventory Value (matching filters, ignoring pagination)
+    $valSql = "SELECT SUM(b.current_qty * b.buying_price) as grand_total 
+               FROM products p 
+               INNER JOIN batches b ON p.id = b.product_id 
+               $whereClause";
+    $valStmt = $pdo->prepare($valSql);
+    $valStmt->execute($params);
+    $grandTotalValue = $valStmt->fetchColumn() ?: 0;
+
+    // Fetch Products with Stock Levels and Valuation
+    $sql = "SELECT p.*, 
+            COALESCE(SUM(b.current_qty), 0) as total_stock,
+            COALESCE(SUM(b.current_qty * b.buying_price), 0) as total_value,
+            (SELECT buying_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as buying_price,
+            (SELECT selling_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as selling_price
             FROM products p 
             LEFT JOIN batches b ON p.id = b.product_id 
             $whereClause 
@@ -66,6 +92,7 @@ if ($action === 'fetch_inventory') {
 
     echo json_encode([
         'products' => $products,
+        'grand_total_value' => $grandTotalValue,
         'pagination' => [
             'current_page' => $page,
             'total_pages' => $totalPages,
@@ -100,5 +127,17 @@ if ($action === 'update_product') {
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to update product']);
     }
+    exit;
+}
+
+if ($action === 'fetch_batch_details') {
+    $invoice_id = $_GET['id'];
+    $stmt = $pdo->prepare("SELECT b.*, p.name, p.barcode 
+                          FROM batches b 
+                          JOIN products p ON b.product_id = p.id 
+                          WHERE b.invoice_id = ?");
+    $stmt->execute([$invoice_id]);
+    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode(['success' => true, 'items' => $items]);
     exit;
 }

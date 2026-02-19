@@ -72,6 +72,11 @@ if ($action === 'add_to_batch') {
         $total_item_val = $_POST['b_price'] * $_POST['qty'];
         $pdo->prepare("UPDATE invoices SET total_amount = total_amount + ? WHERE id = ?")->execute([$total_item_val, $invoice_id]);
         
+        // 4. Automatically Activate Product if Qty > 0
+        if ($_POST['qty'] > 0) {
+            $pdo->prepare("UPDATE products SET is_active = 1 WHERE id = ?")->execute([$p_id]);
+        }
+        
         $pdo->commit();
         
         $new_total = $pdo->query("SELECT total_amount FROM invoices WHERE id = $invoice_id")->fetchColumn();
@@ -97,10 +102,15 @@ if ($action === 'remove_item') {
     $invoice_id = $_SESSION['active_invoice_id'];
     
     $batch = $pdo->query("SELECT * FROM batches WHERE id = $batch_id")->fetch();
+    $p_id = $batch['product_id'];
     $dec_amount = $batch['buying_price'] * $batch['original_qty'];
     
     $pdo->prepare("DELETE FROM batches WHERE id = ?")->execute([$batch_id]);
     $pdo->prepare("UPDATE invoices SET total_amount = total_amount - ? WHERE id = ?")->execute([$dec_amount, $invoice_id]);
+    
+    // Auto-deactivate if total stock becomes 0
+    $pdo->prepare("UPDATE products SET is_active = 0 WHERE id = ? AND (SELECT SUM(current_qty) FROM batches WHERE product_id = ?) <= 0")
+        ->execute([$p_id, $p_id]);
     
     $new_total = $pdo->query("SELECT total_amount FROM invoices WHERE id = $invoice_id")->fetchColumn();
     echo json_encode(['success' => true, 'new_total' => number_format($new_total, 2)]);

@@ -11,13 +11,26 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 $action = $_REQUEST['action'] ?? '';
 
+if ($action === 'fetch_items') {
+    $sale_id = $_GET['id'];
+    $stmt = $pdo->prepare("SELECT si.*, p.name, p.barcode 
+                          FROM sale_items si 
+                          JOIN products p ON si.product_id = p.id 
+                          WHERE si.sale_id = ?");
+    $stmt->execute([$sale_id]);
+    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode(['success' => true, 'items' => $items]);
+    exit;
+}
+
 if ($action === 'fetch') {
     $search = $_GET['search'] ?? '';
     $date = $_GET['date'] ?? '';
     
-    $query = "SELECT s.*, c.name as cust_name, c.contact as cust_contact 
+    $query = "SELECT s.*, c.name as cust_name, c.contact as cust_contact, u.full_name as officer_name
               FROM sales s 
               LEFT JOIN customers c ON s.customer_id = c.id 
+              LEFT JOIN users u ON s.user_id = u.id
               WHERE 1=1 ";
     $params = [];
     
@@ -31,6 +44,18 @@ if ($action === 'fetch') {
     if ($date) {
         $query .= " AND DATE(s.created_at) = ? ";
         $params[] = $date;
+    }
+
+    $method = $_GET['method'] ?? 'all';
+    if ($method !== 'all') {
+        $query .= " AND s.payment_method = ? ";
+        $params[] = $method;
+    }
+
+    $status = $_GET['status'] ?? 'all';
+    if ($status !== 'all') {
+        $query .= " AND s.payment_status = ? ";
+        $params[] = $status;
     }
     
     $query .= " ORDER BY s.created_at DESC LIMIT 100";
@@ -106,6 +131,9 @@ if ($action === 'delete') {
         foreach ($items as $item) {
             $update_inventory = $pdo->prepare("UPDATE batches SET current_qty = current_qty + ? WHERE id = ?");
             $update_inventory->execute([$item['qty'], $item['batch_id']]);
+
+            // Re-activate product if stock becomes > 0
+            $pdo->prepare("UPDATE products SET is_active = 1 WHERE id = ?")->execute([$item['product_id']]);
         }
 
         // 3. Delete from tables

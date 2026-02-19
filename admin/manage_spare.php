@@ -13,85 +13,157 @@ check_auth('admin');
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0d1117;
+            color: #e6edf3;
+        }
+        .bg-main {
+            background:  url('public/admin_background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .colorful-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .blue-gradient-card {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.9) 0%, rgba(30, 64, 175, 0.8) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+        .glass-nav {
+            background: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        input, select {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            cursor: pointer;
+        }
+        select option {
+            background: #0f172a;
+            color: white;
+            padding: 10px;
+        }
+        th {
+            font-weight: 900;
+            color: #93c5fd;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 </head>
-<body class="bg-slate-50 min-h-screen">
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="px-4 md:px-6 py-3 flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-3 md:gap-4">
-                <a href="dashboard.php" class="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                    <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+<body class="bg-main min-h-screen relative">
+    <div class="colorful-overlay"></div>
+    
+    <nav class="glass-nav sticky top-0 z-30">
+        <div class="px-4 md:px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center gap-4">
+                <a href="dashboard.php" class="p-2 hover:bg-white/10 rounded-xl transition-all text-blue-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
-                <h1 class="text-lg md:text-xl font-black text-slate-800 tracking-tight">Spare Parts</h1>
+                <h1 class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 tracking-tight">SPARE PARTS</h1>
             </div>
-            <a href="addItems.php" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 transition-all">+ Stock</a>
+            <a href="addItems.php" class="bg-blue-500 text-white px-6 py-2.5 rounded-xl text-xs font-black hover:bg-blue-400 transition-all shadow-lg shadow-blue-500/20 uppercase tracking-widest">+ Stock Entry</a>
         </div>
     </nav>
 
-    <main class="p-6 max-w-7xl mx-auto space-y-6">
+    <main class="p-8 max-w-7xl mx-auto space-y-8 relative z-10">
         
-        <!-- Search & Filter -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div class="relative w-full md:w-1/2">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <input type="text" id="searchInventory" class="block w-full pl-10 pr-3 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500" placeholder="Search Spares by Name, Barcode or Brand...">
+        <!-- Inventory Valuation & Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pb-2">
+            <div class="blue-gradient-card p-6 rounded-[2rem] flex flex-col justify-center">
+                <p class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-2 opacity-70">Spare Parts Inventory Total</p>
+                <h2 id="grand_inventory_value" class="text-2xl font-black text-white tracking-tighter">Rs. 0.00</h2>
             </div>
+            <div class="md:col-span-3 blue-gradient-card p-6 rounded-[2rem] flex flex-col lg:flex-row gap-6 items-center">
+                <div class="relative flex-grow w-full">
+                    <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-blue-300/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" id="searchInventory" class="block w-full pl-14 pr-6 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-blue-300/20 text-sm font-bold" placeholder="Find spare by name, barcode or brand...">
+                </div>
 
-            <button id="lowStockToggle" class="flex items-center gap-2 px-4 py-3 bg-slate-50 text-slate-600 border border-slate-100 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-all font-bold text-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                Low Stock Only
-            </button>
+                <div class="flex items-center gap-4 w-full lg:w-auto">
+                    <select id="statusFilter" class="flex-grow lg:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-white/10 border-blue-500/30">
+                        <option value="all">Total Registry</option>
+                        <option value="active">Active Stocks</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <!-- Inventory Table -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="blue-gradient-card rounded-[2.5rem] overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse min-w-[700px]">
-                <thead class="bg-slate-50 border-b border-slate-100">
+                <thead class="bg-white/5 border-b border-white/10 font-black">
                     <tr>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Product Details</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Category</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Current Stock</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-center">Status</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-center">Actions</th>
+                        <th class="px-8 py-5 text-[10px] text-blue-300 uppercase tracking-[0.2em]">Product Details</th>
+                        <th class="px-8 py-5 text-[10px] text-blue-300 uppercase tracking-[0.2em] text-right">Buying Price</th>
+                        <th class="px-8 py-5 text-[10px] text-blue-300 uppercase tracking-[0.2em] text-right">Selling Price</th>
+                        <th class="px-8 py-5 text-[10px] text-blue-300 uppercase tracking-[0.2em] text-right">Stock Level</th>
+                        <th class="px-8 py-5 text-[10px] text-blue-300 uppercase tracking-[0.2em] text-right">Total Value</th>
+                        <th class="px-8 py-5 text-[10px] text-blue-300 uppercase tracking-[0.2em] text-center">Status</th>
+                        <th class="px-8 py-5 text-[10px] text-blue-300 uppercase tracking-[0.2em] text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="inventoryBody" class="divide-y divide-slate-50">
+                <tbody id="inventoryBody" class="divide-y divide-white/5">
                     <!-- Loaded via AJAX -->
                 </tbody>
             </table>
             
             <!-- Pagination Controls -->
-            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center" id="paginationControls">
+            <div class="px-8 py-6 border-t border-white/10 bg-white/5 flex justify-between items-center" id="paginationControls">
                 <!-- Loaded via JS -->
             </div>
         </div>
     </main>
 
     <!-- Edit Modal -->
-    <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
-            <h3 class="text-xl font-bold text-slate-800 mb-4">Edit Product</h3>
-            <form id="editForm" class="space-y-4">
+    <div id="editModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="blue-gradient-card w-full max-w-lg rounded-[2.5rem] shadow-2xl p-10 border border-white/20">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-black text-white uppercase tracking-tighter">Edit Spare Registry</h3>
+                <button onclick="closeEditModal()" class="text-white/40 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="editForm" class="space-y-6">
                 <input type="hidden" name="id" id="edit_id">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700">Product Name</label>
-                    <input type="text" name="name" id="edit_name" class="w-full px-4 py-2 bg-slate-50 border rounded-lg">
+                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-widest mb-3 ml-1">Spare Designation</label>
+                    <input type="text" name="name" id="edit_name" class="w-full px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-blue-300/20 font-bold" placeholder="Product Name">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700">Brand</label>
-                    <input type="text" name="brand" id="edit_brand" class="w-full px-4 py-2 bg-slate-50 border rounded-lg">
+                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-widest mb-3 ml-1">Brand Identity</label>
+                    <input type="text" name="brand" id="edit_brand" class="w-full px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-blue-300/20 font-bold" placeholder="Brand Name">
                 </div>
                 <div>
-                   <label class="block text-sm font-medium text-slate-700">Vehicle Compatibility</label>
-                   <input type="text" name="v_types" id="edit_v_types" class="w-full px-4 py-2 bg-slate-50 border rounded-lg">
+                   <label class="block text-[10px] font-black text-blue-300 uppercase tracking-widest mb-3 ml-1">Fittings Profile</label>
+                   <input type="text" name="v_types" id="edit_v_types" class="w-full px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-blue-300/20 font-bold" placeholder="Universal / Specific">
                 </div>
-                <div class="flex justify-end gap-3 mt-6">
-                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+                <div class="flex flex-col gap-3 mt-10">
+                    <button type="submit" class="w-full py-5 bg-blue-500 text-white rounded-2xl font-black hover:bg-blue-400 shadow-xl shadow-blue-500/20 transition-all uppercase text-sm tracking-widest">Commit Changes</button>
+                    <button type="button" onclick="closeEditModal()" class="w-full py-4 bg-white/5 text-white/50 rounded-2xl font-bold hover:bg-white/10 transition-all uppercase text-xs tracking-widest">Dismiss</button>
                 </div>
             </form>
         </div>
@@ -100,7 +172,7 @@ check_auth('admin');
     <script>
         let currentPage = 1;
         let debounceTimer;
-        let lowStockOnly = false;
+        let currentStatus = 'all';
 
         document.addEventListener('DOMContentLoaded', () => {
             loadInventory(1);
@@ -109,18 +181,14 @@ check_auth('admin');
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => {
                     currentPage = 1;
-                    loadInventory(1, this.value, lowStockOnly);
+                    loadInventory(1, this.value, currentStatus);
                 }, 300);
             });
 
-            document.getElementById('lowStockToggle').onclick = function() {
-                lowStockOnly = !lowStockOnly;
-                this.classList.toggle('bg-rose-600', lowStockOnly);
-                this.classList.toggle('text-white', lowStockOnly);
-                this.classList.toggle('bg-slate-50', !lowStockOnly);
-                this.classList.toggle('text-slate-600', !lowStockOnly);
-                loadInventory(1, document.getElementById('searchInventory').value, lowStockOnly);
-            };
+            document.getElementById('statusFilter').addEventListener('change', function() {
+                currentStatus = this.value;
+                loadInventory(1, document.getElementById('searchInventory').value, currentStatus);
+            });
 
             document.getElementById('editForm').onsubmit = async (e) => {
                 e.preventDefault();
@@ -131,61 +199,73 @@ check_auth('admin');
                 const data = await res.json();
                 if(data.success) {
                     closeEditModal();
-                    loadInventory(currentPage, document.getElementById('searchInventory').value, lowStockOnly);
+                    loadInventory(currentPage, document.getElementById('searchInventory').value, currentStatus);
                     Swal.fire('Success', 'Product updated!', 'success');
                 }
             };
         });
 
-        async function loadInventory(page, search = '', low_stock = false) {
+        async function loadInventory(page, search = '', status = 'all') {
             currentPage = page;
             // Updated to fetch only spare_part type
-            const res = await fetch(`manage_handler.php?action=fetch_inventory&page=${page}&search=${search}&type=spare_part&low_stock=${low_stock ? 'active' : ''}`);
+            const res = await fetch(`manage_handler.php?action=fetch_inventory&page=${page}&search=${search}&type=spare_part&status=${status}`);
             const data = await res.json();
             
             const tbody = document.getElementById('inventoryBody');
             tbody.innerHTML = '';
             
+            // Update Grand Total Value
+            document.getElementById('grand_inventory_value').innerText = 'Rs. ' + parseFloat(data.grand_total_value || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
             if(data.products.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400">No spare parts found.</td></tr>';
                 return;
             }
 
             data.products.forEach(p => {
-                let qtyDisplay = `<span class="font-bold text-slate-700">${p.total_stock}</span> Units`;
+                let qtyDisplay = `<span class="font-black text-emerald-400">${p.total_stock}</span> <span class="text-emerald-300/60 font-bold">Units</span>`;
 
                 let statusBadge = p.is_active == 1 
-                    ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md text-xs font-bold uppercase">Active</span>'
-                    : '<span class="px-2 py-1 bg-slate-100 text-slate-500 rounded-md text-xs font-bold uppercase">Deactivated</span>';
+                    ? '<span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest">Active</span>'
+                    : '<span class="px-3 py-1 bg-white/5 text-white/40 border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest">Out of Stock</span>';
 
                 let statusBtn = p.is_active == 1
-                    ? `<button onclick="toggleStatus(${p.id}, 0)" class="text-xs text-red-500 hover:underline" title="Mark Out of Stock/Inactive">Deactivate</button>`
-                    : `<button onclick="toggleStatus(${p.id}, 1)" class="text-xs text-emerald-600 hover:underline" title="Mark Active">Activate</button>`;
+                    ? `<button onclick="toggleStatus(${p.id}, 0)" class="text-[10px] font-black text-red-400/60 hover:text-red-400 transition-colors uppercase tracking-tight" title="Mark Out of Stock">Out of Stock</button>`
+                    : `<button onclick="toggleStatus(${p.id}, 1)" class="text-[10px] font-black text-emerald-400/60 hover:text-emerald-400 transition-colors uppercase tracking-tight" title="Activate">Activate</button>`;
 
                 const row = `
-                    <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="px-6 py-4">
-                            <p class="font-bold text-slate-800">${p.name}</p>
-                            <p class="text-xs font-mono text-slate-400">${p.barcode}</p>
+                    <tr class="hover:bg-white/5 transition-all group">
+                        <td class="px-8 py-5">
+                            <p class="font-black text-white text-sm tracking-tight">${p.name}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] font-black text-emerald-300 uppercase tracking-widest">${p.brand || 'No Brand'}</span>
+                                <span class="w-1 h-1 rounded-full bg-white/20"></span>
+                                <span class="text-[10px] font-mono text-emerald-300/50 font-black uppercase tracking-tighter">${p.barcode}</span>
+                            </div>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="text-xs font-semibold px-2 py-1 bg-slate-100 rounded text-slate-600 uppercase">${p.type}</span>
-                            <span class="text-xs text-slate-400 ml-2">${p.brand || ''}</span>
+                        <td class="px-8 py-5 text-right font-mono font-black text-white/40">
+                            Rs. ${parseFloat(p.buying_price || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </td>
-                        <td class="px-6 py-4 text-right">
+                        <td class="px-8 py-5 text-right font-mono font-black text-emerald-400">
+                             Rs. ${parseFloat(p.selling_price || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                        </td>
+                        <td class="px-8 py-5 text-right font-mono">
                             ${qtyDisplay}
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-8 py-5 text-right font-mono font-black text-emerald-400">
+                             Rs. ${parseFloat(p.total_value || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                        </td>
+                        <td class="px-8 py-5 text-center">
                             ${statusBadge}
                         </td>
-                        <td class="px-6 py-4 text-center flex justify-center items-center gap-2">
-                            <button onclick='showCompatibility(${JSON.stringify(p)})' class="p-2 text-slate-400 hover:text-emerald-600 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg transition-all" title="View Compatibility">
+                        <td class="px-8 py-5 text-center flex justify-center items-center gap-3">
+                            <button onclick='showCompatibility(${JSON.stringify(p)})' class="p-2.5 text-blue-400 bg-blue-400/10 border border-blue-400/20 rounded-xl hover:bg-blue-400/20 transition-all" title="View Compatibility">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </button>
-                            <button onclick='printBarcode("${p.barcode}", "${p.name.replace(/'/g, "\\'")}", "${(p.brand || '').replace(/'/g, "\\'")}")' class="p-2 text-slate-400 hover:text-amber-600 bg-white hover:bg-amber-50 border border-slate-200 rounded-lg transition-all" title="Print Barcode Label">
+                            <button onclick='printBarcode("${p.barcode}", "${p.name.replace(/'/g, "\\'")}", "${(p.brand || '').replace(/'/g, "\\'")}")' class="p-2.5 text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-xl hover:bg-amber-400/20 transition-all" title="Print Barcode">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10M7 11h10M7 15h10M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"></path></svg>
                             </button>
-                            <button onclick='editProduct(${JSON.stringify(p)})' class="p-2 text-slate-400 hover:text-blue-600 bg-white hover:bg-blue-50 border border-slate-200 rounded-lg transition-all" title="Edit Details">
+                            <button onclick='editProduct(${JSON.stringify(p)})' class="p-2.5 text-indigo-400 bg-indigo-400/10 border border-indigo-400/20 rounded-xl hover:bg-indigo-400/20 transition-all" title="Edit Details">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </button>
                             ${statusBtn}
@@ -205,18 +285,18 @@ check_auth('admin');
             
             // Previous Button (Icon only)
             if(pg.current_page > 1) {
-                html += `<button onclick="loadInventory(${pg.current_page - 1}, document.getElementById('searchInventory').value, lowStockOnly)" class="p-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-400 hover:text-blue-600 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>`;
+                html += `<button onclick="loadInventory(${pg.current_page - 1}, document.getElementById('searchInventory').value, currentStatus)" class="p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 text-blue-300 transition-all font-black"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>`;
             }
 
             // Page Numbers
             for(let i = 1; i <= pg.total_pages; i++) {
-                const activeClass = i === pg.current_page ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-100' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50';
-                html += `<button onclick="loadInventory(${i}, document.getElementById('searchInventory').value, lowStockOnly)" class="w-9 h-9 flex items-center justify-center border rounded-lg text-sm font-bold transition-all ${activeClass}">${i}</button>`;
+                const activeClass = i === pg.current_page ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20' : 'bg-white/5 text-white/40 border-white/10 hover:bg-white/10';
+                html += `<button onclick="loadInventory(${i}, document.getElementById('searchInventory').value, currentStatus)" class="w-9 h-9 flex items-center justify-center border rounded-lg text-sm font-bold transition-all ${activeClass}">${i}</button>`;
             }
 
             // Next Button (Icon only)
             if(pg.current_page < pg.total_pages) {
-                html += `<button onclick="loadInventory(${pg.current_page + 1}, document.getElementById('searchInventory').value, lowStockOnly)" class="p-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-400 hover:text-blue-600 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>`;
+                html += `<button onclick="loadInventory(${pg.current_page + 1}, document.getElementById('searchInventory').value, currentStatus)" class="p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 text-blue-300 transition-all font-black"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>`;
             }
             
             html += '</div>';

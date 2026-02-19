@@ -14,99 +14,163 @@ check_auth('cashier');
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc;
+            color: #334155;
+        }
+        .bg-main {
+            background: url('../admin/public/admin_background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .colorful-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(238, 242, 255, 0.7) 100%);
+            pointer-events: none; z-index: 0;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 1.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+        .blue-gradient-header {
+            background: linear-gradient(to right, #2563eb, #1e40af);
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-blue {
+            background: linear-gradient(to right, #2563eb, #1e40af);
+            color: white;
+            padding: 0.6rem 2rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            border: none;
+        }
+        .btn-blue:hover {
+            background: linear-gradient(to right, #1d4ed8, #1e3a8a);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-slate-100 h-screen overflow-hidden flex flex-col">
-
+<body class="bg-main h-screen overflow-hidden flex flex-col relative ">
+    <div class="colorful-overlay"></div>
+    
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col bg-slate-50/50">
+    <main class="h-screen max-h-screen flex flex-col relative z-20 overflow-hidden">
         <!-- Top Navigation Bar -->
-        <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 flex flex-col md:flex-row items-center justify-between shadow-sm z-20 gap-4 md:gap-0">
-            <div class="flex items-center justify-between w-full md:w-auto gap-8 text-sm font-medium text-slate-500">
-                <div class="flex items-center gap-4">
-                    <a href="dashboard.php" class="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-blue-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <header class="blue-gradient-header px-4 md:px-6 py-2 flex flex-col sm:flex-row items-center justify-between shadow-lg z-20 gap-3 sm:gap-0 border-b border-white/10">
+            <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-8 text-sm font-medium text-white/70">
+                <div class="flex items-center gap-3">
+                    <a href="dashboard.php" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </a>
                     <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        <span class="hidden sm:inline">System Online</span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50 animate-pulse"></span>
+                        <span class="hidden lg:inline font-bold uppercase tracking-widest text-[9px] text-white">Online</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-4 md:gap-6">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span id="header_date" class="text-[10px] md:text-sm"></span>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span id="header_date" class="text-[10px] font-bold text-white"></span>
                     </div>
-                    <div class="flex items-center gap-2 font-mono">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span id="header_time" class="text-[10px] md:text-sm"></span>
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span id="header_time" class="text-[10px] font-bold text-white"></span>
                     </div>
                 </div>
             </div>
-
-            <div class="flex items-center justify-between w-full md:w-auto gap-4 md:gap-6">
-                <div class="text-left md:text-right">
-                    <p class="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Current User</p>
-                    <p class="text-xs md:text-sm font-semibold text-blue-600 uppercase"><?php echo $_SESSION['full_name']; ?></p>
+            
+            <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-8">
+                <div class="text-right hidden sm:block">
+                    <p class="text-[8px] text-white/60 font-bold uppercase tracking-widest leading-none mb-1">Operator</p>
+                    <p class="text-[11px] font-bold text-white uppercase truncate max-w-[120px]"><?php echo $_SESSION['full_name']; ?></p>
                 </div>
-                <div class="hidden md:block h-8 w-px bg-slate-200"></div>
-                <div class="bg-blue-50 px-3 md:px-4 py-1 md:py-1.5 rounded-lg border border-blue-100 flex items-center gap-2 md:gap-3">
-                    <p class="text-[8px] md:text-[10px] font-bold text-blue-400 uppercase">Today's Total</p>
-                    <p id="today_total" class="text-sm md:text-base font-bold text-blue-700">LKR 0.00</p>
+                <div class="h-8 w-px bg-white/20 hidden sm:block"></div>
+                <div class="flex items-center gap-3 px-3 py-1.5 backdrop-blur-md border border-white/20 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-blue-600 shadow-lg shadow-white/20">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[8px] font-black text-white/70 uppercase tracking-widest leading-none mb-1">Today's Sales</p>
+                        <p id="today_total" class="text-xs font-black text-white leading-none tracking-tight">LKR 0.00</p>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- POS Workspace -->
-        <div class="flex-1 overflow-hidden flex flex-col p-4 space-y-3">
+        <div class="flex-1 min-h-0 overflow-hidden flex flex-col p-4 space-y-2">
             
             <!-- Page Title section -->
             <div class="flex justify-between items-center px-1">
                 <div>
-                    <h1 class="text-xl font-bold text-slate-800 tracking-tight leading-none">New Sale Entry</h1>
-                    <p class="text-[11px] text-slate-400 font-medium">Record and automate sale transactions efficiently</p>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight leading-none">Customer Details</h1>
+                    <p class="text-[11px] text-slate-400 font-medium">Select or register a customer to begin the transaction</p>
                 </div>
             </div>
 
             <!-- Section 1: Customer Details -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm px-4 py-2.5">
-                <div class="flex flex-col md:flex-row md:items-center gap-4">
-                    <div class="flex items-center gap-4 flex-1">
-                        <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <div class="glass-panel px-4 py-2.5 bg-white/80 backdrop-blur-sm border-blue-100/50">
+                <div class="flex flex-col lg:flex-row lg:items-center gap-4">
+                    <div class="flex items-center gap-3 flex-1">
+                        <div class="w-8 h-8 bg-blue-100/50 rounded-xl flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div id="custSearchArea" class="flex items-center gap-4">
+                            <div id="custSearchArea" class="flex items-center gap-2">
                                 <div class="relative w-full max-w-sm">
-                                    <input type="text" id="custSearch" class="block w-full px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 text-xs outline-none font-medium" placeholder="Search by Name or Contact...">
-                                    <div id="custResults" class="absolute left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-slate-100 z-50 hidden max-h-48 overflow-y-auto"></div>
+                                    <input type="text" id="custSearch" class="block w-full px-3 py-2 bg-slate-50/50 border border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-[11px] outline-none font-bold placeholder:text-slate-300 transition-all uppercase tracking-wider" placeholder="Search by name or contact...">
+                                    <div id="custResults" class="absolute left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-slate-100 z-50 hidden max-h-48 overflow-y-auto p-1"></div>
                                 </div>
                             </div>
-                            <div id="selectedCustArea" class="hidden flex items-center justify-between md:justify-start gap-4 md:gap-8 animate-fade-in">
+                            <div id="selectedCustArea" class="hidden flex items-center gap-6 animate-fade-in overflow-hidden">
                                 <div class="flex flex-col min-w-0">
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Customer Name</span>
-                                    <span id="selectedCustName" class="text-xs font-bold text-slate-700 truncate"></span>
+                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">Customer</span>
+                                    <span id="selectedCustName" class="text-[11px] font-black text-slate-800 truncate uppercase tracking-tight"></span>
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Contact</span>
-                                    <span id="selectedCustPhone" class="text-xs font-bold text-slate-700"></span>
+                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">Contact</span>
+                                    <span id="selectedCustPhone" class="text-[11px] font-black text-slate-800 tracking-wider"></span>
                                 </div>
-                                <button onclick="clearCustomer()" class="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all shrink-0">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                <button onclick="clearCustomer()" class="p-1.5 bg-red-50 text-red-500 rounded-[10px] hover:bg-red-500 hover:text-white transition-all shrink-0 shadow-sm">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <button onclick="openNewCustomerModal()" class="w-full md:w-auto shrink-0 bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-all font-bold text-[10px] flex items-center justify-center gap-2">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        New Customer
+                    <button onclick="openNewCustomerModal()" class="w-full lg:w-auto shrink-0 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 uppercase tracking-widest flex items-center justify-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                        New Registration
                     </button>
                 </div>
             </div>
 
+            <!-- Page Title section -->
+            <div class="flex justify-between items-center px-1 pt-2">
+                <div>
+                    <h1 class="text-lg font-bold text-slate-800 tracking-tight leading-none uppercase">Product Items Info</h1>
+                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Search and add items to the current order</p>
+                </div>
+            </div>
+
             <!-- Section 2: Product Search Bar -->
-            <div id="pos_search_area" class="pointer-events-none opacity-50 grayscale transition-all duration-300 h-auto">
+            <div id="pos_search_area" class="pointer-events-none opacity-50 grayscale transition-all duration-300 shrink-0">
                 <div class="relative group">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -116,65 +180,58 @@ check_auth('cashier');
                 </div>
             </div>
 
-            <!-- Section 3: Sale Items Table -->
-            <div id="pos_main_area" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden pointer-events-none opacity-50 grayscale transition-all duration-300 flex-1 flex flex-col min-h-0 relative">
-                <div class="hidden md:grid grid-cols-12 bg-slate-50 border-b border-slate-100 text-[9px] font-black text-slate-400 uppercase tracking-widest px-6 py-2">
-                    <div class="col-span-1">#</div>
-                    <div class="col-span-4">Product Details</div>
-                    <div class="col-span-2 text-center">Batch ID</div>
-                    <div class="col-span-1 text-center">Qty</div>
-                    <div class="col-span-1 text-right">Unit Price</div>
-                    <div class="col-span-1 text-right">Discount</div>
-                    <div class="col-span-2 text-right">Line Total</div>
+            <!-- Section  section 3: Sale Items Table -->
+            <div id="pos_main_area" class="glass-panel overflow-hidden pointer-events-none opacity-50 grayscale transition-all duration-300 flex-1 flex flex-col min-h-0 relative bg-white/80 backdrop-blur-sm">
+                <div class="hidden lg:grid grid-cols-12 blue-gradient-header text-[11px] font-black uppercase tracking-[0.2em] px-6 py-4 border-b border-white/10">
+                    <div class="col-span-3">Product Profile</div>
+                    <div class="col-span-2 text-center">Category / Type</div>
+                    <div class="col-span-2 text-right">Net Unit Price</div>
+                    <div class="col-span-2 text-center">Quantity</div>
+                    <div class="col-span-2 text-right">Total Payable</div>
+                    <div class="col-span-1 text-center">Action</div>
                 </div>
                 
-                <div id="cartBody" class="flex-1 overflow-y-auto divide-y divide-slate-50 text-xs scrollbar-thin scrollbar-thumb-slate-200" style="max-height: calc(100vh - 450px);">
+                <div id="cartBody" class="flex-1 overflow-y-auto min-h-0 divide-y divide-slate-50 text-xs scrollbar-thin scrollbar-thumb-slate-200 pb-36">
                     <div class="h-full flex flex-col items-center justify-center text-slate-300 py-20">
                         <p class="text-[10px] font-bold uppercase tracking-widest opacity-40">Scan an item to begin</p>
                     </div>
                 </div>
 
-                <!-- Summary Row -->
-                <div class="px-4 md:px-6 py-4 bg-slate-50 border-t border-slate-200 mt-auto">
-                    <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-start gap-4 lg:gap-8">
-                        <div class="flex-1 min-h-0">
-                            <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Payment Method</label>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="pay_method" value="cash" class="peer hidden" checked>
-                                    <div class="py-2 text-center border border-slate-200 rounded-lg peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white transition-all font-bold text-[9px] text-slate-500 uppercase">Cash</div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="pay_method" value="card" class="peer hidden">
-                                    <div class="py-2 text-center border border-slate-200 rounded-lg peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white transition-all font-bold text-[9px] text-slate-500 uppercase">Card</div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="pay_method" value="cheque" class="peer hidden">
-                                    <div class="py-2 text-center border border-slate-200 rounded-lg peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white transition-all font-bold text-[9px] text-slate-500 uppercase">Cheque</div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="pay_method" value="credit" class="peer hidden">
-                                    <div class="py-2 text-center border border-slate-200 rounded-lg peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white transition-all font-bold text-[9px] text-slate-500 uppercase">Credit</div>
-                                </label>
+                <!-- Summary Row (Fixed Bottom) -->
+                <div class="absolute bottom-0 left-0 right-0 px-4 md:px-8 py-3 md:py-4 bg-white/95 backdrop-blur-3xl border-t border-slate-200/80 z-30 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)]">
+                    <div class="flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-8">
+                        <div class="flex-1 hidden xl:flex items-center">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Active Cart</p>
+                                    <p id="item_count_label" class="text-[11px] font-black text-slate-800 uppercase">0 Items Loaded</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="w-full lg:w-72 text-right space-y-2">
-                            <div class="flex justify-between items-center text-slate-500 font-medium text-[10px] md:text-[11px]">
-                                <span>Subtotal</span>
-                                <span id="subtotal">Rs. 0.00</span>
+                        
+                        <div class="w-full lg:w-auto flex flex-col md:flex-row items-center gap-4 md:gap-8 lg:gap-10">
+                            <div class="flex items-center justify-center md:justify-end gap-6 md:gap-10 w-full md:w-auto">
+                                <div class="text-right">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Subtotal</p>
+                                    <p id="subtotal" class="text-xs md:text-sm font-black text-slate-500 tracking-tight">Rs. 0.00</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-0.5">Discounts</p>
+                                    <p id="total_discount" class="text-xs md:text-sm font-black text-red-500 tracking-tight">Rs. 0.00</p>
+                                </div>
+                                <div class="h-8 w-px bg-slate-200/50 hidden md:block"></div>
+                                <div class="text-right">
+                                    <p class="text-[10px] font-black text-blue-600 uppercase tracking-tight mb-0.5 opacity-80">Net Payable</p>
+                                    <p id="final_payable" class="text-2xl md:text-3xl font-black text-blue-700 tracking-tighter leading-none">Rs. 0.00</p>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center text-red-500 font-medium text-[10px] md:text-[11px]">
-                                <span>Total Discount</span>
-                                <span id="total_discount">Rs. 0.00</span>
-                            </div>
-                            <div class="h-px bg-slate-200 my-1"></div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-800 font-bold text-[10px] md:text-xs uppercase tracking-tight">Total Payable</span>
-                                <span id="final_payable" class="text-lg md:text-xl font-bold text-blue-600">Rs. 0.00</span>
-                            </div>
-                            <div class="flex gap-2 pt-2 justify-end">
-                                <button onclick="clearCart()" class="flex-1 lg:flex-none px-4 md:px-5 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg font-bold text-[9px] md:text-[10px] hover:bg-slate-50 transition-all uppercase tracking-wide">Cancel</button>
-                                <button onclick="checkout()" class="flex-1 lg:flex-none px-4 md:px-5 py-2 bg-blue-600 text-white rounded-lg font-bold text-[9px] md:text-[10px] shadow-lg shadow-blue-100 hover:bg-black transition-all uppercase tracking-wide">Checkout</button>
+                            
+                            <div class="flex gap-3 w-full md:w-auto">
+                                <button onclick="clearCart()" class="flex-1 md:flex-none px-6 py-3 bg-slate-50 text-slate-400 rounded-xl font-black text-[10px] hover:bg-red-50 hover:text-red-500 border border-slate-100 transition-all uppercase tracking-widest shadow-sm">Discard</button>
+                                <button onclick="checkout()" class="flex-1 md:flex-none px-10 py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] hover:bg-blue-700 transition-all uppercase tracking-[0.2em] shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-[0.98] border border-blue-500/50">Complete Order</button>
                             </div>
                         </div>
                     </div>
@@ -183,84 +240,213 @@ check_auth('cashier');
         </div>
     </main>
 
-    <!-- Modal: Select Batch -->
-    <div id="batchModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden anim-pop">
-            <div class="px-8 py-6 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                <div>
-                    <h3 class="text-xl font-bold text-slate-800" id="batchModalTitle">Select Batch</h3>
-                    <div class="flex items-center gap-3 mt-1">
-                        <p class="text-xs text-slate-400 font-medium" id="batchModalSub"></p>
-                        <span id="batchModalType" class="px-2 py-0.5 bg-blue-100 text-blue-600 rounded text-[9px] font-black uppercase"></span>
+    <!-- Modal: Payment Method Selection -->
+    <div id="paymentModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-[100] hidden grid place-items-center p-4">
+        <div class="bg-white backdrop-blur-2xl w-full max-w-[420px] rounded-[2rem] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.4)] overflow-hidden anim-pop border border-white/40">
+            <!-- Header -->
+            <div class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-slate-50">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Complete Sale</h3>
+                        <p class="text-[9px] text-slate-400 font-bold mt-1 uppercase tracking-[0.1em] opacity-60">Finalize transaction</p>
                     </div>
                 </div>
-                <button onclick="closeBatchModal()" class="text-slate-400 hover:text-red-500 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button onclick="closePaymentModal()" class="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-300 hover:text-slate-900 hover:rotate-90">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="p-8 max-h-[60vh] overflow-y-auto space-y-4" id="batchList">
+
+            <div class="p-6 space-y-5">
+                <!-- Totals Section -->
+                <div class="space-y-2">
+                    <div class="bg-slate-50/50 rounded-2xl p-3 flex justify-between items-center border border-slate-100/50">
+                        <span class="text-slate-400 font-black text-[10px] uppercase tracking-widest">Gross total</span>
+                        <span id="pay_modal_total" class="text-xl font-black text-slate-900 tracking-tight">Rs. 0.00</span>
+                    </div>
+
+                    <div class="bg-red-50/30 rounded-2xl p-3 flex justify-between items-center border border-red-100/30">
+                        <span class="text-red-400 font-black text-[10px] uppercase tracking-widest">Savings / items disc</span>
+                        <span id="pay_modal_item_disc" class="text-base font-black text-red-500 tracking-tight">Rs. 0.00</span>
+                    </div>
+
+                    <div class="px-1 pt-1">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Wholesale discount</label>
+                        <div class="relative mb-3">
+                            <span class="absolute left-5 inset-y-0 flex items-center text-slate-300 font-black text-base">Rs.</span>
+                            <input type="number" id="wholesale_discount" value="0" step="0.01" oninput="updatePaymentTotal()" class="w-full pl-12 pr-6 py-3 bg-white border-2 border-slate-100 rounded-xl font-black text-xl text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all shadow-sm text-center">
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="applyPercentageDiscount(5)" class="py-2 bg-white border border-slate-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-[11px] font-black transition-all shadow-sm">5%</button>
+                            <button onclick="applyPercentageDiscount(10)" class="py-2 bg-white border border-slate-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-[11px] font-black transition-all shadow-sm">10%</button>
+                            <button onclick="applyPercentageDiscount(20)" class="py-2 bg-white border border-slate-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-[11px] font-black transition-all shadow-sm">20%</button>
+                            <button onclick="applyPercentageDiscount(25)" class="py-2 bg-white border border-slate-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-[11px] font-black transition-all shadow-sm">25%</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payable Box -->
+                <div class="bg-blue-600 rounded-[1.75rem] p-4 flex justify-between items-center shadow-xl shadow-blue-600/30 border border-blue-400/20">
+                    <div>
+                        <p class="text-[10px] font-bold text-blue-100 uppercase tracking-widest mb-1 opacity-70">Amount to pay</p>
+                        <p id="final_pay_modal_total" class="text-2xl font-black text-white tracking-tighter leading-none">Rs. 0.00</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white backdrop-blur-md border border-white/10 shadow-inner">
+                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.21 1.87 1.15 0 1.94-.54 1.94-1.3 0-.7-.56-1.17-2.02-1.54-1.95-.51-3.54-1.29-3.54-3.32 0-1.7 1.34-2.85 3.05-3.21V5h2.67v1.86c1.29.23 2.53 1.02 2.87 2.44H14.5c-.24-.76-.83-1.19-1.84-1.19-1.02 0-1.56.49-1.56 1.15 0 .64.57 1.01 2.05 1.39 2.02.53 3.51 1.41 3.51 3.32.01 1.91-1.39 3.19-3.2 3.52z"/></svg>
+                    </div>
+                </div>
+
+                <!-- Payment Methods Selection -->
+                <div class="pt-1">
+                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">Payment Method</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="processPayment('cash')" class="group p-4 bg-slate-50 border-2 border-transparent hover:border-emerald-500 hover:bg-emerald-50 transition-all rounded-[1.5rem] text-center shadow-sm">
+                            <div class="w-10 h-10 rounded-xl bg-white text-emerald-600 flex items-center justify-center mx-auto mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-md">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </div>
+                            <span class="text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-emerald-700">Cash Sale</span>
+                        </button>
+                        <button onclick="processPayment('card')" class="group p-4 bg-slate-50 border-2 border-transparent hover:border-blue-500 hover:bg-blue-50 transition-all rounded-[1.5rem] text-center shadow-sm">
+                            <div class="w-10 h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-md">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            </div>
+                            <span class="text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-blue-700">Card Payment</span>
+                        </button>
+                        <button onclick="processPayment('cheque')" class="group p-4 bg-slate-50 border-2 border-transparent hover:border-slate-500 hover:bg-slate-100 transition-all rounded-[1.5rem] text-center shadow-sm">
+                            <div class="w-10 h-10 rounded-xl bg-white text-slate-600 flex items-center justify-center mx-auto mb-3 group-hover:bg-slate-600 group-hover:text-white transition-all shadow-md">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </div>
+                            <span class="text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-slate-700">Cheque</span>
+                        </button>
+                        <button onclick="processPayment('credit')" class="group p-4 bg-slate-50 border-2 border-transparent hover:border-orange-500 hover:bg-orange-50 transition-all rounded-[1.5rem] text-center shadow-sm">
+                            <div class="w-10 h-10 rounded-xl bg-white text-orange-600 flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-all shadow-md">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <span class="text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-orange-700">Credit Sale</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Select Batch -->
+    <div id="batchModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-white/80 backdrop-blur-xl w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden anim-pop border border-white/50">
+            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none" id="batchModalTitle">Select Batch</h3>
+                        <div class="flex items-center gap-3 mt-1.5">
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest" id="batchModalSub"></p>
+                            <span id="batchModalType" class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[8px] font-black uppercase tracking-widest border border-blue-100"></span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closeBatchModal()" class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 max-h-[60vh] overflow-y-auto" id="batchList">
                 <!-- Batch items -->
             </div>
         </div>
     </div>
 
     <!-- Modal: Sale Entry Details -->
-    <div id="entryModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 anim-pop relative">
-            <button onclick="closeEntryModal()" class="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <div id="entryModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
+        <div class="bg-white/80 backdrop-blur-xl w-full max-w-[400px] rounded-3xl shadow-2xl p-6 anim-pop relative border border-white/50">
+            <button onclick="closeEntryModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <h3 class="text-xl font-black text-slate-800 mb-6 uppercase tracking-tighter">Item Sale Details</h3>
-            <div class="space-y-4">
+            
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                </div>
+                <h3 class="text-lg font-black text-slate-900 uppercase tracking-tighter">Configure Sale</h3>
+            </div>
+
+            <div class="space-y-3">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Quantity to Sell</label>
-                    <div class="flex items-center gap-3">
-                        <input type="number" id="entry_qty" step="0.01" value="1" class="flex-1 px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-center text-xl outline-none focus:ring-2 focus:ring-blue-600">
-                        <span id="entry_unit" class="text-sm font-bold text-slate-500">Units</span>
-                    </div>
-                    <p id="entry_max" class="text-[10px] text-red-500 font-bold mt-2 uppercase"></p>
+                   <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Quantity to Sell</label>
+                   <div class="flex items-center gap-2">
+                       <input type="number" id="entry_qty" step="1" value="1" oninput="updateEntryTotal()" class="flex-1 px-4 py-2.5 bg-white/80 border border-slate-200 rounded-xl font-bold text-center text-lg text-blue-600 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm">
+                       <span id="entry_unit" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-3 py-2 rounded-lg border border-slate-200 min-w-[60px] text-center">Units</span>
+                   </div>
+                   <p id="entry_max" class="text-[9px] text-red-500 font-bold mt-1.5 uppercase tracking-tight ml-1"></p>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Unit Price</label>
-                        <input type="number" id="entry_price" step="0.01" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-600">
+                        <label class="block text-[9px] font-bold text-slate-800 uppercase tracking-widest mb-1 ml-1 opacity-70">Buying Price</label>
+                        <input type="number" id="entry_buy_price" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-800 outline-none text-[11px]">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Discount (Amt)</label>
-                        <input type="number" id="entry_discount" value="0" step="0.01" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-red-500 outline-none focus:ring-2 focus:ring-blue-600">
+                        <label class="block text-[9px] font-bold text-slate-800 uppercase tracking-widest mb-1 ml-1">Labeled Price</label>
+                        <input type="number" id="entry_labeled_price" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-800 outline-none text-[11px]">
                     </div>
                 </div>
-                <div class="pt-6 border-t border-slate-100 flex justify-between items-center">
+                
+                <div class="grid grid-cols-2 gap-3 pt-0.5">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">Line Total</p>
-                        <p id="entry_total" class="text-2xl font-black text-blue-700">LKR 0.00</p>
+                        <label class="block text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-1.5 ml-1">Selling Price</label>
+                        <input type="number" id="entry_price" step="0.01" oninput="syncFromPrice()" class="w-full px-3 py-2.5 bg-white border-2 border-blue-100 rounded-xl font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm">
                     </div>
-                    <button onclick="addToCart()" class="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-xl shadow-blue-100 hover:bg-black transition-all uppercase text-sm">Add Item</button>
+                    <div>
+                        <label class="block text-[9px] font-bold text-red-500 uppercase tracking-widest mb-1.5 ml-1">Discount (Item)</label>
+                        <input type="number" id="entry_discount" value="0" step="0.01" oninput="syncFromDiscount()" class="w-full px-3 py-2.5 bg-white border-2 border-red-50 rounded-xl font-bold text-red-500 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all shadow-sm">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 mt-1">
+                    <div class="flex justify-between items-center mb-1">
+                        <div>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Total Payable</p>
+                            <p id="entry_total" class="text-2xl font-black text-slate-900 tracking-tighter">Rs. 0.00</p>
+                        </div>
+                        <button onclick="addToCart()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all shadow-md shadow-blue-600/20">
+                            Add to Cart
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal: New Customer -->
-    <div id="newCustModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8">
-            <h3 class="text-xl font-black text-slate-800 mb-6 uppercase tracking-tight">Register New Customer</h3>
-            <form id="newCustForm" class="space-y-4">
+    <div id="newCustModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white/80 backdrop-blur-xl w-full max-w-[400px] rounded-3xl shadow-2xl p-6 border border-white/50 relative anim-pop">
+            <button onclick="closeNewCustomerModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-lg font-black text-slate-900 uppercase tracking-tighter mb-6 flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                Register Customer
+            </h3>
+            <form id="newCustForm" class="space-y-3">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Full Name *</label>
-                    <input type="text" name="name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Full Name *</label>
+                    <input type="text" name="name" required class="w-full px-4 py-2.5 bg-white/80 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-700 transition-all shadow-sm">
                 </div>
                 <div>
-                   <label class="block text-sm font-bold text-slate-700 mb-1">Contact Number *</label>
-                   <input type="text" name="contact" required class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                   <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Contact Number *</label>
+                   <input type="text" name="contact" required class="w-full px-4 py-2.5 bg-white/80 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-700 transition-all shadow-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Address (Optional)</label>
-                    <textarea name="address" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Address (Optional)</label>
+                    <textarea name="address" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-700 transition-all shadow-sm min-h-[70px]"></textarea>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" onclick="closeNewCustomerModal()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg font-bold">Cancel</button>
-                    <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all">Save Customer</button>
+                    <button type="button" onclick="closeNewCustomerModal()" class="px-5 py-2 text-slate-400 hover:text-slate-600 font-bold uppercase text-[9px] tracking-widest transition-all">Cancel</button>
+                    <button type="submit" class="btn-blue px-7 py-2.5 text-[10px]">Save Customer</button>
                 </div>
             </form>
         </div>
@@ -415,26 +601,61 @@ check_auth('cashier');
             const data = await fetchAPI('search_product', { query: val });
             list.innerHTML = '';
             if(data.products.length > 0) {
+                // Add Table Header
+                const header = document.createElement('div');
+                header.className = 'px-4 py-3 blue-gradient-header border-b border-blue-700 flex items-center text-[9px] uppercase tracking-widest sticky top-0 z-10 rounded-t-xl';
+                header.innerHTML = `
+                    <div class="w-[35%]">Product Name</div>
+                    <div class="w-[15%] text-center">Category</div>
+                    <div class="w-[15%] text-center">Ref. Type</div>
+                    <div class="w-[15%] text-center">Available</div>
+                    <div class="w-[20%] text-right">Label Price</div>
+                `;
+                list.appendChild(header);
+
                 data.products.forEach(p => {
-                    const div = document.createElement('div');
-                    div.className = 'p-3 hover:bg-slate-50 rounded-xl cursor-pointer border border-transparent hover:border-blue-100 transition-all flex justify-between items-center group';
-                    div.innerHTML = `
-                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    p.batches.forEach(b => {
+                        const div = document.createElement('div');
+                        const isOil = p.type === 'oil';
+                        
+                        // Icons
+                        const typeIcon = isOil ? 
+                            `<svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C12 2 6 9 6 14a6 6 0 0 0 12 0c0-5-6-12-6-12z"/></svg>` : 
+                            `<svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>`;
+                        
+                        const typeLabel = isOil ? 'OIL' : 'SPARE';
+                        const typeColor = isOil ? 'text-blue-600' : 'text-emerald-600';
+                        const typeBg = isOil ? 'bg-blue-50' : 'bg-emerald-50';
+                        
+                        div.className = 'flex items-center gap-4 p-4 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 active:bg-blue-100 transition-all rounded-xl m-1';
+                        div.innerHTML = `
+                             <!-- Col 1: Icon/Category -->
+                            <div class="w-10 h-10 rounded-xl ${isOil ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'} flex items-center justify-center shrink-0">
+                                ${isOil ? '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C12 2 6 9 6 14a6 6 0 0 0 12 0c0-5-6-12-6-12z"/></svg>' : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>'}
                             </div>
-                            <div>
-                                <p class="font-bold text-slate-800">${p.name}</p>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${p.brand || 'No Brand'} • ${p.barcode}</p>
+
+                            <!-- Col 2: Info -->
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[13px] font-black text-slate-900 leading-tight uppercase truncate">${p.name}</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">${p.brand}</span>
+                                    <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                                    <span class="text-[9px] font-mono text-blue-400 font-bold tracking-tight">${p.barcode}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-[8px] font-black px-2 py-1 bg-blue-50 text-blue-600 rounded-lg uppercase tracking-wider">${p.type === 'oil' ? 'Oil' : 'Spare Part'}</span>
-                            ${p.type === 'oil' ? `<span class="text-[8px] font-black px-2 py-1 bg-amber-50 text-amber-600 rounded-lg uppercase border border-amber-100">${p.oil_type}</span>` : ''}
-                        </div>
-                    `;
-                    div.onclick = () => openBatchModal(p);
-                    list.appendChild(div);
+
+                            <!-- Col 3: Qty -->
+                            <div class="text-right shrink-0">
+                                <p class="text-[11px] font-black text-slate-700 leading-none mb-1">${b.current_qty} ${isOil ? (p.oil_type === 'loose' ? 'L' : 'C') : 'P'}</p>
+                                <p class="text-[13px] font-black text-blue-600 tracking-tighter">Rs. ${numberFormat(b.selling_price)}</p>
+                            </div>
+                        `;
+                        div.onclick = () => {
+                            selectedProduct = p;
+                            openEntryModal(b);
+                        };
+                        list.appendChild(div);
+                    });
                 });
                 list.classList.remove('hidden');
             } else {
@@ -460,17 +681,17 @@ check_auth('cashier');
             `;
             if(data.batches.length > 0) {
                 list.innerHTML = compHtml + `
-                    <div class="rounded-xl border border-slate-100 overflow-hidden">
+                    <div class="rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
                         <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-100">
-                                <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                    <th class="px-5 py-4">Batch Info</th>
-                                    <th class="px-5 py-4 text-center text-blue-600">Retail (Rs.)</th>
-                                    <th class="px-5 py-4 text-center opacity-50 font-medium">Buying (Rs.)</th>
-                                    <th class="px-5 py-4 text-right">Stock Level</th>
+                            <thead class="blue-gradient-header">
+                                <tr class="text-[10px] uppercase tracking-[0.1em]">
+                                    <th class="px-5 py-4">Batch Details</th>
+                                    <th class="px-5 py-4 text-center">Retail Price</th>
+                                    <th class="px-5 py-4 text-center opacity-70">Buying Price</th>
+                                    <th class="px-5 py-4 text-right">Available</th>
                                 </tr>
                             </thead>
-                            <tbody id="batchTableBody" class="divide-y divide-slate-50"></tbody>
+                            <tbody id="batchTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
                         </table>
                     </div>
                 `;
@@ -484,23 +705,23 @@ check_auth('cashier');
 
                     const unit = selectedProduct.oil_type === 'loose' ? 'Ltrs' : (selectedProduct.oil_type === 'can' ? 'Cans' : 'Units');
                     const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-blue-50/50 cursor-pointer transition-colors group';
+                    tr.className = 'hover:bg-blue-50/50 cursor-pointer transition-all group active:bg-blue-100';
                     tr.innerHTML = `
                         <td class="px-5 py-4">
-                            <span class="bg-slate-100 group-hover:bg-blue-100 text-slate-600 group-hover:text-blue-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">Batch ID- ${b.id}</span>
-                            <p class="text-[10px] font-bold text-slate-400 mt-1 flex items-center gap-1.5">
+                            <span class="bg-slate-100 group-hover:bg-blue-100 text-slate-600 group-hover:text-blue-700 px-2 py-0.5 rounded text-[10px] font-black uppercase transition-colors">Batch: ID-${b.id}</span>
+                            <p class="text-[10px] font-bold text-slate-400 mt-1.5 flex items-center gap-1.5 opacity-70">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 Expiry: ${b.expire_date || 'N/A'}
                             </p>
                         </td>
                         <td class="px-5 py-4 text-center">
-                            <p class="text-base font-bold text-slate-900">${numberFormat(b.selling_price)}</p>
+                            <p class="text-base font-black text-slate-900 leading-none">${numberFormat(b.selling_price)}</p>
                         </td>
                         <td class="px-5 py-4 text-center">
-                            <p class="text-xs font-medium text-slate-300 group-hover:text-blue-400 transition-colors">${numberFormat(b.buying_price)}</p>
+                            <p class="text-xs font-bold text-slate-300 group-hover:text-blue-400 transition-colors uppercase italic">${numberFormat(b.buying_price)}</p>
                         </td>
                         <td class="px-5 py-4 text-right">
-                            <p class="text-lg font-bold text-slate-800">${actualQty} <span class="text-[10px] text-slate-400 font-bold uppercase">${unit}</span></p>
+                            <p class="text-lg font-black text-slate-800 tabular-nums">${actualQty} <span class="text-[10px] text-slate-400 font-bold uppercase ml-1">${unit}</span></p>
                         </td>
                     `;
                     // Update the batch object with the locally adjusted qty for validation in openEntryModal
@@ -524,24 +745,36 @@ check_auth('cashier');
         function openEntryModal(b) {
             selectedBatch = b;
             document.getElementById('entry_qty').value = 1;
+            document.getElementById('entry_buy_price').value = b.buying_price;
+            document.getElementById('entry_labeled_price').value = b.selling_price;
             document.getElementById('entry_price').value = b.selling_price;
+            document.getElementById('entry_discount').value = 0;
             document.getElementById('entry_unit').innerText = selectedProduct.oil_type === 'loose' ? 'Liters' : (selectedProduct.oil_type === 'can' ? 'Cans' : 'Units');
             document.getElementById('entry_max').innerText = `Max available: ${b.current_qty}`;
             updateEntryTotal();
             document.getElementById('entryModal').classList.remove('hidden');
         }
 
+        function syncFromPrice() {
+            const labeled = parseFloat(document.getElementById('entry_labeled_price').value);
+            const selling = parseFloat(document.getElementById('entry_price').value) || 0;
+            document.getElementById('entry_discount').value = Math.max(0, (labeled - selling)).toFixed(2);
+            updateEntryTotal();
+        }
+
+        function syncFromDiscount() {
+            const labeled = parseFloat(document.getElementById('entry_labeled_price').value);
+            const discount = parseFloat(document.getElementById('entry_discount').value) || 0;
+            document.getElementById('entry_price').value = Math.max(0, (labeled - discount)).toFixed(2);
+            updateEntryTotal();
+        }
+
         function updateEntryTotal() {
             const qty = parseFloat(document.getElementById('entry_qty').value) || 0;
             const price = parseFloat(document.getElementById('entry_price').value) || 0;
-            const discount = parseFloat(document.getElementById('entry_discount').value) || 0;
-            const total = (qty * price) - discount;
+            const total = qty * price;
             document.getElementById('entry_total').innerText = 'Rs. ' + numberFormat(total);
         }
-
-        ['entry_qty', 'entry_price', 'entry_discount'].forEach(id => {
-            document.getElementById(id).addEventListener('input', updateEntryTotal);
-        });
 
         function addToCart() {
             if(!selectedCustomer) { Swal.fire('Required', 'Please select a customer first.', 'warning'); document.getElementById('entryModal').classList.add('hidden'); return; }
@@ -550,25 +783,31 @@ check_auth('cashier');
             if(qty > selectedBatch.current_qty) { Swal.fire('Over Stock', 'Quantity exceeds available stock.', 'error'); return; }
             if(qty <= 0) return;
 
-            const unit_price = parseFloat(document.getElementById('entry_price').value);
-            const discount = parseFloat(document.getElementById('entry_discount').value) || 0;
-            const total_price = (qty * unit_price) - discount;
+            const labeled_price = parseFloat(document.getElementById('entry_labeled_price').value);
+            const actual_price = parseFloat(document.getElementById('entry_price').value);
+            const per_item_discount = parseFloat(document.getElementById('entry_discount').value) || 0;
+            
+            const total_price = qty * actual_price;
+            const total_discount = qty * per_item_discount;
 
             const existingIndex = cart.findIndex(item => item.batch_id === selectedBatch.id);
             if(existingIndex > -1) {
                 cart[existingIndex].qty += qty;
-                cart[existingIndex].discount += discount;
-                cart[existingIndex].total_price = (cart[existingIndex].qty * cart[existingIndex].unit_price) - cart[existingIndex].discount;
+                cart[existingIndex].total_discount = cart[existingIndex].qty * cart[existingIndex].per_item_discount;
+                cart[existingIndex].total_price = (cart[existingIndex].qty * cart[existingIndex].unit_price) - cart[existingIndex].total_discount;
             } else {
                 cart.push({
                     product_id: selectedProduct.id,
                     batch_id: selectedBatch.id,
                     name: selectedProduct.name,
                     brand: selectedProduct.brand,
+                    category: selectedProduct.type === 'oil' ? 'Oil' : 'Spare parts',
+                    oil_type: selectedProduct.type === 'oil' ? selectedProduct.oil_type : 'Unit',
                     qty,
-                    unit_price,
-                    discount,
-                    total_price
+                    unit_price: labeled_price, 
+                    per_item_discount: per_item_discount,
+                    total_discount: total_discount,
+                    total_price: total_price
                 });
             }
 
@@ -594,38 +833,84 @@ check_auth('cashier');
 
             cart.forEach((item, index) => {
                 subtotal += (item.qty * item.unit_price);
-                total_discount += item.discount;
+                total_discount += item.total_discount;
                 
+                const netPrice = item.unit_price - item.per_item_discount;
+                const typeLabel = item.oil_type.charAt(0).toUpperCase() + item.oil_type.slice(1);
+
+                // Category Icon
+                const catIcon = item.category === 'Oil' 
+                    ? `<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C12 2 6 9 6 14a6 6 0 0 0 12 0c0-5-6-12-6-12z"/></svg>`
+                    : `<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>`;
+                
+                // Type Icon
+                let typeIcon = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 11v10l8 4"/></svg>`; // Default box
+                if(item.oil_type === 'loose') typeIcon = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 21c-4.418 0-8-3.582-8-8s8-11 8-11 8 6.582 8 11-3.582 8-8 8z"/></svg>`;
+                if(item.oil_type === 'can') typeIcon = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>`;
+
                 const div = document.createElement('div');
-                div.className = 'grid grid-cols-12 items-center px-8 py-4 hover:bg-slate-50 transition-colors gap-4 group';
+                div.className = 'grid grid-cols-1 lg:grid-cols-12 items-center px-5 lg:px-6 py-5 lg:py-3.5 hover:bg-blue-50/20 transition-all gap-5 lg:gap-2 group border-b border-slate-100/50 animate-fade-in';
                 div.innerHTML = `
-                    <div class="col-span-1 text-sm font-bold text-slate-400">#${index + 1}</div>
-                    <div class="col-span-4">
-                        <p class="font-bold text-slate-800">${item.name}</p>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase">${item.brand}</p>
-                    </div>
-                    <div class="col-span-2 text-center">
-                        <span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold">ID-${item.batch_id}</span>
-                    </div>
-                    <div class="col-span-1 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button onclick="updateQty(${index}, -1)" class="w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-500 rounded-md hover:bg-red-500 hover:text-white transition-all">-</button>
-                            <span class="font-bold text-slate-700 w-8">${item.qty}</span>
-                            <button onclick="updateQty(${index}, 1)" class="w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-500 rounded-md hover:bg-blue-600 hover:text-white transition-all">+</button>
+                    <!-- Product Info -->
+                    <div class="col-span-1 lg:col-span-3">
+                        <div class="flex flex-col">
+                            <p class="font-black text-slate-900 text-[15px] lg:text-[14px] leading-tight mb-1.5 uppercase tracking-tight">${item.name}</p>
+                            <div class="flex items-center gap-3">
+                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] opacity-80">${item.brand}</span>
+                                <span class="lg:hidden flex items-center gap-1.5 text-[8px] font-black px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-500 uppercase">
+                                    ${item.category}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-span-1 text-right text-sm text-slate-500">${numberFormat(item.unit_price)}</div>
-                    <div class="col-span-1 text-right text-sm text-red-400">-${numberFormat(item.discount)}</div>
-                    <div class="col-span-2 text-right flex items-center justify-end gap-4">
-                        <p class="font-bold text-slate-900">Rs. ${numberFormat(item.total_price)}</p>
-                        <button onclick="removeFromCart(${index})" class="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100">
-                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+
+                    <!-- Category / Type (Hidden on Mobile) -->
+                    <div class="hidden lg:flex col-span-2 items-center justify-center gap-3">
+                        <span class="flex items-center gap-1.5 text-[10px] font-black px-3 py-1.5 rounded-xl border ${item.category === 'Oil' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'} uppercase">
+                            ${catIcon} ${item.category}
+                        </span>
+                        <span class="font-black text-slate-400 text-[10px] uppercase tracking-widest">${typeLabel}</span>
+                    </div>
+
+                    <!-- Net Price -->
+                    <div class="col-span-1 lg:col-span-2 text-left lg:text-right flex items-center justify-between lg:justify-end">
+                        <span class="lg:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Unit Price</span>
+                        <p class="text-[15px] lg:text-[16px] font-black text-slate-900 tracking-tighter">Rs. ${numberFormat(netPrice)}</p>
+                    </div>
+
+                    <!-- Quantity (Large Touch Target) -->
+                    <div class="col-span-1 lg:col-span-2 flex justify-center">
+                        <div class="flex items-center justify-center gap-4 lg:gap-3 bg-slate-50/50 p-1.5 lg:p-0 rounded-2xl lg:bg-transparent">
+                            <button onclick="updateQty(${index}, -1)" class="w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm active:scale-90">
+                                <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
+                            </button>
+                            <span class="font-black text-slate-900 w-10 lg:w-9 text-2xl lg:text-lg text-center tabular-nums">${item.qty}</span>
+                            <button onclick="updateQty(${index}, 1)" class="w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm active:scale-90">
+                                <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Line Total -->
+                    <div class="col-span-1 lg:col-span-2 text-left lg:text-right flex items-center justify-between lg:justify-end">
+                        <div class="lg:hidden flex flex-col">
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Saved Info</span>
+                            <p class="text-[11px] font-black text-red-500 uppercase tracking-tighter italic">Off Rs.${numberFormat(item.total_discount)}</p>
+                        </div>
+                        <p class="text-[20px] lg:text-[19px] font-black text-blue-800 tracking-tighter leading-none">Rs. ${numberFormat(item.total_price)}</p>
+                    </div>
+
+                    <!-- Remove Action -->
+                    <div class="col-span-1 lg:col-span-1 flex justify-end lg:justify-center">
+                        <button onclick="removeFromCart(${index})" class="w-12 h-12 lg:w-10 lg:h-10 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500 rounded-2xl transition-all shadow-sm border border-slate-100 lg:border-transparent hover:shadow-red-500/20 active:scale-90">
+                             <svg class="w-6 h-6 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
                 `;
                 body.appendChild(div);
             });
 
+            document.getElementById('item_count_label').innerText = `${cart.length} ${cart.length === 1 ? 'Item' : 'Items'} in Cart`;
             updateSummary(subtotal, total_discount);
         }
 
@@ -638,15 +923,9 @@ check_auth('cashier');
                 return;
             }
 
-            // Check stock if increasing
-            if(delta > 0) {
-                 // For now, we don't have the current batch stock easily accessible in the cart object
-                 // Ideally 'addToCart' should store the max allowed QTY
-                 // Let's assume for this step we just update since it's a minor increment
-            }
-
             item.qty = newQty;
-            item.total_price = (item.qty * item.unit_price) - item.discount;
+            item.total_discount = item.qty * item.per_item_discount;
+            item.total_price = (item.qty * item.unit_price) - item.total_discount;
             renderCart();
         }
 
@@ -667,28 +946,65 @@ check_auth('cashier');
             renderCart();
         }
 
+        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
+
         async function checkout() {
             if(cart.length === 0) return;
             if(!selectedCustomer) { Swal.fire('Whoops', 'Please select or add a customer first.', 'warning'); return; }
 
-            const payMethod = document.querySelector('input[name="pay_method"]:checked').value;
             const sub = cart.reduce((a, b) => a + (b.qty * b.unit_price), 0);
-            const disc = cart.reduce((a, b) => a + b.discount, 0);
-            const final = sub - disc;
+            const itemDisc = cart.reduce((a, b) => a + b.total_discount, 0); 
+
+            document.getElementById('pay_modal_total').innerText = 'Rs. ' + numberFormat(sub);
+            document.getElementById('pay_modal_item_disc').innerText = 'Rs. ' + numberFormat(itemDisc);
+            document.getElementById('wholesale_discount').value = 0;
+            updatePaymentTotal();
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function updatePaymentTotal() {
+            const subTotal = cart.reduce((a, b) => a + (b.qty * b.unit_price), 0);
+            const itemDiscount = cart.reduce((a, b) => a + b.total_discount, 0);
+            const wDiscount = parseFloat(document.getElementById('wholesale_discount').value) || 0;
+            const final = (subTotal - itemDiscount) - wDiscount;
+            document.getElementById('final_pay_modal_total').innerText = 'Rs. ' + numberFormat(final);
+        }
+
+        function applyPercentageDiscount(pct) {
+            const subTotal = cart.reduce((a, b) => a + (b.qty * b.unit_price), 0);
+            const itemDiscount = cart.reduce((a, b) => a + b.total_discount, 0);
+            const netBeforeWholesale = subTotal - itemDiscount;
+            const discAmount = netBeforeWholesale * (pct / 100);
+            document.getElementById('wholesale_discount').value = discAmount.toFixed(2);
+            updatePaymentTotal();
+        }
+
+        async function processPayment(payMethod) {
+            const sub = cart.reduce((a, b) => a + (b.qty * b.unit_price), 0);
+            const itemDiscount = cart.reduce((a, b) => a + b.total_discount, 0);
+            const wDiscount = parseFloat(document.getElementById('wholesale_discount').value) || 0;
+            const final = (sub - itemDiscount) - wDiscount;
 
             const fd = new FormData();
             fd.append('customer_id', selectedCustomer.id);
             fd.append('total_amount', sub);
-            fd.append('discount', disc);
+            fd.append('discount', itemDiscount + wDiscount); // Total discount = Item-wise + Wholesale
             fd.append('final_amount', final);
             fd.append('payment_method', payMethod);
-            fd.append('items', JSON.stringify(cart));
+            fd.append('items', JSON.stringify(cart.map(i => ({
+                product_id: i.product_id,
+                batch_id: i.batch_id,
+                qty: i.qty,
+                unit_price: i.unit_price,
+                discount: i.total_discount,
+                total_price: i.total_price
+            }))));
 
             const data = await postAPI('submit_sale', fd);
             if(data.success) {
-                printReceipt(data.sale_id);
+                closePaymentModal();
+                printReceipt(data.sale_id, payMethod);
                 
-                // Automated Toast for 1.5 seconds
                 const Toast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
@@ -704,26 +1020,31 @@ check_auth('cashier');
                 clearCart();
                 clearCustomer();
                 updateTodayTotal();
+                
+                // Clear search inputs and results after sale
+                document.getElementById('prodSearch').value = '';
+                document.getElementById('prodList').innerHTML = '';
+                document.getElementById('prodList').classList.add('hidden');
             } else {
                 Swal.fire('Error', data.message, 'error');
             }
         }
 
-        function printReceipt(saleId) {
+        function printReceipt(saleId, payMethod) {
             const now = new Date();
             document.getElementById('bill_date').innerText = now.toLocaleDateString();
             document.getElementById('bill_time').innerText = now.toLocaleTimeString();
             document.getElementById('bill_id').innerText = 'SALE-' + saleId;
             document.getElementById('bill_cust').innerText = selectedCustomer.name;
             document.getElementById('bill_phone').innerText = selectedCustomer.contact;
-            document.getElementById('bill_pay').innerText = document.querySelector('input[name="pay_method"]:checked').value.toUpperCase();
+            document.getElementById('bill_pay').innerText = payMethod.toUpperCase();
             
             const list = document.getElementById('bill_items');
             list.innerHTML = '';
             let sub = 0; let disc = 0;
             cart.forEach(item => {
                 sub += (item.qty * item.unit_price);
-                disc += item.discount;
+                disc += item.total_discount;
                 list.innerHTML += `
                     <tr>
                         <td class="py-1">${item.name}</td>

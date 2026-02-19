@@ -32,16 +32,22 @@ if ($action === 'add_customer') {
 
 if ($action === 'search_product') {
     $query = $_GET['query'];
-    // Filter to only show products that have at least one batch with stock
+    // Fetch products that have at least one batch with stock
     $stmt = $pdo->prepare("SELECT p.* FROM products p 
-                           JOIN batches b ON p.id = b.product_id 
                            WHERE (p.barcode LIKE ? OR p.name LIKE ?) 
                            AND p.is_active = 1 
-                           AND b.current_qty > 0 
-                           GROUP BY p.id 
+                           AND (SELECT SUM(current_qty) FROM batches WHERE product_id = p.id) > 0
                            LIMIT 10");
     $stmt->execute(["%$query%", "%$query%"]);
-    echo json_encode(['success' => true, 'products' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($products as &$product) {
+        $stmt_batch = $pdo->prepare("SELECT * FROM batches WHERE product_id = ? AND current_qty > 0 ORDER BY expire_date ASC");
+        $stmt_batch->execute([$product['id']]);
+        $product['batches'] = $stmt_batch->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    echo json_encode(['success' => true, 'products' => $products]);
     exit;
 }
 
@@ -79,6 +85,10 @@ if ($action === 'submit_sale') {
             // Save sale item
             $stmt = $pdo->prepare("INSERT INTO sale_items (sale_id, product_id, batch_id, qty, unit_price, discount, total_price) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$sale_id, $item['product_id'], $item['batch_id'], $item['qty'], $item['unit_price'], $item['discount'], $item['total_price']]);
+
+            // Auto-deactivate if total stock becomes 0
+            $pdo->prepare("UPDATE products SET is_active = 0 WHERE id = ? AND (SELECT SUM(current_qty) FROM batches WHERE product_id = ?) <= 0")
+                ->execute([$item['product_id'], $item['product_id']]);
         }
 
         $pdo->commit();
