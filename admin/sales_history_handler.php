@@ -26,42 +26,67 @@ if ($action === 'fetch_items') {
 if ($action === 'fetch') {
     $search = $_GET['search'] ?? '';
     $date = $_GET['date'] ?? '';
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $limit = 10;
+    $offset = ($page - 1) * $limit;
     
-    $query = "SELECT s.*, c.name as cust_name, c.contact as cust_contact, u.full_name as officer_name
-              FROM sales s 
-              LEFT JOIN customers c ON s.customer_id = c.id 
-              LEFT JOIN users u ON s.user_id = u.id
-              WHERE 1=1 ";
+    $whereClause = " WHERE 1=1 ";
     $params = [];
     
     if ($search) {
-        $query .= " AND (s.id LIKE ? OR c.name LIKE ? OR s.payment_method LIKE ?) ";
+        $whereClause .= " AND (s.id LIKE ? OR c.name LIKE ? OR s.payment_method LIKE ?) ";
         $params[] = "%$search%";
         $params[] = "%$search%";
         $params[] = "%$search%";
     }
     
     if ($date) {
-        $query .= " AND DATE(s.created_at) = ? ";
+        $whereClause .= " AND DATE(s.created_at) = ? ";
         $params[] = $date;
     }
 
     $method = $_GET['method'] ?? 'all';
     if ($method !== 'all') {
-        $query .= " AND s.payment_method = ? ";
+        $whereClause .= " AND s.payment_method = ? ";
         $params[] = $method;
     }
 
     $status = $_GET['status'] ?? 'all';
     if ($status !== 'all') {
-        $query .= " AND s.payment_status = ? ";
+        $whereClause .= " AND s.payment_status = ? ";
         $params[] = $status;
     }
+
+    // Count total items
+    $countSql = "SELECT COUNT(*) FROM sales s 
+                 LEFT JOIN customers c ON s.customer_id = c.id 
+                 $whereClause";
+    $countStmt = $pdo->prepare($countSql);
+    $countStmt->execute($params);
+    $totalItems = $countStmt->fetchColumn();
+    $totalPages = ceil($totalItems / $limit);
     
-    $query .= " ORDER BY s.created_at DESC LIMIT 100";
+    $query = "SELECT s.*, c.name as cust_name, c.contact as cust_contact, u.full_name as officer_name
+              FROM sales s 
+              LEFT JOIN customers c ON s.customer_id = c.id 
+              LEFT JOIN users u ON s.user_id = u.id
+              $whereClause
+              ORDER BY s.created_at DESC 
+              LIMIT $limit OFFSET $offset";
+              
     $stmt = $pdo->prepare($query);
     $stmt->execute($params);
-    echo json_encode(['success' => true, 'sales' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    $sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode([
+        'success' => true, 
+        'sales' => $sales,
+        'pagination' => [
+            'current_page' => $page,
+            'total_pages' => $totalPages,
+            'total_items' => $totalItems
+        ]
+    ]);
     exit;
 }
 

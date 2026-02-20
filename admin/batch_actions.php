@@ -16,7 +16,7 @@ if ($action === 'reopen') {
     $stmt = $pdo->prepare("UPDATE invoices SET status = 'draft' WHERE id = ?");
     if ($stmt->execute([$id])) {
         $_SESSION['active_invoice_id'] = $id;
-        header("location: addItems.php");
+        header("location: batchHistroy.php?msg=Invoice Reopened as Draft");
         exit;
     }
 }

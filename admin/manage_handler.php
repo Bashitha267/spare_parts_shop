@@ -13,8 +13,9 @@ if ($action === 'fetch_inventory') {
     $search = $_GET['search'] ?? '';
     $type = $_GET['type'] ?? '';
     $low_stock = isset($_GET['low_stock']) && $_GET['low_stock'] === 'active';
-    $status_filter = $_GET['status'] ?? 'all'; // all, active, out_of_stock
-
+    $status_filter = $_GET['status'] ?? 'all';
+    $sort = $_GET['sort'] ?? 'high_value';
+    
     $whereClause = "WHERE 1=1";
     $params = [];
     
@@ -42,6 +43,10 @@ if ($action === 'fetch_inventory') {
         $params[] = "%$search%";
     }
 
+    $orderBy = "total_value DESC"; // Default
+    if ($sort === 'low_value') $orderBy = "total_value ASC";
+    else if ($sort === 'name_asc') $orderBy = "p.name ASC";
+
     $havingClause = $low_stock ? " HAVING total_stock < 5 " : "";
 
     // If filtering by low stock, we need to wrap the count query
@@ -53,6 +58,7 @@ if ($action === 'fetch_inventory') {
                         $whereClause 
                         GROUP BY p.id 
                         $havingClause
+                        ORDER BY $orderBy
                      ) as subquery";
     } else {
         $countSql = "SELECT COUNT(*) FROM products p $whereClause";
@@ -77,13 +83,14 @@ if ($action === 'fetch_inventory') {
             COALESCE(SUM(b.current_qty), 0) as total_stock,
             COALESCE(SUM(b.current_qty * b.buying_price), 0) as total_value,
             (SELECT buying_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as buying_price,
-            (SELECT selling_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as selling_price
+            (SELECT selling_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as selling_price,
+            (SELECT estimated_selling_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as estimated_selling_price
             FROM products p 
             LEFT JOIN batches b ON p.id = b.product_id 
             $whereClause 
             GROUP BY p.id 
             $havingClause
-            ORDER BY p.name ASC 
+            ORDER BY $orderBy 
             LIMIT $limit OFFSET $offset";
     
     $stmt = $pdo->prepare($sql);
@@ -120,12 +127,159 @@ if ($action === 'update_product') {
     $name = $_POST['name'];
     $brand = $_POST['brand'];
     $v_types = $_POST['v_types'];
+    $qty = $_POST['qty'] ?? null;
+    $b_price = $_POST['b_price'] ?? null;
+    $s_price = $_POST['s_price'] ?? null;
+    $est_price = $_POST['est_price'] ?? null;
     
-    $stmt = $pdo->prepare("UPDATE products SET name = ?, brand = ?, vehicle_compatibility = ? WHERE id = ?");
-    if ($stmt->execute([$name, $brand, $v_types, $id])) {
+    $pdo->beginTransaction();
+    try {
+        // 1. Update Product Details
+        $stmt = $pdo->prepare("UPDATE products SET name = ?, brand = ?, vehicle_compatibility = ? WHERE id = ?");
+        $stmt->execute([$name, $brand, $v_types, $id]);
+
+        // 2. Update Latest Batch Details (if prices/qty provided)
+        if ($qty !== null || $b_price !== null || $s_price !== null || $est_price !== null) {
+            // Find the latest batch
+            $stmt = $pdo->prepare("SELECT id FROM batches WHERE product_id = ? ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$id]);
+            $batch_id = $stmt->fetchColumn();
+
+            if ($batch_id) {
+                // Update specific batch fields
+                $stmt = $pdo->prepare("UPDATE batches SET buying_price = ?, selling_price = ?, estimated_selling_price = ?, current_qty = ? WHERE id = ?");
+                $stmt->execute([$b_price, $s_price, $est_price, $qty, $batch_id]);
+            }
+        }
+        
+        $pdo->commit();
         echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Failed to update product']);
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+if ($action === 'delete_product') {
+    $id = $_POST['id'] ?? null;
+    if (!$id) {
+        echo json_encode(['success' => false, 'message' => 'No ID provided']);
+        exit;
+    }
+
+    $pdo->beginTransaction();
+    try {
+        // 1. Check if the product has EVER been sold (Safety)
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM sale_items WHERE product_id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->fetchColumn() > 0) {
+            // If historical sales exist, we cannot delete without breaking records. 
+            // We just deactivate it.
+            $stmt = $pdo->prepare("UPDATE products SET is_active = 0 WHERE id = ?");
+            $stmt->execute([$id]);
+            $pdo->commit();
+            echo json_encode(['success' => true, 'message' => 'Product has sales history. Registry deactivated instead of deleted.']);
+            exit;
+        }
+
+        // 2. If no sales, delete associated batches first (foreign key constraint)
+        $stmt = $pdo->prepare("DELETE FROM batches WHERE product_id = ?");
+        $stmt->execute([$id]);
+
+        // 3. Delete the product
+        $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
+        $stmt->execute([$id]);
+        
+        $pdo->commit();
+        echo json_encode(['success' => true, 'message' => 'Product and all associated batches deleted successfully.']);
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+if ($action === 'quick_add_stock') {
+    $p_id = $_POST['product_id'] ?? null;
+    $barcode = $_POST['barcode'] ?? '';
+    
+    $pdo->beginTransaction();
+    try {
+        // 1. If we have a barcode but no p_id, check if barcode exists
+        if (empty($p_id) && !empty($barcode)) {
+            $stmt = $pdo->prepare("SELECT id FROM products WHERE barcode = ?");
+            $stmt->execute([$barcode]);
+            $p_id = $stmt->fetchColumn();
+        }
+
+        // 2. Create product if still no p_id (New Product Path)
+        if (empty($p_id)) {
+            $stmt = $pdo->prepare("INSERT INTO products (barcode, name, type, oil_type, brand, vehicle_compatibility) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $barcode,
+                $_POST['name'],
+                $_POST['type'],
+                ($_POST['type'] === 'oil' ? ($_POST['oil_type'] ?? 'can') : 'none'),
+                $_POST['brand'] ?? 'Generic',
+                $_POST['v_types'] ?? 'Universal'
+            ]);
+            $p_id = $pdo->lastInsertId();
+        }
+
+        // 3. Check for existing batch to merge (if buying price matches)
+        $stmt = $pdo->prepare("SELECT id, invoice_id, buying_price, current_qty, original_qty FROM batches WHERE product_id = ? ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$p_id]);
+        $latest_batch = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $new_b_price = $_POST['b_price'];
+        $new_qty = $_POST['qty'];
+        $new_s_price = $_POST['s_price'];
+        $new_est_price = $_POST['est_price'];
+
+        if ($latest_batch && (float)$latest_batch['buying_price'] == (float)$new_b_price) {
+            // MERGE PATH: Update existing batch
+            $batch_id = $latest_batch['id'];
+            $invoice_id = $latest_batch['invoice_id'];
+
+            // Update Batch Qty & Prices
+            $stmt = $pdo->prepare("UPDATE batches SET current_qty = current_qty + ?, original_qty = original_qty + ?, selling_price = ?, estimated_selling_price = ? WHERE id = ?");
+            $stmt->execute([$new_qty, $new_qty, $new_s_price, $new_est_price, $batch_id]);
+
+            // Update associated silent invoice total
+            $stmt = $pdo->prepare("UPDATE invoices SET total_amount = total_amount + ? WHERE id = ?");
+            $stmt->execute([($new_qty * $new_b_price), $invoice_id]);
+
+        } else {
+            // NEW BATCH PATH: Create silent invoice and new batch
+            $invoice_no = "DIRECT-" . date('Ymd-His') . "-" . rand(100, 999);
+            $stmt = $pdo->prepare("INSERT INTO invoices (invoice_no, invoice_date, supplier_name, total_amount, status, user_id) VALUES (?, ?, ?, ?, 'completed', ?)");
+            $total_buying = $new_b_price * $new_qty;
+            $stmt->execute([$invoice_no, date('Y-m-d'), 'Direct Entry', $total_buying, $_SESSION['id']]);
+            $invoice_id = $pdo->lastInsertId();
+
+            $stmt = $pdo->prepare("INSERT INTO batches (product_id, invoice_id, buying_price, selling_price, estimated_selling_price, original_qty, current_qty) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $p_id,
+                $invoice_id,
+                $new_b_price,
+                $new_s_price,
+                $new_est_price,
+                $new_qty,
+                $new_qty
+            ]);
+        }
+
+        // 4. Ensure Product is Active
+        $stmt = $pdo->prepare("UPDATE products SET is_active = 1 WHERE id = ?");
+        $stmt->execute([$p_id]);
+
+        $pdo->commit();
+        echo json_encode(['success' => true, 'message' => 'Stock updated successfully']);
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     exit;
 }

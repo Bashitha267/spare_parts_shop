@@ -17,7 +17,7 @@ check_auth('cashier');
         body { 
             font-family: 'Inter', sans-serif; 
             
-            color: #1e293b;
+            color: #0f172a;
         }
         .bg-main {
             background: url('../admin/public/admin_background.jpg');
@@ -51,24 +51,59 @@ check_auth('cashier');
         }
         th {
             background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            opacity: 1 !important;
             color: white;
-            padding: 0.75rem 1.25rem !important;
-            font-size: 0.65rem;
-            font-weight: 800;
+            padding: 1.25rem 1.25rem !important;
+            font-size: 0.75rem;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             text-align: left;
+            border: none;
         }
-        th:first-child { border-top-left-radius: 0.75rem; }
-        th:last-child { border-top-right-radius: 0.75rem; }
+        th:first-child { border-top-left-radius: 1rem; }
+        th:last-child { border-top-right-radius: 1rem; }
+        
+        tr:nth-child(even) {
+            background-color: rgba(248, 250, 252, 0.8);
+        }
+        
         td {
-            padding: 0.75rem 1.25rem !important;
-            color: #1e293b;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.82rem;
+            padding: 1.25rem 1.25rem !important;
+            color: #0f172a;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.4);
+            font-size: 0.88rem;
+            vertical-align: middle;
         }
         tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(99, 102, 241, 0.04); }
+        tr:hover td { background: rgba(59, 130, 246, 0.05); }
+
+        .pagination-btn {
+            padding: 0.5rem 0.875rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+        }
+        .pagination-active {
+            background-color: #2563eb;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        .pagination-inactive {
+            background-color: white;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        .pagination-inactive:hover {
+            background-color: #eff6ff;
+            color: #2563eb;
+        }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
@@ -93,11 +128,11 @@ check_auth('cashier');
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
                 <div>
-                    <h1 class="text-sm font-black text-blue-700 uppercase tracking-tight flex items-center gap-2">
-                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    <h1 class="text-sm font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                         Sales History
                     </h1>
-                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">All your past sales</p>
+                    <p class="text-[9px] text-slate-600 font-bold uppercase tracking-widest">All your past sales</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 md:gap-5">
@@ -113,15 +148,15 @@ check_auth('cashier');
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     </div>
                     <div class="text-right">
-                        <p class="text-[9px] text-slate-500 uppercase font-black tracking-widest">Cashier</p>
-                        <p class="text-xs font-bold text-slate-800"><?php echo $_SESSION['full_name']; ?></p>
+                        <p class="text-[9px] text-slate-600 uppercase font-black tracking-widest">Cashier</p>
+                        <p class="text-xs font-bold text-slate-950"><?php echo $_SESSION['full_name']; ?></p>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="pt-24 px-3 md:px-6 max-w-7xl mx-auto animate-fade relative z-10 pb-8">
+    <div class="pt-28 px-3 md:px-6 max-w-7xl mx-auto animate-fade relative z-10 pb-8">
         <!-- Table Card -->
         <div class="glass-card overflow-hidden">
             <div class="overflow-x-auto">
@@ -164,17 +199,31 @@ check_auth('cashier');
                     <tbody>
                         <?php
                         $user_id = $_SESSION['id'];
+                        
+                        // Pagination logic
+                        $limit = 10;
+                        $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+                        if ($page < 1) $page = 1;
+                        $offset = ($page - 1) * $limit;
+
+                        // Get total records
+                        $count_stmt = $pdo->prepare("SELECT COUNT(*) FROM sales WHERE user_id = ?");
+                        $count_stmt->execute([$user_id]);
+                        $total_records = $count_stmt->fetchColumn();
+                        $total_pages = ceil($total_records / $limit);
+
                         $stmt = $pdo->prepare("SELECT s.*, c.name as cust_name, c.contact as cust_phone 
                                               FROM sales s 
                                               LEFT JOIN customers c ON s.customer_id = c.id 
                                               WHERE s.user_id = ? 
-                                              ORDER BY s.created_at DESC");
+                                              ORDER BY s.created_at DESC 
+                                              LIMIT $limit OFFSET $offset");
                         $stmt->execute([$user_id]);
                         while($row = $stmt->fetch()):
                         ?>
                         <tr class="group">
                             <td>
-                                <span class="bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-lg text-[10px] font-black tracking-tight">#<?php echo $row['id']; ?></span>
+                                <span class="bg-gradient-to-r from-blue-400 to-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black tracking-widest shadow-md shadow-blue-500/20">#<?php echo $row['id']; ?></span>
                             </td>
                             <td>
                                 <p class="text-sm font-bold text-slate-800"><?php echo date('d M, Y', strtotime($row['created_at'])); ?></p>
@@ -182,7 +231,7 @@ check_auth('cashier');
                             </td>
                             <td>
                                 <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white text-[10px] font-black shadow-sm">
+                                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-black shadow-sm">
                                         <?php echo strtoupper(substr($row['cust_name'] ?: 'G', 0, 1)); ?>
                                     </div>
                                     <div>
@@ -195,31 +244,31 @@ check_auth('cashier');
                                 <?php
                                 $method = $row['payment_method'];
                                 $methodStyles = [
-                                    'cash'   => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                    'card'   => 'bg-blue-50 text-blue-700 border-blue-200',
-                                    'cheque' => 'bg-amber-50 text-amber-700 border-amber-200',
-                                    'credit' => 'bg-rose-50 text-rose-700 border-rose-200'
+                                    'cash'   => 'bg-emerald-500 text-white shadow-emerald-500/20',
+                                    'card'   => 'bg-blue-600 text-white shadow-blue-500/20',
+                                    'cheque' => 'bg-amber-500 text-white shadow-amber-500/20',
+                                    'credit' => 'bg-rose-500 text-white shadow-rose-500/20'
                                 ];
                                 $methodIcons = [
-                                    'cash'   => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>',
-                                    'card'   => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>',
-                                    'cheque' => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>',
-                                    'credit' => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+                                    'cash'   => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>',
+                                    'card'   => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>',
+                                    'cheque' => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>',
+                                    'credit' => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
                                 ];
-                                $style = $methodStyles[$method] ?? 'bg-slate-50 text-slate-600 border-slate-200';
+                                $style = $methodStyles[$method] ?? 'bg-slate-500 text-white';
                                 $icon = $methodIcons[$method] ?? '';
                                 ?>
-                                <span class="inline-flex items-center gap-1.5 text-[10px] font-black px-3 py-1.5 <?php echo $style; ?> border rounded-lg uppercase tracking-wider">
+                                <span class="inline-flex items-center gap-1.5 text-[10px] font-black px-4 py-2 <?php echo $style; ?> rounded-full uppercase tracking-widest shadow-lg">
                                     <?php echo $icon; ?>
                                     <?php echo $method; ?>
                                 </span>
                             </td>
                             <td class="text-right">
-                                <p class="text-base font-black text-slate-900 tracking-tight">Rs. <?php echo number_format($row['final_amount'], 2); ?></p>
+                                <p class="text-lg font-black text-blue-800 tracking-tight">Rs. <?php echo number_format($row['final_amount'], 2); ?></p>
                                 <?php if($row['discount'] > 0): ?>
-                                    <p class="text-[10px] text-rose-500 font-bold mt-0.5 flex items-center justify-end gap-1">
+                                    <p class="text-xs text-rose-500 font-bold mt-0.5 flex items-center justify-end gap-1">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                                        -Rs. <?php echo number_format($row['discount'], 2); ?>
+                                        Saved Rs. <?php echo number_format($row['discount'], 2); ?>
                                     </p>
                                 <?php endif; ?>
                             </td>
@@ -233,13 +282,61 @@ check_auth('cashier');
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination UI -->
+            <?php if ($total_pages > 1): ?>
+            <div class="px-6 py-5 bg-white/50 border-t border-slate-100 flex items-center justify-between gap-4 flex-wrap">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                    Showing <span class="text-blue-600"><?php echo $offset + 1; ?></span> to 
+                    <span class="text-blue-600"><?php echo min($offset + $limit, $total_records); ?></span> of 
+                    <span class="text-blue-600"><?php echo $total_records; ?></span> sales
+                </p>
+                
+                <div class="flex items-center gap-1.5">
+                    <?php if ($page > 1): ?>
+                        <a href="?page=<?php echo $page - 1; ?>" class="pagination-btn pagination-inactive">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                        </a>
+                    <?php endif; ?>
+
+                    <?php
+                    $start_page = max(1, $page - 2);
+                    $end_page = min($total_pages, $page + 2);
+
+                    if ($start_page > 1) {
+                        echo '<a href="?page=1" class="pagination-btn pagination-inactive">1</a>';
+                        if ($start_page > 2) echo '<span class="text-slate-400 font-bold px-1">...</span>';
+                    }
+
+                    for ($i = $start_page; $i <= $end_page; $i++):
+                    ?>
+                        <a href="?page=<?php echo $i; ?>" class="pagination-btn <?php echo $i == $page ? 'pagination-active' : 'pagination-inactive'; ?>">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <?php
+                    if ($end_page < $total_pages) {
+                        if ($end_page < $total_pages - 1) echo '<span class="text-slate-400 font-bold px-1">...</span>';
+                        echo '<a href="?page='.$total_pages.'" class="pagination-btn pagination-inactive">'.$total_pages.'</a>';
+                    }
+                    ?>
+
+                    <?php if ($page < $total_pages): ?>
+                        <a href="?page=<?php echo $page + 1; ?>" class="pagination-btn pagination-inactive">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
     <!-- Sale Detail Modal -->
     <div id="detailModal" class="fixed inset-0 bg-black/30 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-white/90 backdrop-blur-xl w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden anim-pop border border-white/50">
-            <div class="px-8 py-6 border-b border-slate-100 bg-gradient-to-r from-blue-600 to-blue-800 flex justify-between items-center">
+            <div class="px-8 py-6 border-b border-slate-100 bg-gradient-to-r from-blue-500 to-blue-700 flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
                         <svg class="w-5 h-5 text-white/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>

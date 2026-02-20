@@ -15,8 +15,8 @@ check_auth('admin');
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #0d1117;
-            color: #e6edf3;
+            background: #f8fafc;
+            color: #1e293b;
         }
         .bg-main {
             background:  url('public/admin_background.jpg');
@@ -32,39 +32,50 @@ check_auth('admin');
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
         }
-        .blue-tile-card {
+        .blue-gradient-card {
             background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            border: 3px solid #ffffff;
-            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.4);
+            border: 2px solid #ffffff;
+            box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.3);
         }
         .glass-nav {
-            background: rgba(13, 17, 23, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 2px solid #ffffff;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
         }
         input, select {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
+            background: white !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
             outline: none !important;
         }
-        option {
-            background-color: #0f172a !important;
-            color: white !important;
-        }
         th {
-            font-weight: 900;
-            color: #ffffff;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white !important;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
+            padding: 1.25rem 1.5rem !important;
             font-size: 10px;
-            padding: 1.5rem 2rem;
+        }
+        tr:nth-child(even) {
+            background-color: rgba(241, 245, 249, 0.5);
+        }
+        td {
+            padding: 1rem 1.5rem !important;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            color: #0f172a;
         }
         .status-badge {
             padding: 0.25rem 0.75rem;
@@ -82,23 +93,23 @@ check_auth('admin');
     <nav class="glass-nav sticky top-0 z-50">
         <div class="px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
             <div class="flex items-center gap-4">
-                <a href="dashboard.php" class="p-2 hover:bg-white/10 rounded-xl transition-all text-blue-300">
+                <a href="dashboard.php" class="p-2 hover:bg-slate-100 rounded-xl transition-all text-blue-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
-                <h1 class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 tracking-tight uppercase">Approval History</h1>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Approval History</h1>
             </div>
         </div>
     </nav>
 
     <main class="p-6 max-w-7xl mx-auto space-y-10 relative z-10">
         
-        <!-- Search & Filter Bar -->
-        <div class="blue-tile-card p-4 rounded-[2rem] flex flex-wrap lg:flex-nowrap items-center gap-4">
+        <!-- Search \u0026 Filter Bar -->
+        <div class="glass-card p-6 rounded-[2rem] flex flex-wrap lg:flex-nowrap items-center gap-4">
             <div class="relative w-full lg:w-72 flex-shrink-0">
-                <span class="absolute left-5 top-1/2 -translate-y-1/2 text-white/40">
+                <span class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </span>
-                <input type="text" id="search" placeholder="Search TRX..." class="w-full pl-12 pr-4 py-3 rounded-xl text-xs font-bold placeholder:text-white/20">
+                <input type="text" id="search" placeholder="Search TRX..." class="w-full pl-12 pr-4 py-3 rounded-xl text-xs font-bold placeholder:text-slate-400">
             </div>
             
             <div class="flex flex-wrap lg:flex-nowrap items-center gap-3 w-full lg:flex-grow">
@@ -125,20 +136,20 @@ check_auth('admin');
                 </select>
 
                 <div class="flex items-center gap-2 ml-auto">
-                    <button onclick="clearTemporalFilters()" class="p-3 bg-white/10 border border-white/10 rounded-xl text-white hover:bg-white/20 transition-all" title="Reset">
+                    <button onclick="clearTemporalFilters()" class="p-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-200 transition-all font-black" title="Reset">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     </button>
-                    <button onclick="loadHistory()" class="px-6 py-3 bg-white text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all shadow-lg active:scale-95">Filter</button>
+                    <button onclick="loadHistory()" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:shadow-lg transition-all active:scale-95">Audit Audit</button>
                 </div>
             </div>
         </div>
 
         <!-- History Table -->
-        <div class="blue-tile-card rounded-[2.5rem] overflow-hidden">
+        <div class="glass-card rounded-[2.5rem] overflow-hidden border-4 border-blue-500/20">
             <div class="overflow-x-auto">
                 <table class="w-full text-left min-w-[800px] border-collapse">
                     <thead>
-                        <tr class="bg-white/10 border-b border-white/20">
+                        <tr>
                             <th>Record ID</th>
                             <th>Customer Identity</th>
                             <th>Strategy</th>
@@ -194,41 +205,41 @@ check_auth('admin');
                 tbody.innerHTML = '';
 
                 if(data.sales.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="px-8 py-20 text-center text-white/20 font-black uppercase tracking-[0.2em] italic text-sm">No historical records detected in current audit.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="px-8 py-20 text-center text-slate-400 font-black uppercase tracking-[0.2em] italic text-sm">No historical records detected in current audit.</td></tr>`;
                     return;
                 }
 
                 data.sales.forEach(sale => {
-                    const statusClass = sale.payment_status === 'approved' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 
-                                      sale.payment_status === 'rejected' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 
-                                      'bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                    const statusClass = sale.payment_status === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 
+                                      sale.payment_status === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-200' : 
+                                      'bg-amber-100 text-amber-800 border border-amber-200';
                     
-                    const methodClass = sale.payment_method === 'cheque' ? 'text-amber-200' : 'text-emerald-200';
+                    const methodClass = sale.payment_method === 'cheque' ? 'text-amber-600' : 'text-emerald-600';
 
                     tbody.innerHTML += `
-                        <tr class="hover:bg-white/5 transition-all">
+                        <tr class="hover:bg-slate-50 transition-all">
                             <td class="px-8 py-6">
-                                <span class="font-mono text-[10px] font-black text-white/40 tracking-tighter uppercase px-3 py-1 bg-white/10 rounded-lg border border-white/10">TRX-${sale.id}</span>
+                                <span class="font-mono text-[10px] font-black text-blue-800 tracking-tighter uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">TRX-${sale.id}</span>
                             </td>
                             <td class="px-8 py-6">
-                                <p class="font-black text-white leading-tight text-sm">${sale.cust_name || 'Anonymous Guest'}</p>
-                                <p class="text-[9px] text-white/30 font-black uppercase tracking-wider mt-1">Audit Record Verified</p>
+                                <p class="font-black text-slate-900 leading-tight text-sm">${sale.cust_name || 'Anonymous Guest'}</p>
+                                <p class="text-[9px] text-slate-400 font-black uppercase tracking-wider mt-1">Audit Record Verified</p>
                             </td>
                             <td class="px-8 py-6">
                                 <span class="text-[10px] font-black uppercase tracking-[0.2em] ${methodClass}">${sale.payment_method}</span>
                             </td>
-                            <td class="px-8 py-6 font-black text-white tracking-widest text-sm">
+                            <td class="px-8 py-6 font-black text-slate-900 tracking-widest text-sm">
                                 LKR ${parseFloat(sale.final_amount).toLocaleString(undefined, {minimumFractionDigits: 2})}
                             </td>
                             <td class="px-8 py-6 text-center">
-                                <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">${sale.cashier_name}</span>
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${sale.cashier_name}</span>
                             </td>
                             <td class="px-8 py-6 text-center">
                                 <span class="status-badge ${statusClass}">${sale.payment_status}</span>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <p class="font-bold text-white text-[11px] tracking-widest">${new Date(sale.created_at).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
-                                <p class="text-[9px] text-white/20 font-black uppercase tracking-widest mt-1">${new Date(sale.created_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
+                                <p class="font-bold text-slate-900 text-[11px] tracking-widest">${new Date(sale.created_at).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                                <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-1">${new Date(sale.created_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
                             </td>
                         </tr>
                     `;

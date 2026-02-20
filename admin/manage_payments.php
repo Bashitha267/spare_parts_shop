@@ -24,8 +24,8 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #0d1117;
-            color: #e6edf3;
+            background: #f8fafc;
+            color: #1e293b;
         }
         .bg-main {
             background:  url('public/admin_background.jpg');
@@ -41,39 +41,55 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
         }
         .blue-gradient-card {
-            background: linear-gradient(135deg, rgba(30, 58, 138, 0.9) 0%, rgba(30, 64, 175, 0.8) 100%);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            border: 2px solid #ffffff;
+            box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.3);
         }
         .glass-nav {
-            background: rgba(13, 17, 23, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 2px solid #ffffff;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
         }
         input, select {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
+            background: white !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
+            outline: none !important;
         }
         th {
-            font-weight: 900;
-            color: #93c5fd;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white !important;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
+            padding: 1.25rem 1.5rem !important;
             font-size: 10px;
         }
+        tr:nth-child(even) {
+            background-color: rgba(241, 245, 249, 0.5);
+        }
+        td {
+            padding: 1.25rem 1.5rem !important;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            color: #0f172a;
+        }
         .tab-active { 
-            background: #3b82f6 !important; 
+            background: #2563eb !important; 
             color: white !important;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
         }
     </style>
 </head>
@@ -83,19 +99,19 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
     <nav class="glass-nav sticky top-0 z-50">
         <div class="px-4 md:px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
             <div class="flex items-center gap-4">
-                <a href="dashboard.php" class="p-2 hover:bg-white/10 rounded-xl transition-all text-blue-300">
+                <a href="dashboard.php" class="p-2 hover:bg-slate-100 rounded-xl transition-all text-blue-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
                 <div>
-                  <h1 class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 tracking-tight uppercase">Payment Clearing</h1>
-                  <p class="hidden sm:block text-[9px] text-blue-300/40 font-black uppercase tracking-[0.2em]">Transaction Approval Center</p>
+                  <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Payment Clearing</h1>
+                  <p class="hidden sm:block text-[9px] text-slate-400 font-black uppercase tracking-[0.2em]">Transaction Approval Center</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-6">
                 <div class="hidden lg:flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                    <span class="text-[10px] font-black text-blue-300 uppercase tracking-widest"><?php echo $counts['total']; ?> Pending Review</span>
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest"><?php echo $counts['total']; ?> Pending Review</span>
                 </div>
             </div>
         </div>
@@ -110,8 +126,8 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-black text-blue-300/40 uppercase tracking-widest mb-1">Total Pending</p>
-                    <h3 class="text-2xl font-black text-white"><?php echo $counts['total']; ?> <span class="text-xs font-bold text-white/30 tracking-normal ml-1">TRX</span></h3>
+                    <p class="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">Total Pending</p>
+                    <h3 class="text-2xl font-black text-white"><?php echo $counts['total']; ?> <span class="text-xs font-bold text-white/40 tracking-normal ml-1">TRX</span></h3>
                 </div>
             </div>
             <div class="blue-gradient-card p-6 rounded-[2.5rem] flex items-center gap-5">
@@ -128,44 +144,44 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-black text-emerald-400/40 uppercase tracking-widest mb-1">Credit Clearance</p>
-                    <h3 class="text-2xl font-black text-white"><?php echo $counts['credits']; ?> <span class="text-xs font-bold text-white/30 tracking-normal ml-1">items</span></h3>
+                    <p class="text-[10px] font-black text-emerald-100/60 uppercase tracking-widest mb-1">Credit Clearance</p>
+                    <h3 class="text-2xl font-black text-white"><?php echo $counts['credits']; ?> <span class="text-xs font-bold text-white/40 tracking-normal ml-1">items</span></h3>
                 </div>
             </div>
         </div>
 
-        <!-- Filter & Actions Bar -->
-        <div class="blue-gradient-card p-6 rounded-[2.5rem] flex flex-col lg:flex-row gap-6 items-center">
+        <!-- Filter \u0026 Actions Bar -->
+        <div class="glass-card p-6 rounded-[2.5rem] flex flex-col lg:flex-row gap-6 items-center">
             <div class="relative flex-grow w-full lg:w-auto">
                 <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-blue-300/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
-                <input type="text" id="searchPayments" class="block w-full pl-14 pr-6 py-4 rounded-2xl outline-none transition-all placeholder:text-blue-300/20 text-sm font-bold bg-white/5 border border-white/10" placeholder="Search by Sale ID or Customer Name...">
+                <input type="text" id="searchPayments" class="block w-full pl-14 pr-6 py-4 rounded-2xl outline-none transition-all placeholder:text-slate-400 text-sm font-bold bg-white border border-slate-200" placeholder="Search by Sale ID or Customer Name...">
             </div>
 
             <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
                 <div class="relative flex-grow lg:flex-none">
-                    <input type="date" id="dateFilter" class="w-full lg:w-auto px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none transition-all border-white/10 bg-white/5">
+                    <input type="date" id="dateFilter" class="w-full lg:w-auto px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none transition-all border-slate-200 bg-white">
                 </div>
                 
-                <div class="flex bg-white/5 p-1.5 rounded-2xl border border-white/5 flex-grow lg:flex-none">
+                <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 flex-grow lg:flex-none">
                     <button onclick="changeMethod('all')" id="tab-all" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all tab-active">All</button>
-                    <button onclick="changeMethod('cheque')" id="tab-cheque" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-white/30 hover:text-white">Cheques</button>
-                    <button onclick="changeMethod('credit')" id="tab-credit" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-white/30 hover:text-white">Credits</button>
+                    <button onclick="changeMethod('cheque')" id="tab-cheque" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600">Cheques</button>
+                    <button onclick="changeMethod('credit')" id="tab-credit" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600">Credits</button>
                 </div>
 
-                <button onclick="loadPendingPayments()" class="p-4 bg-white/5 border border-white/10 rounded-2xl text-blue-300 hover:bg-blue-500/10 transition-all shadow-inner">
+                <button onclick="loadPendingPayments()" class="p-4 bg-white border border-slate-200 rounded-2xl text-blue-600 hover:bg-slate-50 transition-all font-black">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
             </div>
         </div>
 
         <!-- Data Table -->
-        <div class="blue-gradient-card rounded-[2.5rem] overflow-hidden">
+        <div class="glass-card rounded-[2.5rem] overflow-hidden border-4 border-blue-500/20">
             <div class="overflow-x-auto">
                 <table class="w-full text-left min-w-[800px] border-collapse">
                 <thead>
-                    <tr class="bg-white/5 border-b border-white/10">
+                    <tr>
                         <th class="px-8 py-6">Transaction ID</th>
                         <th class="px-8 py-6">Customer Profile</th>
                         <th class="px-8 py-6">Payment Mode</th>
@@ -174,7 +190,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                         <th class="px-8 py-6 text-right">Operational Actions</th>
                     </tr>
                 </thead>
-                <tbody id="paymentBody" class="divide-y divide-white/5">
+                <tbody id="paymentBody" class="divide-y divide-slate-100">
                     <!-- Loaded via AJAX -->
                 </tbody>
             </table>
@@ -198,10 +214,10 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
             currentMethod = method;
             document.querySelectorAll('button[id^="tab-"]').forEach(btn => {
                 btn.classList.remove('tab-active');
-                btn.classList.add('text-white/30', 'hover:text-white');
+                btn.classList.add('text-slate-400', 'hover:text-slate-600');
             });
             const activeBtn = document.getElementById(`tab-${method}`);
-            activeBtn.classList.remove('text-white/30', 'hover:text-white');
+            activeBtn.classList.remove('text-slate-400', 'hover:text-slate-600');
             activeBtn.classList.add('tab-active');
             loadPendingPayments();
         }
@@ -222,8 +238,8 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                         <tr>
                             <td colspan="6" class="py-32 text-center">
                                 <div class="flex flex-col items-center gap-6 opacity-20">
-                                    <svg class="w-24 h-24 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <p class="text-lg font-black text-blue-300 uppercase tracking-[0.2em]">Clear Skies. No Pending Items.</p>
+                                    <svg class="w-24 h-24 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <p class="text-lg font-black text-slate-400 uppercase tracking-[0.2em]">Clear Skies. No Pending Items.</p>
                                 </div>
                             </td>
                         </tr>`;
@@ -231,35 +247,35 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                 }
 
                 data.sales.forEach(sale => {
-                    const methodClass = sale.payment_method.toLowerCase() === 'cheque' ? 'bg-amber-400/10 text-amber-400 border-amber-400/20' : 
-                                      sale.payment_method.toLowerCase() === 'credit' ? 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20' : 
-                                      'bg-white/5 text-white/40 border-white/10';
+                    const methodClass = sale.payment_method.toLowerCase() === 'cheque' ? 'bg-amber-100 text-amber-800 border-amber-200' : 
+                                      sale.payment_method.toLowerCase() === 'credit' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 
+                                      'bg-slate-100 text-slate-400 border-slate-200';
                     
                     tbody.innerHTML += `
-                        <tr class="hover:bg-white/5 transition-all group">
+                        <tr class="hover:bg-slate-50 transition-all group">
                             <td class="px-8 py-8">
-                                <span class="font-mono text-[10px] font-black text-blue-300/40 tracking-tighter uppercase px-3 py-1 bg-white/5 rounded-lg border border-white/5">TRX-${sale.id}</span>
+                                <span class="font-mono text-[10px] font-black text-blue-800 tracking-tighter uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">TRX-${sale.id}</span>
                             </td>
                             <td class="px-8 py-8">
-                                <p class="font-black text-white leading-tight text-sm">${sale.cust_name || 'Anonymous Guest'}</p>
-                                <p class="text-[9px] text-blue-300/40 font-black uppercase tracking-wider mt-1.5">${new Date(sale.created_at).toLocaleDateString()} @ ${new Date(sale.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                                <p class="font-black text-slate-900 leading-tight text-sm">${sale.cust_name || 'Anonymous Guest'}</p>
+                                <p class="text-[9px] text-slate-400 font-black uppercase tracking-wider mt-1.5">${new Date(sale.created_at).toLocaleDateString()} @ ${new Date(sale.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                             </td>
                             <td class="px-8 py-8">
                                 <span class="px-4 py-1.5 border rounded-xl text-[9px] font-black uppercase tracking-widest ${methodClass}">${sale.payment_method}</span>
                             </td>
                             <td class="px-8 py-8">
-                                <p class="font-black text-white tracking-widest text-base">Rs. ${numberFormat(sale.final_amount)}</p>
+                                <p class="font-black text-slate-900 tracking-widest text-base">Rs. ${numberFormat(sale.final_amount)}</p>
                             </td>
                             <td class="px-8 py-8 text-center text-nowrap">
-                                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/5 rounded-2xl">
-                                    <div class="w-6 h-6 rounded-lg bg-blue-500 text-[10px] flex items-center justify-center font-black text-white shadow-lg shadow-blue-500/20">${sale.cashier_name.charAt(0)}</div>
-                                    <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">${sale.cashier_name}</span>
+                                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-2xl">
+                                    <div class="w-6 h-6 rounded-lg bg-blue-600 text-[10px] flex items-center justify-center font-black text-white shadow-lg shadow-blue-600/20">${sale.cashier_name.charAt(0)}</div>
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${sale.cashier_name}</span>
                                 </div>
                             </td>
                             <td class="px-8 py-8 text-right">
                                 <div class="flex flex-row flex-nowrap justify-end items-center gap-3">
-                                    <button onclick="updateStatus(${sale.id}, 'approved')" class="whitespace-nowrap px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-emerald-500/20 active:scale-95">Approve</button>
-                                    <button onclick="updateStatus(${sale.id}, 'rejected')" class="whitespace-nowrap px-6 py-3 bg-white/5 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">Reject</button>
+                                    <button onclick="updateStatus(${sale.id}, 'approved')" class="whitespace-nowrap px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-800 hover:shadow-lg text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">Approve</button>
+                                    <button onclick="updateStatus(${sale.id}, 'rejected')" class="whitespace-nowrap px-6 py-3 bg-white border border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">Reject</button>
                                 </div>
                             </td>
                         </tr>`;
@@ -280,9 +296,9 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                 confirmButtonText: status === 'approved' ? 'Yes, Authorize' : 'Yes, Reject',
                 cancelButtonText: 'Wait, Cancel',
                 customClass: {
-                    popup: 'rounded-[2.5rem] bg-slate-900 border border-white/10 text-white',
+                    popup: 'rounded-[2.5rem] bg-white border border-slate-100 shadow-2xl text-slate-800',
                     confirmButton: 'rounded-2xl font-black uppercase text-[10px] px-8 py-4 tracking-widest',
-                    cancelButton: 'rounded-2xl font-black uppercase text-[10px] px-8 py-4 tracking-widest bg-white/5 text-white/40 border border-white/10'
+                    cancelButton: 'rounded-2xl font-black uppercase text-[10px] px-8 py-4 tracking-widest bg-slate-50 text-slate-400 border border-slate-100'
                 }
             });
 
@@ -301,7 +317,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                         icon: 'success',
                         timer: 1500,
                         showConfirmButton: false,
-                        customClass: { popup: 'rounded-[2rem] bg-slate-900 border border-white/10 text-white' }
+                        customClass: { popup: 'rounded-[2rem] bg-white border border-slate-100 shadow-xl text-slate-800' }
                     });
                     loadPendingPayments();
                 }

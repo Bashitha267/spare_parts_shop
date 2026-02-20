@@ -120,8 +120,8 @@ $chart_profit_data = array_values($chart_profit);
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #0d1117;
-            color: #e6edf3;
+            background: #f8fafc;
+            color: #0f172a;
         }
         .bg-main {
             background:  url('public/admin_background.jpg');
@@ -143,47 +143,56 @@ $chart_profit_data = array_values($chart_profit);
             pointer-events: none;
             z-index: 0;
         }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 2rem;
+            box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.08);
+        }
         .blue-gradient-card {
-            background: linear-gradient(135deg, rgba(30, 58, 138, 0.9) 0%, rgba(30, 64, 175, 0.8) 100%);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.3);
         }
         .glass-nav {
-            background: rgba(13, 17, 23, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
         input, select {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
+            background: white !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
             outline: none !important;
             appearance: none;
             cursor: pointer;
         }
         option {
-            background-color: #0f172a !important;
-            color: white !important;
+            background-color: white !important;
+            color: #0f172a !important;
         }
         th {
-            font-weight: 900;
-            color: #93c5fd;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white !important;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
+            padding: 1.25rem 1.5rem !important;
             font-size: 10px;
         }
         .emerald-gradient {
-            background: linear-gradient(135deg, rgba(6, 78, 59, 0.8) 0%, rgba(5, 150, 105, 0.7) 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
         }
         .amber-gradient {
-            background: linear-gradient(135deg, rgba(120, 53, 15, 0.8) 0%, rgba(217, 119, 6, 0.7) 100%);
+            background: linear-gradient(135deg, #d97706 0%, #fbbf24 100%);
         }
         .rose-gradient {
-            background: linear-gradient(135deg, rgba(136, 19, 55, 0.8) 0%, rgba(225, 29, 72, 0.7) 100%);
+            background: linear-gradient(135deg, #e11d48 0%, #fb7185 100%);
         }
         .indigo-gradient {
-            background: linear-gradient(135deg, rgba(49, 46, 129, 0.8) 0%, rgba(67, 56, 202, 0.7) 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
         }
         .card-glow {
             position: absolute;
@@ -191,8 +200,16 @@ $chart_profit_data = array_values($chart_profit);
             right: -50%;
             width: 150%;
             height: 150%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
             pointer-events: none;
+        }
+        tr:nth-child(even) {
+            background-color: rgba(241, 245, 249, 0.5);
+        }
+        td {
+            padding: 1rem 1.5rem !important;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            color: #1e293b;
         }
     </style>
 </head>
@@ -202,10 +219,10 @@ $chart_profit_data = array_values($chart_profit);
     <nav class="glass-nav sticky top-0 z-50">
         <div class="px-4 md:px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
             <div class="flex items-center gap-4">
-                <a href="dashboard.php" class="p-2 hover:bg-white/10 rounded-xl transition-all text-blue-300">
+                <a href="dashboard.php" class="p-2 hover:bg-blue-50 rounded-xl transition-all text-blue-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
-                <h1 class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 tracking-tight uppercase">Reports</h1>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Reports</h1>
             </div>
             <div class="flex items-center gap-2">
                 
@@ -218,60 +235,69 @@ $chart_profit_data = array_values($chart_profit);
         <!-- Summary Dashboard -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Today's Approved Sales -->
-            <div class="emerald-gradient p-6 rounded-[2rem] relative overflow-hidden flex flex-col justify-between min-h-[160px] border border-emerald-500/20 backdrop-blur-xl shadow-2xl shadow-emerald-950/20 group hover:scale-[1.02] transition-all">
+            <div class="emerald-gradient p-6 rounded-[2rem] relative overflow-hidden flex flex-col justify-between min-h-[160px] border border-white/20 backdrop-blur-xl shadow-xl shadow-emerald-500/20 group hover:scale-[1.02] transition-all">
                 <div class="card-glow"></div>
                 <div class="relative z-10">
-                    <p class="text-[9px] font-black text-emerald-200 uppercase tracking-widest mb-2 opacity-60">Total Verified Sales Today</p>
-                    <h2 class="text-xl font-black text-white leading-tight">Rs. <?php echo number_format($today_sales_approved, 2); ?></h2>
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 border border-white/20">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <p class="text-[9px] font-black text-emerald-50 uppercase tracking-widest mb-1 opacity-80">Verified Sales Today</p>
+                    <h2 class="text-2xl font-black text-white leading-tight">Rs. <?php echo number_format($today_sales_approved, 2); ?></h2>
                 </div>
                 <div class="relative z-10 flex items-center gap-2">
-                    <span class="px-2.5 py-1 bg-white/10 rounded-lg text-[9px] font-black text-emerald-100 uppercase tracking-widest border border-white/10"><?php echo $today_sales_count; ?> Sales</span>
+                    <span class="px-2.5 py-1 bg-black/10 rounded-lg text-[9px] font-black text-white uppercase tracking-widest border border-white/10"><?php echo $today_sales_count; ?> Sales</span>
                 </div>
             </div>
 
             <!-- Pending Cheques Today -->
-            <div class="amber-gradient p-6 rounded-[2rem] relative overflow-hidden flex flex-col justify-between min-h-[160px] border border-amber-500/20 backdrop-blur-xl shadow-2xl shadow-amber-950/20 group hover:scale-[1.02] transition-all">
+            <div class="amber-gradient p-6 rounded-[2rem] relative overflow-hidden flex flex-col justify-between min-h-[160px] border border-white/20 backdrop-blur-xl shadow-xl shadow-amber-500/20 group hover:scale-[1.02] transition-all">
                 <div class="card-glow"></div>
                 <div class="relative z-10">
-                    <p class="text-[9px] font-black text-amber-200 uppercase tracking-widest mb-2 opacity-60">Pending Cheques</p>
-                    <h2 class="text-xl font-black text-white leading-tight">Rs. <?php echo number_format($today_pending_cheque, 2); ?></h2>
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 border border-white/20">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <p class="text-[9px] font-black text-amber-50 uppercase tracking-widest mb-1 opacity-80">Pending Cheques</p>
+                    <h2 class="text-2xl font-black text-white leading-tight">Rs. <?php echo number_format($today_pending_cheque, 2); ?></h2>
                 </div>
-               
             </div>
 
             <!-- Pending Credit Today -->
-            <div class="rose-gradient p-6 rounded-[2rem] relative overflow-hidden flex flex-col justify-between min-h-[160px] border border-rose-500/20 backdrop-blur-xl shadow-2xl shadow-rose-950/20 group hover:scale-[1.02] transition-all">
+            <div class="rose-gradient p-6 rounded-[2rem] relative overflow-hidden flex flex-col justify-between min-h-[160px] border border-white/20 backdrop-blur-xl shadow-xl shadow-rose-500/20 group hover:scale-[1.02] transition-all">
                 <div class="card-glow"></div>
                 <div class="relative z-10">
-                    <p class="text-[9px] font-black text-rose-200 uppercase tracking-widest mb-2 opacity-60">Pending Credits</p>
-                    <h2 class="text-xl font-black text-white leading-tight">Rs. <?php echo number_format($today_pending_credit, 2); ?></h2>
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 border border-white/20">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <p class="text-[9px] font-black text-rose-50 uppercase tracking-widest mb-1 opacity-80">Pending Credits</p>
+                    <h2 class="text-2xl font-black text-white leading-tight">Rs. <?php echo number_format($today_pending_credit, 2); ?></h2>
                 </div>
-             
             </div>
 
             <!-- Gross Intake Today -->
-            <div class="indigo-gradient p-6 rounded-[2rem] relative overflow-hidden flex flex-col justify-between min-h-[160px] border border-indigo-500/20 backdrop-blur-xl shadow-2xl shadow-indigo-950/20 group hover:scale-[1.02] transition-all">
+            <div class="indigo-gradient p-6 rounded-[2rem] relative overflow-hidden flex flex-col justify-between min-h-[160px] border border-white/20 backdrop-blur-xl shadow-xl shadow-indigo-500/20 group hover:scale-[1.02] transition-all">
                 <div class="card-glow"></div>
                 <div class="relative z-10">
-                    <p class="text-[9px] font-black text-indigo-200 uppercase tracking-widest mb-2 opacity-60">Gross Profit From Today's Sales</p>
-                    <h2 class="text-xl font-black text-white leading-tight">Rs. <?php echo number_format($today_gross_intake, 2); ?></h2>
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 border border-white/20">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                    <p class="text-[9px] font-black text-indigo-50 uppercase tracking-widest mb-1 opacity-80">Today's Gross Intake</p>
+                    <h2 class="text-2xl font-black text-white leading-tight">Rs. <?php echo number_format($today_gross_intake, 2); ?></h2>
                 </div>
-             
             </div>
         </div>
 
         <!-- Fiscal Performance Graph -->
-        <div class="blue-gradient-card p-10 rounded-[3rem] border-white/10 shadow-2xl relative overflow-hidden">
+        <div class="glass-card p-10 shadow-2xl relative overflow-hidden">
             <div class="relative z-10">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
                     <div>
-                        <h3 class="text-2xl font-black text-white tracking-tighter uppercase mb-1">Total Sales Monthly</h3>
-                        <p class="text-[10px] text-blue-300/40 font-black uppercase tracking-[0.2em]"> <?php echo date('Y'); ?></p>
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tighter uppercase mb-1">Total Sales Monthly</h3>
+                        <p class="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]"> <?php echo date('Y'); ?></p>
                     </div>
                     
-                    <div class="flex bg-white/5 p-1.5 rounded-2xl border border-white/5">
-                        <button onclick="updateChart('sales')" id="btn-sales" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-blue-500 shadow-lg shadow-blue-500/20 text-white">Total Sales</button>
-                        <button onclick="updateChart('profit')" id="btn-profit" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-white/30 hover:text-white">Net Profit</button>
+                    <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                        <button onclick="updateChart('sales')" id="btn-sales" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-blue-600 shadow-lg shadow-blue-500/20 text-white">Total Sales</button>
+                        <button onclick="updateChart('profit')" id="btn-profit" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600">Net Profit</button>
                     </div>
                 </div>
 
@@ -279,39 +305,38 @@ $chart_profit_data = array_values($chart_profit);
                     <canvas id="performanceChart"></canvas>
                 </div>
             </div>
-            <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px]"></div>
         </div>
 
         <!-- Sales Reporting View -->
         <div class="space-y-10">
-            <div class="blue-gradient-card p-6 rounded-[2.5rem] flex flex-wrap gap-8 items-center border-white/10">
+            <div class="glass-card p-6 flex flex-wrap gap-8 items-center">
                 <form class="flex flex-wrap gap-8 items-center w-full">
                     
-                    <div class="flex bg-white/5 p-1.5 rounded-2xl border border-white/5">
-                        <button type="submit" name="type" value="sales" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $type === 'sales' ? 'bg-blue-500 shadow-lg shadow-blue-500/20 text-white font-black' : 'text-white/30 hover:text-white'; ?>">Sales Ledger</button>
-                        <button type="submit" name="type" value="logs" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $type === 'logs' ? 'bg-indigo-500 shadow-lg shadow-indigo-500/20 text-white font-black' : 'text-white/30 hover:text-white'; ?>">System Audits</button>
+                    <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                        <button type="submit" name="type" value="sales" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $type === 'sales' ? 'bg-blue-600 shadow-lg shadow-blue-500/20 text-white font-black' : 'text-slate-400 hover:text-slate-600'; ?>">Sales Ledger</button>
+                        <button type="submit" name="type" value="logs" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $type === 'logs' ? 'bg-indigo-600 shadow-lg shadow-indigo-500/20 text-white font-black' : 'text-slate-400 hover:text-slate-600'; ?>">System Audits</button>
                     </div>
 
-                    <div class="flex bg-white/5 p-1.5 rounded-2xl border border-white/5">
-                        <button type="submit" name="time" value="daily" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $time_filter === 'daily' ? 'bg-blue-500 shadow-lg shadow-blue-500/20 text-white font-black' : 'text-white/30 hover:text-white'; ?>">Daily</button>
-                        <button type="submit" name="time" value="monthly" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $time_filter === 'monthly' ? 'bg-blue-500 shadow-lg shadow-blue-500/20 text-white font-black' : 'text-white/30 hover:text-white'; ?>">Monthly</button>
-                        <button type="submit" name="time" value="yearly" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $time_filter === 'yearly' ? 'bg-blue-500 shadow-lg shadow-blue-500/20 text-white font-black' : 'text-white/30 hover:text-white'; ?>">Yearly</button>
+                    <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                        <button type="submit" name="time" value="daily" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $time_filter === 'daily' ? 'bg-blue-600 shadow-lg shadow-blue-500/20 text-white font-black' : 'text-slate-400 hover:text-slate-600'; ?>">Daily</button>
+                        <button type="submit" name="time" value="monthly" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $time_filter === 'monthly' ? 'bg-blue-600 shadow-lg shadow-blue-500/20 text-white font-black' : 'text-slate-400 hover:text-slate-600'; ?>">Monthly</button>
+                        <button type="submit" name="time" value="yearly" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all <?php echo $time_filter === 'yearly' ? 'bg-blue-600 shadow-lg shadow-blue-500/20 text-white font-black' : 'text-slate-400 hover:text-slate-600'; ?>">Yearly</button>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <svg class="w-5 h-5 text-blue-300/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         <?php if($time_filter === 'daily'): ?>
-                            <input type="date" name="date" value="<?php echo $filter_date; ?>" onchange="this.form.submit()" class="px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest">
+                            <input type="date" name="date" value="<?php echo $filter_date; ?>" onchange="this.form.submit()" class="px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
                         <?php elseif($time_filter === 'monthly'): ?>
-                            <input type="month" name="month" value="<?php echo $filter_month; ?>" onchange="this.form.submit()" class="px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest">
+                            <input type="month" name="month" value="<?php echo $filter_month; ?>" onchange="this.form.submit()" class="px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
                         <?php else: ?>
-                            <input type="number" name="year" value="<?php echo $_GET['year'] ?? date('Y'); ?>" min="2020" max="2030" onchange="this.form.submit()" class="px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest">
+                            <input type="number" name="year" value="<?php echo $_GET['year'] ?? date('Y'); ?>" min="2020" max="2030" onchange="this.form.submit()" class="px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
                         <?php endif; ?>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <svg class="w-5 h-5 text-blue-300/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                        <select name="method" onchange="this.form.submit()" class="px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest min-w-[160px]">
+                        <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <select name="method" onchange="this.form.submit()" class="px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest min-w-[160px] border border-slate-200">
                             <option value="all">All Methods</option>
                             <option value="cash" <?php echo $filter_method === 'cash' ? 'selected' : ''; ?>>Cash Entry</option>
                             <option value="card" <?php echo $filter_method === 'card' ? 'selected' : ''; ?>>Card Terminal</option>
@@ -369,10 +394,10 @@ $chart_profit_data = array_values($chart_profit);
                 <?php endforeach; ?>
             </div>
 
-            <div class="blue-gradient-card rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
+            <div class="glass-card overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left min-w-[800px] border-collapse">
-                        <thead class="bg-white/5 border-b border-white/10">
+                        <thead>
                         <?php if($type === 'sales'): ?>
                         <tr>
                             <th class="px-8 py-6">Sale ID</th>
@@ -423,19 +448,19 @@ $chart_profit_data = array_values($chart_profit);
 
                             foreach($rows as $row):
                             ?>
-                            <tr class="hover:bg-white/5 transition-all group">
+                            <tr class="hover:bg-blue-50/50 transition-all group">
                                 <td class="px-8 py-6">
-                                    <span class="font-mono text-[10px] font-black text-blue-300/40 tracking-tighter uppercase px-3 py-1 bg-white/5 rounded-lg border border-white/5">ID-<?php echo $row['id']; ?></span>
+                                    <span class="font-mono text-[10px] font-black text-blue-600/40 tracking-tighter uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">ID-<?php echo $row['id']; ?></span>
                                 </td>
-                                <td class="px-8 py-6 font-black text-white text-sm tracking-tight"><?php echo htmlspecialchars($row['cust_name'] ?: 'Public Guest'); ?></td>
+                                <td class="px-8 py-6 font-black text-slate-900 text-sm tracking-tight"><?php echo htmlspecialchars($row['cust_name'] ?: 'Public Guest'); ?></td>
                                 <td class="px-8 py-6">
-                                    <p class="text-[10px] font-black text-white/30 uppercase tracking-widest"><?php echo date('d M, Y', strtotime($row['created_at'])); ?></p>
-                                    <p class="text-[9px] font-bold text-blue-400 mt-1 uppercase"><?php echo date('h:i A', strtotime($row['created_at'])); ?></p>
+                                    <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest"><?php echo date('d M, Y', strtotime($row['created_at'])); ?></p>
+                                    <p class="text-[9px] font-bold text-blue-800 mt-1 uppercase"><?php echo date('h:i A', strtotime($row['created_at'])); ?></p>
                                 </td>
                                 <td class="px-8 py-6 text-center">
-                                    <span class="px-3 py-1 bg-white/5 text-blue-300/60 border border-white/10 rounded-lg text-[9px] font-black uppercase tracking-widest"><?php echo $row['payment_method']; ?></span>
+                                    <span class="px-3 py-1 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-[9px] font-black uppercase tracking-widest"><?php echo $row['payment_method']; ?></span>
                                 </td>
-                                <td class="px-8 py-6 text-right font-black text-white tracking-widest text-sm">Rs. <?php echo number_format($row['final_amount'], 2); ?></td>
+                                <td class="px-8 py-6 text-right font-black text-blue-900 tracking-widest text-sm">Rs. <?php echo number_format($row['final_amount'], 2); ?></td>
                                 <td class="px-8 py-6 text-center">
                                     <?php if($row['payment_status'] === 'approved'): ?>
                                         <span class="text-[9px] font-black text-white uppercase tracking-widest px-4 py-1.5 bg-emerald-500 rounded-xl shadow-lg shadow-emerald-500/20">Approved</span>
@@ -495,9 +520,9 @@ $chart_profit_data = array_values($chart_profit);
 
             <!-- Pagination Controls -->
             <?php if($total_pages > 1): ?>
-            <div class="flex justify-center items-center gap-3 py-10 border-t border-white/5 bg-white/5">
+            <div class="flex justify-center items-center gap-3 py-10 border-t border-slate-100 bg-slate-50/50">
                 <?php if($page > 1): ?>
-                    <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page - 1])); ?>" class="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 text-blue-300 transition-all">
+                    <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page - 1])); ?>" class="p-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-blue-600 transition-all shadow-sm">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                     </a>
                 <?php endif; ?>
@@ -505,17 +530,17 @@ $chart_profit_data = array_values($chart_profit);
                 <div class="flex gap-2">
                     <?php for($i = 1; $i <= $total_pages; $i++): ?>
                         <?php if($i == 1 || $i == $total_pages || ($i >= $page - 1 && $i <= $page + 1)): ?>
-                            <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $i])); ?>" class="w-10 h-10 flex items-center justify-center border rounded-xl text-[11px] font-black transition-all <?php echo $i === $page ? 'bg-blue-500 text-white border-blue-500 shadow-xl shadow-blue-500/20' : 'bg-white/5 text-white/40 border-white/10 hover:bg-white/10 hover:text-white'; ?>">
+                            <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $i])); ?>" class="w-10 h-10 flex items-center justify-center border rounded-xl text-[11px] font-black transition-all <?php echo $i === $page ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20' : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600'; ?>">
                                 <?php echo $i; ?>
                             </a>
                         <?php elseif($i == $page - 2 || $i == $page + 2): ?>
-                            <span class="text-white/10 flex items-center">•••</span>
+                            <span class="text-slate-300 flex items-center">•••</span>
                         <?php endif; ?>
                     <?php endfor; ?>
                 </div>
 
                 <?php if($page < $total_pages): ?>
-                    <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page + 1])); ?>" class="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 text-blue-300 transition-all">
+                    <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page + 1])); ?>" class="p-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-blue-600 transition-all shadow-sm">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </a>
                 <?php endif; ?>
@@ -524,19 +549,19 @@ $chart_profit_data = array_values($chart_profit);
         </div>
 
             <!-- Download Section -->
-            <div class="mt-16 pt-10 border-t border-white/5">
-                <h3 class="text-[11px] font-black text-blue-300 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 opacity-60">
+            <div class="mt-16 pt-10 border-t border-slate-200">
+                <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Monthly Sales Reports Downloads
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <?php foreach($monthly_summary as $m): ?>
-                    <div class="blue-gradient-card p-6 rounded-[2rem] flex justify-between items-center group hover:scale-[1.02] transition-all border-white/5">
+                    <div class="glass-card p-6 flex justify-between items-center group hover:scale-[1.02] transition-all border shadow-sm">
                         <div>
-                            <p class="text-[10px] font-black text-white uppercase tracking-widest"><?php echo date('F Y', strtotime($m['month'].'-01')); ?></p>
-                            <p class="text-[9px] text-emerald-400 font-bold mt-1 tracking-widest">VOL: Rs. <?php echo number_format($m['total'], 2); ?></p>
+                            <p class="text-[10px] font-black text-slate-800 uppercase tracking-widest"><?php echo date('F Y', strtotime($m['month'].'-01')); ?></p>
+                            <p class="text-[9px] text-emerald-600 font-bold mt-1 tracking-widest">VOL: Rs. <?php echo number_format($m['total'], 2); ?></p>
                         </div>
-                        <a href="?export=csv&month=<?php echo $m['month']; ?>" class="p-3 bg-white/5 rounded-xl text-blue-300 hover:bg-blue-500 hover:text-white transition-all shadow-inner border border-white/10">
+                        <a href="?export=csv&month=<?php echo $m['month']; ?>" class="p-3 bg-blue-50 rounded-xl text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-blue-100">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         </a>
                     </div>
@@ -548,7 +573,7 @@ $chart_profit_data = array_values($chart_profit);
     </main>
 
     <div class="fixed bottom-0 left-0 right-0 glass-nav py-4 z-40 print:hidden">
-        <div class="max-w-7xl mx-auto px-8 flex justify-between items-center text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">
+        <div class="max-w-7xl mx-auto px-8 flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">
             <span>Vehicle Parts Inventory Management</span>
             <span>Last Sync: <?php echo date('Y-m-d H:i:s'); ?></span>
         </div>
@@ -586,12 +611,12 @@ $chart_profit_data = array_values($chart_profit);
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-                        ticks: { color: 'rgba(255, 255, 255, 0.4)', font: { size: 10, weight: 'bold' } }
+                        grid: { color: 'rgba(0, 0, 0, 0.05)', drawBorder: false },
+                        ticks: { color: 'rgba(0, 0, 0, 0.4)', font: { size: 10, weight: 'bold' } }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: 'rgba(255, 255, 255, 0.4)', font: { size: 10, weight: 'bold' } }
+                        ticks: { color: 'rgba(0, 0, 0, 0.4)', font: { size: 10, weight: 'bold' } }
                     }
                 }
             }
@@ -601,8 +626,8 @@ $chart_profit_data = array_values($chart_profit);
             const isSales = type === 'sales';
             
             // Toggle Buttons
-            document.getElementById('btn-sales').className = isSales ? 'px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-blue-500 shadow-lg shadow-blue-500/20 text-white' : 'px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-white/30 hover:text-white';
-            document.getElementById('btn-profit').className = !isSales ? 'px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-emerald-500 shadow-lg shadow-emerald-500/20 text-white' : 'px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-white/30 hover:text-white';
+            document.getElementById('btn-sales').className = isSales ? 'px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-blue-600 shadow-lg shadow-blue-500/20 text-white' : 'px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600';
+            document.getElementById('btn-profit').className = !isSales ? 'px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-emerald-600 shadow-lg shadow-emerald-500/20 text-white' : 'px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600';
 
             // Update Dataset
             performanceChart.data.datasets[0].label = isSales ? 'Revenue (LKR)' : 'Profit (LKR)';

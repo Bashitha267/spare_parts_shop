@@ -2,6 +2,13 @@
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 check_auth('admin');
+
+// Fetch Metrics
+$inv_stmt = $pdo->query("SELECT SUM(current_qty * buying_price) FROM batches");
+$total_inventory = $inv_stmt->fetchColumn() ?: 0;
+
+$sales_stmt = $pdo->query("SELECT SUM(final_amount) FROM sales WHERE DATE(created_at) = CURDATE()");
+$today_sales = $sales_stmt->fetchColumn() ?: 0;
 ?>
 
 <!DOCTYPE html>
@@ -16,8 +23,8 @@ check_auth('admin');
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #0d1117;
-            color: #e6edf3;
+            background: #f8fafc;
+            color: #0f172a;
         }
         .bg-main {
             background:  url('public/admin_background.jpg');
@@ -59,9 +66,9 @@ check_auth('admin');
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
         }
         .glass-nav {
-            background: rgba(13, 17, 23, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
@@ -71,15 +78,30 @@ check_auth('admin');
     <div class="colorful-overlay"></div>
     
     <!-- Sidebar / Nav -->
-    <nav class="glass-nav fixed w-full z-30 top-0">
+    <nav class="glass-nav fixed w-full z-30 top-0 text-slate-900 font-black">
         <div class="px-4 md:px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
-            <h1 class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 tracking-tight">Admin Dashboard</h1>
-            <div class="flex items-center gap-2 md:gap-5">
-                <div class="hidden sm:block text-right">
-                    <p class="text-[10px] text-blue-300/40 uppercase font-black tracking-widest">Administrator</p>
-                    <p class="text-xs font-bold text-blue-100"><?php echo $_SESSION['full_name']; ?></p>
+            <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Dashboard</h1>
+            
+            <div class="flex items-center gap-4 md:gap-8">
+                <!-- Metrics Badges (Aligned Right) -->
+                <div class="hidden lg:flex items-center gap-4">
+                    <div class="px-5 py-2.5 bg-indigo-50 border-2 border-indigo-200 rounded-2xl flex flex-col items-end shadow-sm">
+                        <span class="text-[8px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1.5">Total Inventory</span>
+                        <span class="text-sm font-black text-indigo-800 leading-none">Rs. <?php echo number_format($total_inventory, 2); ?></span>
+                    </div>
+                    <div class="px-5 py-2.5 bg-emerald-50 border-2 border-emerald-200 rounded-2xl flex flex-col items-end shadow-sm">
+                        <span class="text-[8px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1.5">Today's Sales</span>
+                        <span class="text-sm font-black text-emerald-800 leading-none">Rs. <?php echo number_format($today_sales, 2); ?></span>
+                    </div>
                 </div>
-                <a href="../logout.php" class="text-xs font-black text-white bg-red-500/20 border border-red-500/30 px-4 py-2 rounded-xl hover:bg-red-500 transition-all uppercase tracking-wider">Logout</a>
+
+                <div class="flex items-center gap-4 border-l border-slate-200 pl-8">
+                    <div class="hidden sm:block text-right">
+                        <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none mb-1">Administrator</p>
+                        <p class="text-xs font-bold text-slate-900"><?php echo $_SESSION['full_name']; ?></p>
+                    </div>
+                    <a href="../logout.php" class="text-xs font-black text-white bg-red-600 border-2 border-white px-5 py-2.5 rounded-xl hover:bg-red-700 hover:shadow-lg transition-all uppercase tracking-wider">Logout</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -91,13 +113,7 @@ check_auth('admin');
         <div>
             
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                <!-- Add Items / New Stock -->
-                <a href="addItems.php" class="p-8 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden">
-                    <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
-                        <svg class="w-12 h-12 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Add Items </span>
-                </a>
+
 
                 <!-- Manage Oil Inventory -->
                 <a href="manage.php" class="p-8 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden">

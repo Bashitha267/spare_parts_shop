@@ -16,8 +16,8 @@ check_auth('admin');
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #0d1117;
-            color: #e6edf3;
+            background: #f8fafc;
+            color: #0f172a;
         }
         .bg-main {
             background:  url('public/admin_background.jpg');
@@ -39,33 +39,50 @@ check_auth('admin');
             pointer-events: none;
             z-index: 0;
         }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.08);
+        }
         .blue-gradient-card {
-            background: linear-gradient(135deg, rgba(30, 58, 138, 0.9) 0%, rgba(30, 64, 175, 0.8) 100%);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.3);
         }
         .glass-nav {
-            background: rgba(13, 17, 23, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
         input, select, textarea {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
+            background: white !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
             outline: none !important;
         }
         th {
-            font-weight: 900;
-            color: #93c5fd;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white !important;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
+            padding: 1.25rem 1.5rem !important;
             font-size: 10px;
         }
         option {
-            background-color: #0f172a !important;
-            color: white !important;
+            background-color: white !important;
+            color: #0f172a !important;
+        }
+        tr:nth-child(even) {
+            background-color: rgba(241, 245, 249, 0.5);
+        }
+        td {
+            padding: 1rem 1.5rem !important;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            color: #0f172a;
         }
     </style>
 </head>
@@ -73,37 +90,37 @@ check_auth('admin');
     <div class="colorful-overlay"></div>
     
     <nav class="glass-nav sticky top-0 z-50">
-        <div class="px-4 md:px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="px-4 md:px-6 py-4 flex justify-between items-center ">
             <div class="flex items-center gap-4">
-                <a href="dashboard.php" class="p-2 hover:bg-white/10 rounded-xl transition-all text-blue-300">
+                <a href="dashboard.php" class="p-2 hover:bg-blue-50 rounded-xl transition-all text-blue-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
                 <div>
-                  <h1 class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 tracking-tight uppercase">Sales History</h1>
-                  <p class="hidden sm:block text-[9px] text-blue-300/40 font-black uppercase tracking-[0.2em]">Manage & Audit Registry</p>
+                  <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Sales History</h1>
+                  <p class="hidden sm:block text-[9px] text-slate-600 font-black uppercase tracking-[0.2em]">Manage & Audit Registry</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                <span class="text-[9px] font-black text-blue-300 uppercase tracking-widest">Live Audit</span>
+                <span class="text-[9px] font-black text-blue-600 uppercase tracking-widest">Live Audit</span>
             </div>
         </div>
     </nav>
 
-    <main class="p-8 max-w-7xl mx-auto space-y-10 relative z-10">
+    <main class="p-8 mx-auto space-y-10 relative z-10">
         
         <!-- Search & Filter Bar -->
-        <div class="blue-gradient-card p-6 rounded-[2.5rem] flex flex-col md:flex-row gap-6 items-center">
+        <div class="glass-card p-6 rounded-[2.5rem] flex flex-col md:flex-row gap-6 items-center">
             <div class="relative w-full md:flex-grow">
-                <span class="absolute left-6 top-1/2 -translate-y-1/2 text-blue-300/40">
+                <span class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </span>
-                <input type="text" id="search" placeholder="Locate by ID, Customer Identity..." class="w-full pl-16 pr-6 py-4 rounded-2xl text-sm font-bold placeholder:text-blue-300/20">
+                <input type="text" id="search" placeholder="Locate by ID, Customer Identity..." class="w-full pl-16 pr-6 py-4 rounded-2xl text-sm font-bold placeholder:text-slate-300">
             </div>
             <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
                 <input type="date" id="date_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none">
                 
-                <select id="method_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none cursor-pointer">
+                <select id="method_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
                     <option value="all">All Methods</option>
                     <option value="cash">Cash</option>
                     <option value="card">Card</option>
@@ -111,46 +128,53 @@ check_auth('admin');
                     <option value="credit">Credit</option>
                 </select>
 
-                <select id="status_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none cursor-pointer">
+                <select id="status_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
                     <option value="all">All Status</option>
                     <option value="approved">Approved</option>
                     <option value="pending">Pending</option>
                     <option value="rejected">Rejected</option>
                 </select>
 
-                <button onclick="loadHistory()" class="px-8 py-4 bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-400 transition-all shadow-xl shadow-blue-500/20 active:scale-95">Synchronize</button>
+                <button onclick="loadHistory()" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:shadow-lg transition-all active:scale-95 flex flex-row gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Refresh</button>
             </div>
         </div>
 
         <!-- Sales Table -->
-        <div class="blue-gradient-card rounded-[2.5rem] overflow-hidden">
+        <div class="glass-card overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left min-w-[800px] border-collapse">
                 <thead>
-                    <tr class="bg-white/5 border-b border-white/10">
-                        <th class="px-8 py-6">Transaction ID</th>
-                        <th class="px-8 py-6">Customer Profile</th>
+                    <tr>
+                        <th class="px-6 py-6">ID</th>
+                        <th class="px-8 py-6 min-w-[200px]">Customer</th>
+                        <th class="px-8 py-6">Contact Number</th>
                         <th class="px-8 py-6">Issued By</th>
                         <th class="px-8 py-6">Date & Time</th>
-                        <th class="px-8 py-6">Payment Method</th>
+                        <th class="px-2 py-6">Payment</th>
+                        <th class="px-8 py-6 text-right">Discount (LKR)</th>
                         <th class="px-8 py-6 text-right">Settlement (LKR)</th>
                         <th class="px-8 py-6 text-center">Status</th>
                         <th class="px-8 py-6 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="historyBody" class="divide-y divide-white/5">
+                <tbody id="historyBody" class="divide-y divide-slate-100">
                     <!-- Loaded via AJAX -->
                 </tbody>
             </table>
         </div>
-    </main>
+        <!-- Pagination Controls -->
+        <div id="paginationControls" class="p-8 flex justify-center border-t border-slate-100">
+            <!-- Rendered via JS -->
+        </div>
+    </div>
+</main>
 
     <!-- Edit Modal -->
-    <div id="editModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
-        <div class="blue-gradient-card rounded-[2.5rem] max-w-lg w-full p-10 space-y-8 shadow-2xl border border-white/20">
+    <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
+        <div class="glass-card max-w-lg w-full p-10 space-y-8 shadow-2xl border border-white/50">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-black text-white uppercase tracking-tighter">Edit Sale <span id="editId" class="text-blue-400"></span></h3>
-                <button onclick="closeModal()" class="text-white/40 hover:text-white transition-colors">
+                <h3 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Edit Sale <span id="editId" class="text-blue-600"></span></h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -158,13 +182,13 @@ check_auth('admin');
             <form id="editForm" class="space-y-6">
                 <input type="hidden" name="sale_id" id="formSaleId">
                 <div>
-                    <label class="block text-[10px] font-black text-blue-300 uppercase tracking-widest mb-3 ml-1">Total Adjustment</label>
-                    <input type="number" step="0.01" name="total_amount" id="formAmount" class="w-full px-6 py-4 rounded-2xl text-sm font-bold">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Total Adjustment</label>
+                    <input type="number" step="0.01" name="total_amount" id="formAmount" class="w-full px-6 py-4 rounded-2xl text-sm font-bold border border-slate-200">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-black text-blue-300 uppercase tracking-widest mb-3 ml-1">Payment Protocol</label>
-                        <select name="payment_method" id="formMethod" class="w-full px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Payment Protocol</label>
+                        <select name="payment_method" id="formMethod" class="w-full px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-200">
                             <option value="cash">Cash Flow</option>
                             <option value="card">Terminal Card</option>
                             <option value="cheque">Cheque Pool</option>
@@ -172,8 +196,8 @@ check_auth('admin');
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-blue-300 uppercase tracking-widest mb-3 ml-1">Verification Status</label>
-                        <select name="payment_status" id="formStatus" class="w-full px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Verification Status</label>
+                        <select name="payment_status" id="formStatus" class="w-full px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-200">
                             <option value="approved">Approved</option>
                             <option value="pending">Pending</option>
                             <option value="rejected">Rejected</option>
@@ -181,31 +205,47 @@ check_auth('admin');
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-rose-400 uppercase tracking-widest mb-3 ml-1">Change Authorization Reason *</label>
-                    <textarea name="reason" required placeholder="Describe why this administrative edit is being executed..." class="w-full px-6 py-4 rounded-2xl text-sm font-bold min-h-[120px] resize-none"></textarea>
+                    <label class="block text-[10px] font-black text-rose-500 uppercase tracking-widest mb-3 ml-1">Change Authorization Reason *</label>
+                    <textarea name="reason" required placeholder="Describe why this administrative edit is being executed..." class="w-full px-6 py-4 rounded-2xl text-sm font-bold min-h-[120px] resize-none border border-slate-200"></textarea>
                 </div>
                 
                 <div class="flex flex-col gap-3 pt-4">
-                    <button type="submit" class="w-full py-5 bg-blue-500 text-white rounded-2xl font-black hover:bg-blue-400 shadow-xl shadow-blue-500/20 transition-all uppercase text-sm tracking-widest">Commit Adjustments</button>
-                    <button type="button" onclick="closeModal()" class="w-full py-4 bg-white/5 text-white/50 rounded-2xl font-bold hover:bg-white/10 transition-all uppercase text-xs tracking-widest">Discard</button>
+                    <button type="submit" class="w-full py-5 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-2xl font-black hover:shadow-lg transition-all uppercase text-sm tracking-widest">Commit Adjustments</button>
+                    <button type="button" onclick="closeModal()" class="w-full py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold hover:bg-slate-200 transition-all uppercase text-xs tracking-widest">Discard</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', loadHistory);
-        document.getElementById('search').addEventListener('input', loadHistory);
-        document.getElementById('date_filter').addEventListener('change', loadHistory);
-        document.getElementById('method_filter').addEventListener('change', loadHistory);
-        document.getElementById('status_filter').addEventListener('change', loadHistory);
+        let currentPage = 1;
 
-        async function loadHistory() {
+        document.addEventListener('DOMContentLoaded', () => loadHistory(1));
+        
+        document.getElementById('search').addEventListener('input', () => {
+             currentPage = 1;
+             loadHistory(1);
+        });
+        document.getElementById('date_filter').addEventListener('change', () => {
+             currentPage = 1;
+             loadHistory(1);
+        });
+        document.getElementById('method_filter').addEventListener('change', () => {
+             currentPage = 1;
+             loadHistory(1);
+        });
+        document.getElementById('status_filter').addEventListener('change', () => {
+             currentPage = 1;
+             loadHistory(1);
+        });
+
+        async function loadHistory(page = 1) {
+            currentPage = page;
             const search = document.getElementById('search').value;
             const date = document.getElementById('date_filter').value;
             const method = document.getElementById('method_filter').value;
             const status = document.getElementById('status_filter').value;
-            const res = await fetch(`sales_history_handler.php?action=fetch&search=${search}&date=${date}&method=${method}&status=${status}`);
+            const res = await fetch(`sales_history_handler.php?action=fetch&search=${search}&date=${date}&method=${method}&status=${status}&page=${page}`);
             const data = await res.json();
             const tbody = document.getElementById('historyBody');
             tbody.innerHTML = '';
@@ -228,41 +268,45 @@ check_auth('admin');
                 const methodClass = methodClasses[sale.payment_method.toLowerCase()] || 'text-blue-300 border-white/10 bg-white/5';
                                   
                 tbody.innerHTML += `
-                    <tr class="hover:bg-white/5 transition-all group">
-                        <td class="px-8 py-8">
-                            <span class="font-mono text-[10px] font-black text-blue-300/40 tracking-tighter uppercase px-3 py-1 bg-white/5 rounded-lg border border-white/5">TRX-${sale.id}</span>
+                    <tr class="hover:bg-blue-50/50 transition-all group">
+                        <td class="px-6 py-8">
+                            <span class="font-mono text-[10px] font-black text-blue-600 tracking-tighter whitespace-nowrap uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">TRX-${sale.id}</span>
                         </td>
                         <td class="px-8 py-8">
-                            <p class="font-black text-white text-sm tracking-tight">${sale.cust_name || 'Anonymous Guest'}</p>
-                            <p class="text-[9px] text-blue-300/40 font-black uppercase tracking-wider mt-1.5">${sale.cust_contact || 'Private Line'}</p>
-                        </td>
-                        <td class="px-8 py-8">
-                            <div class="flex items-center gap-3">
-                               
-                                <div>
-                                    <p class="font-black text-white text-[11px] tracking-tight uppercase">${sale.officer_name || 'System'}</p>
-                                </div>
+                            <div class="flex items-center gap-2">
+                              
+                                <p class="font-black text-slate-800 text-sm tracking-tight">${sale.cust_name || 'Anonymous Guest'}</p>
                             </div>
                         </td>
                         <td class="px-8 py-8">
-                            <p class="font-bold text-white text-[11px] tracking-widest">${new Date(sale.created_at).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                            <div class="flex items-center gap-2">
+                                <svg class="w-3 h-3 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                <p class="text-[9px] text-slate-800 font-black uppercase tracking-wider">${sale.cust_contact || 'Private Line'}</p>
+                            </div>
                         </td>
-                        <td class="px-8 py-8 text-left">
+                        <td class="px-8 py-8 text-slate-700">
+                             <p class="font-black text-[11px] tracking-tight uppercase">${sale.officer_name || 'System'}</p>
+                        </td>
+                        <td class="px-8 py-8 text-slate-600">
+                            <p class="font-bold text-[11px] tracking-widest">${new Date(sale.created_at).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                        </td>
+                        <td class="px-2 py-8 text-left">
                             <span class="px-3 py-1 border rounded-lg text-[9px] font-black uppercase tracking-widest ${methodClass}">${sale.payment_method}</span>
                         </td>
-                        <td class="px-8 py-8 text-right font-black text-white tracking-widest text-sm">${parseFloat(sale.final_amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="px-8 py-8 text-right font-black text-rose-600 tracking-widest text-sm">${parseFloat(sale.discount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="px-8 py-8 text-right font-black text-blue-800 tracking-widest text-sm">${parseFloat(sale.final_amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                         <td class="px-8 py-8 text-center text-nowrap">
                             <span class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest text-white ${statusClass} shadow-lg">${sale.payment_status}</span>
                         </td>
                         <td class="px-8 py-8 text-right">
                             <div class="flex justify-end items-center gap-3">
-                                <button onclick="viewSaleItems(${sale.id})" class="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl hover:bg-emerald-500 hover:text-white transition-all shadow-lg active:scale-95" title="View Manifest">
+                                <button onclick="viewSaleItems(${sale.id})" class="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95" title="View Manifest">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                 </button>
-                                <button onclick='openEditModal(${JSON.stringify(sale)})' class="p-3 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl hover:bg-blue-500 hover:text-white transition-all shadow-lg active:scale-95" title="Modify Record">
+                                <button onclick='openEditModal(${JSON.stringify(sale)})' class="p-3 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-95" title="Modify Record">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                 </button>
-                                <button onclick="confirmDelete(${sale.id})" class="p-3 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-lg active:scale-95" title="Purge & Reverse">
+                                <button onclick="confirmDelete(${sale.id})" class="p-3 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm active:scale-95" title="Purge & Reverse">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
                             </div>
@@ -270,6 +314,32 @@ check_auth('admin');
                     </tr>
                 `;
             });
+
+            renderPagination(data.pagination);
+        }
+
+        function renderPagination(pg) {
+            const container = document.getElementById('paginationControls');
+            let html = '<div class="flex items-center gap-2">';
+            
+            // Previous Button
+            if(pg.current_page > 1) {
+                html += `<button onclick="loadHistory(${pg.current_page - 1})" class="p-2 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-blue-800 transition-all font-black"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>`;
+            }
+
+            // Page Numbers
+            for(let i = 1; i <= pg.total_pages; i++) {
+                const activeClass = i === pg.current_page ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20' : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200';
+                html += `<button onclick="loadHistory(${i})" class="w-9 h-9 flex items-center justify-center border rounded-lg text-sm font-bold transition-all ${activeClass}">${i}</button>`;
+            }
+
+            // Next Button
+            if(pg.current_page < pg.total_pages) {
+                html += `<button onclick="loadHistory(${pg.current_page + 1})" class="p-2 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-blue-800 transition-all font-black"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>`;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
         }
 
         async function viewSaleItems(id) {
@@ -296,12 +366,12 @@ check_auth('admin');
                 html += `
                     <tr>
                         <td class="py-3">
-                            <p class="font-black text-white">${item.name}</p>
-                            <p class="text-[9px] opacity-40">${item.barcode}</p>
+                            <p class="font-black text-slate-800">${item.name}</p>
+                            <p class="text-[9px] opacity-80">${item.barcode}</p>
                         </td>
                         <td class="py-3 text-center font-bold">${item.qty}</td>
-                        <td class="py-3 text-right font-mono text-blue-300">${parseFloat(item.unit_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                        <td class="py-3 text-right font-mono text-emerald-400">${parseFloat(item.total_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="py-3 text-right font-mono text-blue-800">${parseFloat(item.unit_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="py-3 text-right font-mono text-emerald-800">${parseFloat(item.total_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                     </tr>
                 `;
             });
@@ -315,8 +385,8 @@ check_auth('admin');
                 confirmButtonText: 'Done',
                 confirmButtonColor: '#3b82f6',
                 customClass: { 
-                    popup: 'rounded-[2rem] bg-slate-900 text-white border border-white/10 px-4',
-                    confirmButton: 'rounded-xl font-black uppercase text-[10px] px-8 py-3 tracking-widest w-full'
+                    popup: 'rounded-[2rem] bg-white text-slate-800 shadow-2xl border border-slate-100 px-4',
+                    confirmButton: 'rounded-xl font-black uppercase text-[10px] px-8 py-3 tracking-widest w-full bg-blue-600 text-white'
                 }
             });
         }

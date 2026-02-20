@@ -17,7 +17,7 @@ check_auth('cashier');
         body { 
             font-family: 'Inter', sans-serif; 
             background: #f8fafc;
-            color: #334155;
+            color: #0f172a;
         }
         .bg-main {
             background: url('../admin/public/admin_background.jpg');
@@ -40,7 +40,7 @@ check_auth('cashier');
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
         .blue-gradient-header {
-            background: linear-gradient(to right, #2563eb, #1e40af);
+            background: linear-gradient(to right, #06266aff, #1e40af);
             color: white;
             font-weight: 700;
             text-transform: uppercase;
@@ -120,8 +120,8 @@ check_auth('cashier');
             <!-- Page Title section -->
             <div class="flex justify-between items-center px-1">
                 <div>
-                    <h1 class="text-xl font-bold text-slate-800 tracking-tight leading-none">Customer Details</h1>
-                    <p class="text-[11px] text-slate-400 font-medium">Select or register a customer to begin the transaction</p>
+                    <h1 class="text-xl font-black text-slate-900 tracking-tight leading-none uppercase">Customer Details</h1>
+                    <p class="text-[11px] text-slate-600 font-bold uppercase tracking-widest mt-1">Select or register a customer to begin</p>
                 </div>
             </div>
 
@@ -141,12 +141,12 @@ check_auth('cashier');
                             </div>
                             <div id="selectedCustArea" class="hidden flex items-center gap-6 animate-fade-in overflow-hidden">
                                 <div class="flex flex-col min-w-0">
-                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">Customer</span>
-                                    <span id="selectedCustName" class="text-[11px] font-black text-slate-800 truncate uppercase tracking-tight"></span>
+                                    <span class="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">Customer</span>
+                                    <span id="selectedCustName" class="text-[11px] font-black text-slate-950 truncate uppercase tracking-tight"></span>
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">Contact</span>
-                                    <span id="selectedCustPhone" class="text-[11px] font-black text-slate-800 tracking-wider"></span>
+                                    <span class="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">Contact</span>
+                                    <span id="selectedCustPhone" class="text-[11px] font-black text-slate-950 tracking-wider"></span>
                                 </div>
                                 <button onclick="clearCustomer()" class="p-1.5 bg-red-50 text-red-500 rounded-[10px] hover:bg-red-500 hover:text-white transition-all shrink-0 shadow-sm">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -164,13 +164,13 @@ check_auth('cashier');
             <!-- Page Title section -->
             <div class="flex justify-between items-center px-1 pt-2">
                 <div>
-                    <h1 class="text-lg font-bold text-slate-800 tracking-tight leading-none uppercase">Product Items Info</h1>
-                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Search and add items to the current order</p>
+                    <h1 class="text-lg font-black text-slate-900 tracking-tight leading-none uppercase">Product Items Info</h1>
+                    <p class="text-[10px] text-slate-600 font-black uppercase tracking-wider mt-1">Search and add items to the current order</p>
                 </div>
             </div>
 
             <!-- Section 2: Product Search Bar -->
-            <div id="pos_search_area" class="pointer-events-none opacity-50 grayscale transition-all duration-300 shrink-0">
+            <div id="pos_search_area" class="transition-all duration-300 shrink-0">
                 <div class="relative group">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -181,7 +181,7 @@ check_auth('cashier');
             </div>
 
             <!-- Section  section 3: Sale Items Table -->
-            <div id="pos_main_area" class="glass-panel overflow-hidden pointer-events-none opacity-50 grayscale transition-all duration-300 flex-1 flex flex-col min-h-0 relative bg-white/80 backdrop-blur-sm">
+            <div id="pos_main_area" class="glass-panel overflow-hidden transition-all duration-300 flex-1 flex flex-col min-h-0 relative bg-white/80 backdrop-blur-sm">
                 <div class="hidden lg:grid grid-cols-12 blue-gradient-header text-[11px] font-black uppercase tracking-[0.2em] px-6 py-4 border-b border-white/10">
                     <div class="col-span-3">Product Profile</div>
                     <div class="col-span-2 text-center">Category / Type</div>
@@ -206,8 +206,8 @@ check_auth('cashier');
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                                 </div>
                                 <div>
-                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Active Cart</p>
-                                    <p id="item_count_label" class="text-[11px] font-black text-slate-800 uppercase">0 Items Loaded</p>
+                                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none mb-1">Active Cart</p>
+                                    <p id="item_count_label" class="text-[11px] font-black text-slate-950 uppercase">0 Items Loaded</p>
                                 </div>
                             </div>
                         </div>
@@ -215,8 +215,8 @@ check_auth('cashier');
                         <div class="w-full lg:w-auto flex flex-col md:flex-row items-center gap-4 md:gap-8 lg:gap-10">
                             <div class="flex items-center justify-center md:justify-end gap-6 md:gap-10 w-full md:w-auto">
                                 <div class="text-right">
-                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Subtotal</p>
-                                    <p id="subtotal" class="text-xs md:text-sm font-black text-slate-500 tracking-tight">Rs. 0.00</p>
+                                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Subtotal</p>
+                                    <p id="subtotal" class="text-xs md:text-sm font-black text-slate-700 tracking-tight">Rs. 0.00</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-0.5">Discounts</p>
@@ -384,22 +384,22 @@ check_auth('cashier');
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[9px] font-bold text-slate-800 uppercase tracking-widest mb-1 ml-1 opacity-70">Buying Price</label>
-                        <input type="number" id="entry_buy_price" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-800 outline-none text-[11px]">
+                        <label class="block text-[9px] font-bold text-slate-800 uppercase tracking-widest mb-1 ml-1 opacity-70">Labled Price</label>
+                        <input type="number" id="entry_labeled_price" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-800 outline-none text-[11px]">
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-slate-800 uppercase tracking-widest mb-1 ml-1">Labeled Price</label>
-                        <input type="number" id="entry_labeled_price" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-800 outline-none text-[11px]">
+                        <label class="block text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-1 ml-1">Co. Base Price</label>
+                        <input type="number" id="entry_base_price" readonly class="w-full px-3 py-2 bg-blue-50 border border-blue-100 rounded-xl font-bold text-blue-700 outline-none text-[11px]">
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3 pt-0.5">
                     <div>
-                        <label class="block text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-1.5 ml-1">Selling Price</label>
-                        <input type="number" id="entry_price" step="0.01" oninput="syncFromPrice()" class="w-full px-3 py-2.5 bg-white border-2 border-blue-100 rounded-xl font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm">
+                        <label class="block text-[9px] font-bold text-slate-900 uppercase tracking-widest mb-1.5 ml-1">Cashier Price (Net)</label>
+                        <input type="number" id="entry_price" step="0.01" oninput="syncFromPrice()" class="w-full px-3 py-2.5 bg-white border-2 border-slate-100 rounded-xl font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm">
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-red-500 uppercase tracking-widest mb-1.5 ml-1">Discount (Item)</label>
+                        <label class="block text-[9px] font-bold text-red-500 uppercase tracking-widest mb-1.5 ml-1">Manual Discount</label>
                         <input type="number" id="entry_discount" value="0" step="0.01" oninput="syncFromDiscount()" class="w-full px-3 py-2.5 bg-white border-2 border-red-50 rounded-xl font-bold text-red-500 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all shadow-sm">
                     </div>
                 </div>
@@ -407,8 +407,8 @@ check_auth('cashier');
                 <div class="pt-4 border-t border-slate-100 mt-1">
                     <div class="flex justify-between items-center mb-1">
                         <div>
-                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Total Payable</p>
-                            <p id="entry_total" class="text-2xl font-black text-slate-900 tracking-tighter">Rs. 0.00</p>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-0.5">Total Payable</p>
+                            <p id="entry_total" class="text-2xl font-black text-slate-950 tracking-tighter">Rs. 0.00</p>
                         </div>
                         <button onclick="addToCart()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all shadow-md shadow-blue-600/20">
                             Add to Cart
@@ -504,6 +504,7 @@ check_auth('cashier');
         let selectedCustomer = null;
         let selectedProduct = null;
         let selectedBatch = null;
+        let isCheckingOut = false;
 
         // Header Time/Date
         setInterval(() => {
@@ -562,22 +563,21 @@ check_auth('cashier');
             document.getElementById('selectedCustPhone').innerText = c.contact;
             document.getElementById('custResults').classList.add('hidden');
             
-            // Enable POS Area
-            document.getElementById('pos_search_area').classList.remove('pointer-events-none', 'opacity-50', 'grayscale');
-            document.getElementById('pos_main_area').classList.remove('pointer-events-none', 'opacity-50', 'grayscale');
-            setTimeout(() => document.getElementById('prodSearch').focus(), 300);
+            setTimeout(() => {
+                if(isCheckingOut) {
+                    checkout();
+                } else {
+                    document.getElementById('prodSearch').focus();
+                }
+            }, 300);
         }
 
         function clearCustomer() {
             selectedCustomer = null;
+            isCheckingOut = false;
             document.getElementById('selectedCustArea').classList.add('hidden');
             document.getElementById('custSearchArea').classList.remove('hidden');
             document.getElementById('custSearch').value = '';
-
-            // Disable POS Area
-            document.getElementById('pos_search_area').classList.add('pointer-events-none', 'opacity-50', 'grayscale');
-            document.getElementById('pos_main_area').classList.add('pointer-events-none', 'opacity-50', 'grayscale');
-            clearCart();
         }
 
         function openNewCustomerModal() { document.getElementById('newCustModal').classList.remove('hidden'); }
@@ -605,11 +605,13 @@ check_auth('cashier');
                 const header = document.createElement('div');
                 header.className = 'px-4 py-3 blue-gradient-header border-b border-blue-700 flex items-center text-[9px] uppercase tracking-widest sticky top-0 z-10 rounded-t-xl';
                 header.innerHTML = `
-                    <div class="w-[35%]">Product Name</div>
-                    <div class="w-[15%] text-center">Category</div>
-                    <div class="w-[15%] text-center">Ref. Type</div>
-                    <div class="w-[15%] text-center">Available</div>
-                    <div class="w-[20%] text-right">Label Price</div>
+                    <div class="w-[22%]">Product Name</div>
+                    <div class="w-[15%]">Barcode</div>
+                    <div class="w-[10%] text-center">Type</div>
+                    <div class="w-[8%] text-center">Stock</div>
+                    <div class="w-[15%] text-right pr-2">Buying</div>
+                    <div class="w-[15%] text-right pr-2">Labeled</div>
+                    <div class="w-[15%] text-right pr-2">Est. Selling</div>
                 `;
                 list.appendChild(header);
 
@@ -617,37 +619,59 @@ check_auth('cashier');
                     p.batches.forEach(b => {
                         const div = document.createElement('div');
                         const isOil = p.type === 'oil';
+                        let typeBadge = '';
+                        if(isOil) {
+                            if(p.oil_type === 'loose') {
+                                typeBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[8px] font-black border border-emerald-100 uppercase">
+                                    LOOSE
+                                </span>`;
+                            } else {
+                                typeBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[8px] font-black border border-blue-100 uppercase">
+                                    CAN
+                                </span>`;
+                            }
+                        } else {
+                            typeBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 text-slate-500 text-[8px] font-black border border-slate-100 uppercase">
+                                SPARE
+                            </span>`;
+                        }
                         
-                        // Icons
-                        const typeIcon = isOil ? 
-                            `<svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C12 2 6 9 6 14a6 6 0 0 0 12 0c0-5-6-12-6-12z"/></svg>` : 
-                            `<svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>`;
-                        
-                        const typeLabel = isOil ? 'OIL' : 'SPARE';
-                        const typeColor = isOil ? 'text-blue-600' : 'text-emerald-600';
-                        const typeBg = isOil ? 'bg-blue-50' : 'bg-emerald-50';
-                        
-                        div.className = 'flex items-center gap-4 p-4 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 active:bg-blue-100 transition-all rounded-xl m-1';
+                        div.className = 'flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 active:bg-blue-100 transition-all m-0.5';
                         div.innerHTML = `
-                             <!-- Col 1: Icon/Category -->
-                            <div class="w-10 h-10 rounded-xl ${isOil ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'} flex items-center justify-center shrink-0">
-                                ${isOil ? '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C12 2 6 9 6 14a6 6 0 0 0 12 0c0-5-6-12-6-12z"/></svg>' : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>'}
+                            <!-- Col 1: Name -->
+                            <div class="w-[22%] min-w-0">
+                                <p class="text-[12px] font-black text-slate-900 leading-tight uppercase truncate">${p.name}</p>
                             </div>
 
-                            <!-- Col 2: Info -->
-                            <div class="flex-1 min-w-0">
-                                <p class="text-[13px] font-black text-slate-900 leading-tight uppercase truncate">${p.name}</p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">${p.brand}</span>
-                                    <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                                    <span class="text-[9px] font-mono text-blue-400 font-bold tracking-tight">${p.barcode}</span>
-                                </div>
+                            <!-- Col 2: Barcode -->
+                            <div class="w-[15%]">
+                                <p class="text-[10px] font-mono text-blue-500 font-black tracking-tight">${p.barcode}</p>
                             </div>
 
-                            <!-- Col 3: Qty -->
-                            <div class="text-right shrink-0">
-                                <p class="text-[11px] font-black text-slate-700 leading-none mb-1">${b.current_qty} ${isOil ? (p.oil_type === 'loose' ? 'L' : 'C') : 'P'}</p>
-                                <p class="text-[13px] font-black text-blue-600 tracking-tighter">Rs. ${numberFormat(b.selling_price)}</p>
+                            <!-- Col 3: Type -->
+                            <div class="w-[10%] text-center">
+                                ${typeBadge}
+                            </div>
+
+                            <!-- Col 4: Qty -->
+                            <div class="w-[8%] text-center">
+                                <span class="text-[11px] font-black text-slate-700">${b.current_qty}</span>
+                                <span class="text-[8px] text-slate-400 font-bold uppercase">${isOil ? (p.oil_type === 'loose' ? 'L' : 'C') : 'P'}</span>
+                            </div>
+
+                            <!-- Col 5: Buying -->
+                            <div class="w-[15%] text-right pr-2">
+                                <p class="text-[11px] font-mono font-bold text-slate-400 italic">${numberFormat(b.buying_price)}</p>
+                            </div>
+
+                            <!-- Col 6: Labeled -->
+                            <div class="w-[15%] text-right pr-2">
+                                <p class="text-[11px] font-mono font-bold text-slate-600">${numberFormat(b.selling_price)}</p>
+                            </div>
+
+                            <!-- Col 7: Estimated -->
+                            <div class="w-[15%] text-right pr-2">
+                                <p class="text-[12px] font-mono font-black text-blue-600">${numberFormat(b.estimated_selling_price)}</p>
                             </div>
                         `;
                         div.onclick = () => {
@@ -687,7 +711,7 @@ check_auth('cashier');
                                 <tr class="text-[10px] uppercase tracking-[0.1em]">
                                     <th class="px-5 py-4">Batch Details</th>
                                     <th class="px-5 py-4 text-center">Retail Price</th>
-                                    <th class="px-5 py-4 text-center opacity-70">Buying Price</th>
+                                    <th class="px-5 py-4 text-center">Est. Sale</th>
                                     <th class="px-5 py-4 text-right">Available</th>
                                 </tr>
                             </thead>
@@ -715,10 +739,10 @@ check_auth('cashier');
                             </p>
                         </td>
                         <td class="px-5 py-4 text-center">
-                            <p class="text-base font-black text-slate-900 leading-none">${numberFormat(b.selling_price)}</p>
+                            <p class="text-xs font-bold text-slate-400 line-through">${numberFormat(b.selling_price)}</p>
                         </td>
                         <td class="px-5 py-4 text-center">
-                            <p class="text-xs font-bold text-slate-300 group-hover:text-blue-400 transition-colors uppercase italic">${numberFormat(b.buying_price)}</p>
+                            <p class="text-base font-black text-blue-600">${numberFormat(b.estimated_selling_price)}</p>
                         </td>
                         <td class="px-5 py-4 text-right">
                             <p class="text-lg font-black text-slate-800 tabular-nums">${actualQty} <span class="text-[10px] text-slate-400 font-bold uppercase ml-1">${unit}</span></p>
@@ -745,27 +769,28 @@ check_auth('cashier');
         function openEntryModal(b) {
             selectedBatch = b;
             document.getElementById('entry_qty').value = 1;
-            document.getElementById('entry_buy_price').value = b.buying_price;
             document.getElementById('entry_labeled_price').value = b.selling_price;
-            document.getElementById('entry_price').value = b.selling_price;
-            document.getElementById('entry_discount').value = 0;
+            document.getElementById('entry_base_price').value = b.estimated_selling_price;
+            document.getElementById('entry_price').value = b.estimated_selling_price;
+            document.getElementById('entry_discount').value = "0.00";
             document.getElementById('entry_unit').innerText = selectedProduct.oil_type === 'loose' ? 'Liters' : (selectedProduct.oil_type === 'can' ? 'Cans' : 'Units');
             document.getElementById('entry_max').innerText = `Max available: ${b.current_qty}`;
             updateEntryTotal();
             document.getElementById('entryModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('entry_qty').focus(), 100);
         }
 
         function syncFromPrice() {
-            const labeled = parseFloat(document.getElementById('entry_labeled_price').value);
+            const base = parseFloat(document.getElementById('entry_base_price').value) || 0;
             const selling = parseFloat(document.getElementById('entry_price').value) || 0;
-            document.getElementById('entry_discount').value = Math.max(0, (labeled - selling)).toFixed(2);
+            document.getElementById('entry_discount').value = (base - selling).toFixed(2);
             updateEntryTotal();
         }
 
         function syncFromDiscount() {
-            const labeled = parseFloat(document.getElementById('entry_labeled_price').value);
+            const base = parseFloat(document.getElementById('entry_base_price').value) || 0;
             const discount = parseFloat(document.getElementById('entry_discount').value) || 0;
-            document.getElementById('entry_price').value = Math.max(0, (labeled - discount)).toFixed(2);
+            document.getElementById('entry_price').value = (base - discount).toFixed(2);
             updateEntryTotal();
         }
 
@@ -783,7 +808,7 @@ check_auth('cashier');
             if(qty > selectedBatch.current_qty) { Swal.fire('Over Stock', 'Quantity exceeds available stock.', 'error'); return; }
             if(qty <= 0) return;
 
-            const labeled_price = parseFloat(document.getElementById('entry_labeled_price').value);
+            const base_price = parseFloat(document.getElementById('entry_base_price').value);
             const actual_price = parseFloat(document.getElementById('entry_price').value);
             const per_item_discount = parseFloat(document.getElementById('entry_discount').value) || 0;
             
@@ -804,7 +829,7 @@ check_auth('cashier');
                     category: selectedProduct.type === 'oil' ? 'Oil' : 'Spare parts',
                     oil_type: selectedProduct.type === 'oil' ? selectedProduct.oil_type : 'Unit',
                     qty,
-                    unit_price: labeled_price, 
+                    unit_price: base_price, 
                     per_item_discount: per_item_discount,
                     total_discount: total_discount,
                     total_price: total_price
@@ -950,8 +975,36 @@ check_auth('cashier');
 
         async function checkout() {
             if(cart.length === 0) return;
-            if(!selectedCustomer) { Swal.fire('Whoops', 'Please select or add a customer first.', 'warning'); return; }
+            
+            if(!selectedCustomer) {
+                isCheckingOut = true;
+                Swal.fire({
+                    title: 'Customer Details Required',
+                    text: "You must select or register a customer before completing this sale.",
+                    icon: 'warning',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Register New',
+                    denyButtonText: 'Search/Select',
+                    cancelButtonText: 'Not Now',
+                    confirmButtonColor: '#2563eb',
+                    denyButtonColor: '#475569',
+                    background: '#ffffff',
+                    color: '#1e293b'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        openNewCustomerModal();
+                    } else if (result.isDenied) {
+                        document.getElementById('custSearch').focus();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        isCheckingOut = false;
+                    }
+                });
+                return;
+            }
 
+            isCheckingOut = false;
             const sub = cart.reduce((a, b) => a + (b.qty * b.unit_price), 0);
             const itemDisc = cart.reduce((a, b) => a + b.total_discount, 0); 
 

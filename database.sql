@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS batches (
     invoice_id INT NOT NULL,
     buying_price DECIMAL(15, 2) NOT NULL,
     selling_price DECIMAL(15, 2) NOT NULL,
+    estimated_selling_price DECIMAL(15, 2) NOT NULL DEFAULT 0,
     original_qty DECIMAL(10, 2) NOT NULL, -- Supporting liters (loose oil)
     current_qty DECIMAL(10, 2) NOT NULL,
     expire_date DATE,
