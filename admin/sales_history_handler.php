@@ -96,7 +96,7 @@ if ($action === 'edit') {
     $method = $_POST['payment_method'];
     $status = $_POST['payment_status'];
     $reason = $_POST['reason'];
-    $admin_id = $_SESSION['user_id'];
+    $admin_id = $_SESSION['id']; // Fixed session key
 
     if (empty($reason)) {
         echo json_encode(['success' => false, 'message' => 'Reason is required']);
@@ -126,6 +126,9 @@ if ($action === 'edit') {
             json_encode(['final_amount' => $amount, 'payment_method' => $method, 'payment_status' => $status])
         ]);
 
+        // 4. Also add to System Logs for dashboard visibility
+        log_action("Edit Sale", "Modified TRX-$sale_id. Reason: $reason");
+
         $pdo->commit();
         echo json_encode(['success' => true]);
     } catch (Exception $e) {
@@ -138,7 +141,7 @@ if ($action === 'edit') {
 if ($action === 'delete') {
     $sale_id = $_POST['sale_id'];
     $reason = $_POST['reason'];
-    $admin_id = $_SESSION['user_id'];
+    $admin_id = $_SESSION['id']; // Fixed session key
 
     try {
         $pdo->beginTransaction();
@@ -169,6 +172,9 @@ if ($action === 'delete') {
         $audit_stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, action_type, table_name, record_id, reason, old_data, new_data) 
                                     VALUES (?, 'delete', 'sales', ?, ?, ?, NULL)");
         $audit_stmt->execute([$admin_id, $sale_id, $reason, json_encode($old_data)]);
+
+        // 5. Also add to System Logs
+        log_action("Purge Sale", "Deleted TRX-$sale_id. Reason: $reason");
 
         $pdo->commit();
         echo json_encode(['success' => true]);

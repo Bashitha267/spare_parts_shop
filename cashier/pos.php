@@ -495,7 +495,6 @@ check_auth('cashier');
             </div>
             <div class="border-b border-dashed border-black my-4"></div>
             <p class="text-[10px] font-bold">THANK YOU! COME AGAIN</p>
-            <p class="text-[8px] opacity-70">POS System by Antigravity</p>
         </div>
     </div>
 
@@ -1055,8 +1054,9 @@ check_auth('cashier');
 
             const data = await postAPI('submit_sale', fd);
             if(data.success) {
+                const wDiscountForPrint = wDiscount; // Store for print
                 closePaymentModal();
-                printReceipt(data.sale_id, payMethod);
+                printReceipt(data.sale_id, payMethod, wDiscountForPrint);
                 
                 const Toast = Swal.mixin({
                     toast: true,
@@ -1083,7 +1083,7 @@ check_auth('cashier');
             }
         }
 
-        function printReceipt(saleId, payMethod) {
+        function printReceipt(saleId, payMethod, wDiscount = 0) {
             const now = new Date();
             document.getElementById('bill_date').innerText = now.toLocaleDateString();
             document.getElementById('bill_time').innerText = now.toLocaleTimeString();
@@ -1108,8 +1108,8 @@ check_auth('cashier');
             });
             
             document.getElementById('bill_total').innerText = 'LKR ' + numberFormat(sub);
-            document.getElementById('bill_discount').innerText = 'LKR ' + numberFormat(disc);
-            document.getElementById('bill_net').innerText = 'LKR ' + numberFormat(sub - disc);
+            document.getElementById('bill_discount').innerText = 'LKR ' + numberFormat(disc + wDiscount);
+            document.getElementById('bill_net').innerText = 'LKR ' + numberFormat(sub - (disc + wDiscount));
 
             // Trigger window print on the hidden div content
             const printContent = document.getElementById('printArea').innerHTML;

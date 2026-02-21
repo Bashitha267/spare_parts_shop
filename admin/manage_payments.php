@@ -126,7 +126,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">Total Pending</p>
+                    <p class="text-[10px] font-black text-white uppercase tracking-widest mb-1">Total Pending</p>
                     <h3 class="text-2xl font-black text-white"><?php echo $counts['total']; ?> <span class="text-xs font-bold text-white/40 tracking-normal ml-1">TRX</span></h3>
                 </div>
             </div>
@@ -135,7 +135,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-black text-amber-400/40 uppercase tracking-widest mb-1">Cheque Validation</p>
+                    <p class="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-1">Cheque Validation</p>
                     <h3 class="text-2xl font-black text-white"><?php echo $counts['cheques']; ?> <span class="text-xs font-bold text-white/30 tracking-normal ml-1">items</span></h3>
                 </div>
             </div>
@@ -144,7 +144,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-black text-emerald-100/60 uppercase tracking-widest mb-1">Credit Clearance</p>
+                    <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Credit Clearance</p>
                     <h3 class="text-2xl font-black text-white"><?php echo $counts['credits']; ?> <span class="text-xs font-bold text-white/40 tracking-normal ml-1">items</span></h3>
                 </div>
             </div>

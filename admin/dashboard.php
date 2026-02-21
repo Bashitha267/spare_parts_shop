@@ -185,6 +185,14 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
                     </div>
                     <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Payments Approval History</span>
                 </a>
+
+                <!-- System Logs -->
+                <a href="logs.php" class="p-8 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden">
+                    <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
+                        <svg class="w-12 h-12 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">System Logs</span>
+                </a>
             </div>
         </div>
     </div>

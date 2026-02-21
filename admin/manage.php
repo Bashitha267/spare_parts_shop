@@ -99,7 +99,13 @@ $is_admin = ($_SESSION['role'] === 'admin');
                 </a>
                 <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Oil Registry</h1>
             </div>
-            <button onclick="openNewProductModal()" class="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-2.5 rounded-xl text-xs font-black hover:shadow-lg hover:shadow-blue-500/30 transition-all uppercase tracking-widest border-2 border-white">+ Add Oil Product</button>
+            <div class="flex items-center gap-3">
+                <a href="manage_handler.php?action=export_inventory&type=oil" class="bg-white text-emerald-600 px-6 py-2.5 rounded-xl text-xs font-black hover:bg-emerald-50 transition-all uppercase tracking-widest border-2 border-emerald-100 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Export Excel
+                </a>
+                <button onclick="openNewProductModal()" class="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-2.5 rounded-xl text-xs font-black hover:shadow-lg hover:shadow-blue-500/30 transition-all uppercase tracking-widest border-2 border-white">+ Add Oil Product</button>
+            </div>
         </div>
     </nav>
 
@@ -149,7 +155,7 @@ $is_admin = ($_SESSION['role'] === 'admin');
                         <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em]">Type</th>
                         <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Buying Price</th>
                         <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Labeled Price</th>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right text-blue-400">Estimated Price</th>
+                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right text-blue-400">Estimated Selling Price</th>
                         <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Stock</th>
                         <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Total Value</th>
                         <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-center">Status</th>
@@ -173,7 +179,7 @@ $is_admin = ($_SESSION['role'] === 'admin');
         <div class="glass-card w-full max-w-md shadow-2xl p-8 border border-white/50 animate-in fade-in zoom-in duration-200">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter" id="qb_title">Add Stock Batch</h3>
+                    <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter" id="qb_title">Add New Oil Product</h3>
                     <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1" id="qb_subtitle"></p>
                 </div>
                 <button onclick="closeModal('quickBatchModal')" class="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>

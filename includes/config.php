@@ -15,4 +15,16 @@ try {
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+function log_action($action, $details = null) {
+    global $pdo;
+    try {
+        $user_id = isset($_SESSION['id']) ? $_SESSION['id'] : null;
+        $stmt = $pdo->prepare("INSERT INTO system_logs (user_id, action, details) VALUES (?, ?, ?)");
+        $stmt->execute([$user_id, $action, $details]);
+    } catch (PDOException $e) {
+        // Silently fail or log to error log
+        error_log("Logging error: " . $e->getMessage());
+    }
+}
 ?>

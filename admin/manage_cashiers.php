@@ -80,7 +80,10 @@ check_auth('admin');
                    <p class="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] mt-0.5">Control Security Clearances</p>
                 </div>
             </div>
-            <button onclick="openCashierModal()" class="bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">+ New Staff Access</button>
+            <div class="flex gap-3">
+                <button onclick="openCashierModal('admin')" class="bg-slate-900 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black hover:bg-slate-800 transition-all shadow-xl shadow-slate-500/20 uppercase tracking-widest ring-4 ring-slate-900/10">+ New Admin Access</button>
+                <button onclick="openCashierModal('cashier')" class="bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">+ New Cashier Access</button>
+            </div>
         </div>
     </nav>
 
@@ -119,7 +122,8 @@ check_auth('admin');
                 </button>
             </div>
             <form id="cashierForm" class="space-y-6">
-                <input type="hidden" name="action" value="add_cashier">
+                <input type="hidden" name="action" value="add_staff">
+                <input type="hidden" name="role" id="staffRole" value="cashier">
                 <div>
                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Full Identity</label>
                     <input type="text" name="full_name" required class="w-full px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-slate-300 font-bold" placeholder="Full Legal Name">
@@ -189,7 +193,7 @@ check_auth('admin');
                             <span class="text-xs font-black text-blue-800 uppercase tracking-widest">${user.username}</span>
                         </td>
                         <td class="px-8 py-6">
-                            <span class="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-100 rounded-lg text-[10px] font-black uppercase tracking-widest">Branch Cashier</span>
+                            <span class="px-3 py-1 ${user.role === 'admin' ? 'bg-slate-900 text-white' : 'bg-blue-50 text-blue-800 border border-blue-100'} rounded-lg text-[10px] font-black uppercase tracking-widest">${user.role}</span>
                         </td>
                         <td class="px-8 py-6">
                             <p class="text-[11px] font-black text-slate-900 uppercase tracking-tight">${new Date(user.created_at).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}</p>
@@ -244,7 +248,10 @@ check_auth('admin');
             }
         }
 
-        function openCashierModal() {
+        function openCashierModal(role = 'cashier') {
+            document.getElementById('staffRole').value = role;
+            const title = role === 'admin' ? 'Grant Admin Access' : 'Grant Cashier Access';
+            document.querySelector('#cashierModal h3').innerText = title;
             document.getElementById('cashierModal').classList.remove('hidden');
         }
 

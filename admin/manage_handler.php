@@ -6,6 +6,69 @@ header('Content-Type: application/json');
 
 $action = $_REQUEST['action'] ?? '';
 
+if ($action === 'export_inventory') {
+    $type = $_GET['type'] ?? 'oil';
+    $filename = ($type === 'oil' ? 'Oil_Inventory_' : 'Spare_Parts_Inventory_') . date('Y-m-d') . '.csv';
+    
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    
+    $output = fopen('php://output', 'w');
+    
+    // Header Row
+    if ($type === 'oil') {
+        fputcsv($output, ['Barcode', 'Designation', 'Brand', 'Oil Type', 'Buying Price', 'Labeled Price', 'Est. Selling Price', 'Stock Level', 'Total Valuation']);
+    } else {
+        fputcsv($output, ['Part Number', 'Part Name', 'Brand', 'Buying Price', 'Labeled Price', 'Est. Price', 'Stock Level', 'Total Valuation']);
+    }
+    
+    // Fetch All Data (No Pagination)
+    $sql = "SELECT p.*, 
+            COALESCE(SUM(b.current_qty), 0) as total_stock,
+            COALESCE(SUM(b.current_qty * b.buying_price), 0) as total_value,
+            (SELECT buying_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as buying_price,
+            (SELECT selling_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as selling_price,
+            (SELECT estimated_selling_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as estimated_selling_price
+            FROM products p 
+            LEFT JOIN batches b ON p.id = b.product_id 
+            WHERE p.type = ?
+            GROUP BY p.id 
+            ORDER BY p.name ASC";
+            
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$type]);
+    
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        if ($type === 'oil') {
+            fputcsv($output, [
+                $row['barcode'],
+                $row['name'],
+                $row['brand'],
+                ucfirst($row['oil_type']),
+                number_format($row['buying_price'], 2, '.', ''),
+                number_format($row['selling_price'], 2, '.', ''),
+                number_format($row['estimated_selling_price'], 2, '.', ''),
+                $row['total_stock'],
+                number_format($row['total_value'], 2, '.', '')
+            ]);
+        } else {
+            fputcsv($output, [
+                $row['barcode'],
+                $row['name'],
+                $row['brand'],
+                number_format($row['buying_price'], 2, '.', ''),
+                number_format($row['selling_price'], 2, '.', ''),
+                number_format($row['estimated_selling_price'], 2, '.', ''),
+                $row['total_stock'],
+                number_format($row['total_value'], 2, '.', '')
+            ]);
+        }
+    }
+    
+    fclose($output);
+    exit;
+}
+
 if ($action === 'fetch_inventory') {
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $limit = 10;
