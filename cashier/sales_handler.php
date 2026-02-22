@@ -117,8 +117,8 @@ if ($action === 'get_today_total') {
     $stmt->execute([$user_id, $today]);
     $approved = $stmt->fetchColumn() ?: 0;
 
-    // Pending/Rejected (Not Approved) Today
-    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status != 'approved'");
+    // Pending Today (Awaiting Approval)
+    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'pending'");
     $stmt->execute([$user_id, $today]);
     $pending = $stmt->fetchColumn() ?: 0;
 

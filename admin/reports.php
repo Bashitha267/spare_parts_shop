@@ -60,6 +60,11 @@ $credit_p_stmt = $pdo->prepare("SELECT SUM(final_amount) as total FROM sales $wh
 $credit_p_stmt->execute($params);
 $total_pending_credit = $credit_p_stmt->fetchColumn() ?: 0;
 
+// Cancelled Payments
+$cancelled_stmt = $pdo->prepare("SELECT SUM(final_amount) as total FROM sales $where_clause AND LOWER(payment_status) = 'rejected'");
+$cancelled_stmt->execute($params);
+$total_cancelled = $cancelled_stmt->fetchColumn() ?: 0;
+
 // Cash Payments (Approved)
 $cash_stmt = $pdo->prepare("SELECT SUM(final_amount) as total FROM sales $where_clause AND LOWER(payment_method) = 'cash' AND LOWER(payment_status) = 'approved'");
 $cash_stmt->execute($params);
@@ -86,7 +91,7 @@ $profit_stmt = $pdo->prepare("
     FROM sale_items si 
     JOIN sales s ON si.sale_id = s.id 
     JOIN batches b ON si.batch_id = b.id 
-    WHERE DATE(s.created_at) BETWEEN ? AND ? AND LOWER(s.payment_status) = 'approved'
+    WHERE DATE(s.created_at) BETWEEN ? AND ? AND (LOWER(s.payment_status) = 'approved' OR LOWER(s.payment_status) = 'rejected')
 ");
 $profit_stmt->execute($params);
 $total_cost = $profit_stmt->fetchColumn() ?: 0;
@@ -300,7 +305,7 @@ foreach($payment_summary_data as $row) {
     <main class="p-8 max-w-7xl mx-auto space-y-10 relative z-10">
         
         <!-- TOP SECTION: PRIMARY FINANCIAL KPIs -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Total Sales -->
             <div class="blue-gradient-card p-10 rounded-[3rem] relative overflow-hidden flex flex-col justify-between min-h-[200px] text-white shadow-2xl group hover:scale-[1.02] transition-all">
                 <div class="relative z-10">
@@ -329,6 +334,14 @@ foreach($payment_summary_data as $row) {
                     <h2 class="text-4xl font-black leading-tight tracking-widest">Rs. <?php echo number_format($total_pending_credit, 2); ?></h2>
                 </div>
                 <div class="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center absolute bottom-8 right-8 border border-white/10 shadow-inner"><svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+            </div>
+            <!-- Cancelled Payments -->
+            <div class="bg-slate-800 p-10 rounded-[3rem] relative overflow-hidden flex flex-col justify-between min-h-[200px] text-white shadow-2xl group hover:scale-[1.02] transition-all border border-white/10 backdrop-blur-xl">
+                <div class="relative z-10">
+                    <p class="text-[12px] font-black uppercase tracking-[0.5em] mb-4 opacity-70">Cancelled Payments</p>
+                    <h2 class="text-4xl font-black leading-tight tracking-widest text-rose-400">Rs. <?php echo number_format($total_cancelled, 2); ?></h2>
+                </div>
+                <div class="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center absolute bottom-8 right-8 border border-white/10 shadow-inner"><svg class="w-8 h-8 text-rose-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
             </div>
         </div>
 

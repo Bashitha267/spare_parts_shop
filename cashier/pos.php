@@ -384,19 +384,21 @@ check_auth('cashier');
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[9px] font-bold text-slate-800 uppercase tracking-widest mb-1 ml-1 opacity-70">Labled Price</label>
-                        <input type="number" id="entry_labeled_price" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-800 outline-none text-[11px]">
+                        <label class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 ml-1">Buying Price</label>
+                        <input type="number" id="entry_buying_price" readonly class="w-full px-2 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-400 outline-none text-[10px]">
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-1 ml-1">Co. Base Price</label>
-                        <input type="number" id="entry_base_price" readonly class="w-full px-3 py-2 bg-blue-50 border border-blue-100 rounded-xl font-bold text-blue-700 outline-none text-[11px]">
+                        <label class="block text-[8px] font-black text-slate-600 uppercase tracking-widest mb-1 ml-1">Labeled Price</label>
+                        <input type="number" id="entry_labeled_price" readonly class="w-full px-2 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-600 outline-none text-[10px]">
                     </div>
                 </div>
+                <!-- Hidden base price for discount calculations -->
+                <input type="hidden" id="entry_base_price">
                 
                 <div class="grid grid-cols-2 gap-3 pt-0.5">
                     <div>
-                        <label class="block text-[9px] font-bold text-slate-900 uppercase tracking-widest mb-1.5 ml-1">Cashier Price (Net)</label>
-                        <input type="number" id="entry_price" step="0.01" oninput="syncFromPrice()" class="w-full px-3 py-2.5 bg-white border-2 border-slate-100 rounded-xl font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm">
+                        <label class="block text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-1.5 ml-1">Estimated Selling Price</label>
+                        <input type="number" id="entry_price" step="0.01" oninput="syncFromPrice()" class="w-full px-3 py-2.5 bg-white border-2 border-blue-100 rounded-xl font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm">
                     </div>
                     <div>
                         <label class="block text-[9px] font-bold text-red-500 uppercase tracking-widest mb-1.5 ml-1">Manual Discount</label>
@@ -768,6 +770,7 @@ check_auth('cashier');
         function openEntryModal(b) {
             selectedBatch = b;
             document.getElementById('entry_qty').value = 1;
+            document.getElementById('entry_buying_price').value = b.buying_price;
             document.getElementById('entry_labeled_price').value = b.selling_price;
             document.getElementById('entry_base_price').value = b.estimated_selling_price;
             document.getElementById('entry_price').value = b.estimated_selling_price;
