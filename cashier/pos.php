@@ -644,7 +644,7 @@ check_auth('cashier');
 
                             <!-- Col 2: Barcode -->
                             <div class="w-[15%]">
-                                <p class="text-[10px] font-mono text-blue-500 font-black tracking-tight">${p.barcode}</p>
+                                <p class="text-[12px] font-mono text-blue-500 font-black tracking-tight">${p.barcode}</p>
                             </div>
 
                             <!-- Col 3: Type -->
@@ -654,18 +654,18 @@ check_auth('cashier');
 
                             <!-- Col 4: Qty -->
                             <div class="w-[8%] text-center">
-                                <span class="text-[11px] font-black text-slate-700">${b.current_qty}</span>
+                                <span class="text-[12px] font-black text-slate-700">${b.current_qty}</span>
                                 <span class="text-[8px] text-slate-400 font-bold uppercase">${isOil ? (p.oil_type === 'loose' ? 'L' : 'C') : 'P'}</span>
                             </div>
 
                             <!-- Col 5: Buying -->
                             <div class="w-[15%] text-right pr-2">
-                                <p class="text-[11px] font-mono font-bold text-slate-400 italic">${numberFormat(b.buying_price)}</p>
+                                <p class="text-[12px] font-mono font-bold text-slate-400 italic">${numberFormat(b.buying_price)}</p>
                             </div>
 
                             <!-- Col 6: Labeled -->
                             <div class="w-[15%] text-right pr-2">
-                                <p class="text-[11px] font-mono font-bold text-slate-600">${numberFormat(b.selling_price)}</p>
+                                <p class="text-[12px] font-mono font-bold text-slate-600">${numberFormat(b.selling_price)}</p>
                             </div>
 
                             <!-- Col 7: Estimated -->

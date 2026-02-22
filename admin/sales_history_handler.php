@@ -127,7 +127,12 @@ if ($action === 'edit') {
         ]);
 
         // 4. Also add to System Logs for dashboard visibility
-        log_action("Edit Sale", "Modified TRX-$sale_id. Reason: $reason");
+        // 4. Also add to System Logs for dashboard visibility
+        $changes = [];
+        if($old_data['final_amount'] != $amount) $changes[] = "Amount: ~~" . number_format($old_data['final_amount'], 0) . "~~ " . number_format($amount, 0);
+        if($old_data['payment_method'] != $method) $changes[] = "Method: ~~{$old_data['payment_method']}~~ $method";
+        if($old_data['payment_status'] != $status) $changes[] = "Status: ~~{$old_data['payment_status']}~~ $status";
+        log_action("Edit Sale", "TRX-$sale_id | " . implode(", ", $changes) . " | $reason");
 
         $pdo->commit();
         echo json_encode(['success' => true]);

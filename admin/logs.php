@@ -78,7 +78,14 @@ check_auth('admin');
                    <p class="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] mt-0.5">Audit Activity Trail</p>
                 </div>
             </div>
-            <button onclick="loadLogs()" class="bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">Refresh Logs</button>
+            
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <input type="text" id="logSearch" class="pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none w-64" placeholder="Search logs...">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <button onclick="loadLogs(1)" class="bg-blue-600 text-white px-8 py-2.5 rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">Refresh</button>
+            </div>
         </div>
     </nav>
 
@@ -110,11 +117,20 @@ check_auth('admin');
 
         document.addEventListener('DOMContentLoaded', () => {
             loadLogs(1);
+
+            let debounceTimer;
+            document.getElementById('logSearch').addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    loadLogs(1);
+                }, 300);
+            });
         });
 
         async function loadLogs(page = 1) {
             currentPage = page;
-            const res = await fetch(`logs_handler.php?action=fetch_logs&page=${page}`);
+            const search = document.getElementById('logSearch').value;
+            const res = await fetch(`logs_handler.php?action=fetch_logs&page=${page}&search=${search}`);
             const data = await res.json();
             
             const tbody = document.getElementById('logsBody');
@@ -126,21 +142,45 @@ check_auth('admin');
             }
 
             data.logs.forEach(log => {
+                const role = log.user_role ? log.user_role.toLowerCase() : 'system';
+                let roleClass = 'bg-slate-100 text-slate-500 border-slate-200'; // Default System
+                
+                if (role === 'admin') {
+                    roleClass = 'bg-violet-100 text-violet-700 border-violet-200';
+                } else if (role === 'cashier') {
+                    roleClass = 'bg-emerald-100 text-emerald-700 border-emerald-200';
+                }
+
+                const action = log.action.toLowerCase();
+                let actionClass = 'bg-blue-50 text-blue-700 border-blue-100'; // Default
+                
+                if (action.includes('payment')) {
+                    actionClass = 'bg-amber-50 text-amber-700 border-amber-200';
+                } else if (action.includes('delete')) {
+                    actionClass = 'bg-rose-50 text-rose-700 border-rose-200';
+                } else if (action.includes('sale')) {
+                    actionClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                } else if (action.includes('update')) {
+                    actionClass = 'bg-indigo-50 text-indigo-700 border-indigo-200';
+                } else if (action.includes('add')) {
+                    actionClass = 'bg-violet-50 text-violet-700 border-violet-200';
+                }
+
                 const row = `
-                    <tr class="hover:bg-slate-50 transition-all group">
+                    <tr class="hover:bg-slate-50 transition-all group border-b border-slate-50 last:border-0 text-sm">
                         <td class="px-8 py-6">
                             <p class="text-[11px] font-black text-slate-900 uppercase tracking-tight">${new Date(log.created_at).toLocaleDateString('en-GB')}</p>
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">${new Date(log.created_at).toLocaleTimeString()}</p>
                         </td>
                         <td class="px-8 py-6">
                             <p class="font-black text-slate-900 text-sm tracking-tight">${log.user_name || 'System'}</p>
-                            <span class="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[8px] font-black uppercase tracking-widest">${log.user_role || 'N/A'}</span>
+                            <span class="px-2 py-0.5 border ${roleClass} rounded text-[8px] font-black uppercase tracking-widest">${role}</span>
                         </td>
                         <td class="px-8 py-6">
-                            <span class="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-100 rounded-lg text-[10px] font-black uppercase tracking-widest">${log.action}</span>
+                            <span class="px-3 py-1.5 border ${actionClass} rounded-lg text-[10px] font-black uppercase tracking-widest whitespace-nowrap shadow-sm">${log.action}</span>
                         </td>
-                        <td class="px-8 py-6">
-                            <p class="text-[11px] font-medium text-slate-600 leading-relaxed">${log.details || '-'}</p>
+                        <td class="px-8 py-6 max-w-md">
+                            <p class="text-[11px] font-medium text-slate-600 leading-relaxed whitespace-pre-wrap">${(log.details || '-').replace(/~~(.*?)~~\s(.*?)(?=, |$)/g, '<span class="line-through opacity-100 text-slate-800">$1</span> <span class="text-blue-400 font-bold mx-1">→</span> <span class="text-rose-600 font-black tracking-tight">$2</span>')}</p>
                         </td>
                     </tr>
                 `;

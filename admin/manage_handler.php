@@ -170,6 +170,13 @@ if ($action === 'toggle_status') {
     // Update batch status instead of product status
     $stmt = $pdo->prepare("UPDATE batches SET is_active = ? WHERE id = ?");
     if ($stmt->execute([$status, $id])) {
+        // Log the action
+        $info_stmt = $pdo->prepare("SELECT p.name, b.id FROM batches b JOIN products p ON b.product_id = p.id WHERE b.id = ?");
+        $info_stmt->execute([$id]);
+        $info = $info_stmt->fetch(PDO::FETCH_ASSOC);
+        $action_name = $status == 1 ? "Activate Batch" : "Deactivate Batch";
+        log_action($action_name, "Batch #{$info['id']} for {$info['name']} set to " . ($status == 1 ? "Active" : "Inactive"));
+        
         echo json_encode(['success' => true]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to update batch status']);
@@ -190,11 +197,26 @@ if ($action === 'update_product') {
     
     $pdo->beginTransaction();
     try {
+        // 0. Get Old Data for Logging
+        $stmt = $pdo->prepare("SELECT p.*, b.buying_price, b.selling_price, b.estimated_selling_price, b.current_qty 
+                              FROM products p 
+                              LEFT JOIN batches b ON p.id = b.product_id 
+                              WHERE p.id = ? " . ($batch_id ? " AND b.id = ?" : " ORDER BY b.id DESC LIMIT 1"));
+        if ($batch_id) {
+            $stmt->execute([$id, $batch_id]);
+        } else {
+            $stmt->execute([$id]);
+        }
+        $old_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $barcode = $_POST['barcode'] ?? $old_data['barcode'];
+
         // 1. Update Product Details
-        $stmt = $pdo->prepare("UPDATE products SET name = ?, brand = ?, vehicle_compatibility = ? WHERE id = ?");
-        $stmt->execute([$name, $brand, $v_types, $id]);
+        $stmt = $pdo->prepare("UPDATE products SET barcode = ?, name = ?, brand = ?, vehicle_compatibility = ? WHERE id = ?");
+        $stmt->execute([$barcode, $name, $brand, $v_types, $id]);
 
         // 2. Update Batch Details (if prices/qty provided)
+        $batch_details_updated = false;
         if ($qty !== null || $b_price !== null || $s_price !== null || $est_price !== null) {
             // Find the batch to update
             if (!$batch_id) {
@@ -208,7 +230,26 @@ if ($action === 'update_product') {
                 // Update specific batch fields
                 $stmt = $pdo->prepare("UPDATE batches SET buying_price = ?, selling_price = ?, estimated_selling_price = ?, current_qty = ? WHERE id = ?");
                 $stmt->execute([$b_price, $s_price, $est_price, $qty, $batch_id]);
+                $batch_details_updated = true;
             }
+        }
+
+        // 3. Log Action with Details
+        $changes = [];
+        if ($old_data['barcode'] != $barcode) $changes[] = "Barcode: ~~{$old_data['barcode']}~~ $barcode";
+        if ($old_data['name'] != $name) $changes[] = "Name: ~~{$old_data['name']}~~ $name";
+        if ($old_data['brand'] != $brand) $changes[] = "Brand: ~~{$old_data['brand']}~~ $brand";
+        if ($old_data['vehicle_compatibility'] != $v_types) $changes[] = "Compatibility: ~~{$old_data['vehicle_compatibility']}~~ $v_types";
+        
+        if ($batch_details_updated) {
+            if ($old_data['buying_price'] != $b_price) $changes[] = "Buying Price: ~~" . number_format($old_data['buying_price'], 0) . "~~ " . number_format($b_price, 0);
+            if ($old_data['selling_price'] != $s_price) $changes[] = "Selling Price: ~~" . number_format($old_data['selling_price'], 0) . "~~ " . number_format($s_price, 0);
+            if ($old_data['estimated_selling_price'] != $est_price) $changes[] = "Estimated Price: ~~" . number_format($old_data['estimated_selling_price'], 0) . "~~ " . number_format($est_price, 0);
+            if ($old_data['current_qty'] != $qty) $changes[] = "Quantity: ~~{$old_data['current_qty']}~~ $qty";
+        }
+        
+        if (!empty($changes)) {
+            log_action("Update Registry", "$name | " . implode(", ", $changes));
         }
         
         $pdo->commit();
@@ -247,9 +288,15 @@ if ($action === 'delete_product') {
         $stmt->execute([$id]);
 
         // 3. Delete the product
+        $stmt = $pdo->prepare("SELECT name, barcode FROM products WHERE id = ?");
+        $stmt->execute([$id]);
+        $p_info = $stmt->fetch(PDO::FETCH_ASSOC);
+
         $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
         $stmt->execute([$id]);
         
+        log_action("Delete Item", "Permanently deleted product: {$p_info['name']} ({$p_info['barcode']}) and its associated batches.");
+
         $pdo->commit();
         echo json_encode(['success' => true, 'message' => 'Product and all associated batches deleted successfully.']);
 
@@ -280,7 +327,9 @@ if ($action === 'quick_add_stock') {
         }
 
         // 2. Create product if still no p_id (New Product Path)
+        $is_new_product = false;
         if (empty($p_id)) {
+            $is_new_product = true;
             $stmt = $pdo->prepare("INSERT INTO products (barcode, name, type, oil_type, brand, vehicle_compatibility) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $barcode,
@@ -348,6 +397,17 @@ if ($action === 'quick_add_stock') {
         // 4. Ensure Product is Active
         $stmt = $pdo->prepare("UPDATE products SET is_active = 1 WHERE id = ?");
         $stmt->execute([$p_id]);
+
+        // 5. Log Action
+        if ($is_new_product) {
+            log_action("New Item Added", "Added new item: {$_POST['name']} ({$barcode}) with initial stock $new_qty at $new_b_price each.");
+        } else {
+            $stmt = $pdo->prepare("SELECT name FROM products WHERE id = ?");
+            $stmt->execute([$p_id]);
+            $p_name = $stmt->fetchColumn();
+            $total_val = $new_qty * $new_b_price;
+            log_action("New Batch Added", "Batch added for $p_name: Qty $new_qty, Total Value Rs. " . number_format($total_val, 2));
+        }
 
         $pdo->commit();
         echo json_encode(['success' => true, 'message' => 'Stock updated successfully']);

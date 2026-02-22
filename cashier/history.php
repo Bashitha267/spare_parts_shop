@@ -135,21 +135,33 @@ check_auth('cashier');
                     <p class="text-[9px] text-slate-600 font-bold uppercase tracking-widest">All your past sales</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 md:gap-5">
-                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-4 md:px-5 py-2 rounded-xl flex items-center gap-2.5 shadow-lg shadow-emerald-500/20">
-                    <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="flex items-center gap-2 md:gap-3">
+                <!-- Total Today -->
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-2 rounded-xl flex items-center gap-2.5 shadow-lg shadow-blue-500/20">
+                    <div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
                     <div>
                         <p class="text-[8px] font-black text-white/70 uppercase tracking-widest leading-none">Today</p>
-                        <p id="today_total" class="text-sm md:text-base font-black text-white leading-none mt-0.5">LKR 0.00</p>
+                        <p id="today_total" class="text-xs md:text-sm font-black text-white leading-none mt-0.5">Rs. 0.00</p>
                     </div>
                 </div>
-                <div class="hidden md:flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+
+                <!-- Approved -->
+                <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl flex items-center gap-2.5">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                    <div>
+                        <p class="text-[8px] font-black opacity-60 uppercase tracking-widest leading-none">Approved</p>
+                        <p id="today_approved" class="text-xs md:text-sm font-black leading-none mt-0.5">Rs. 0.00</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[9px] text-slate-600 uppercase font-black tracking-widest">Cashier</p>
-                        <p class="text-xs font-bold text-slate-950"><?php echo $_SESSION['full_name']; ?></p>
+                </div>
+
+                <!-- Pending -->
+                <div class="bg-rose-50 text-rose-700 border border-rose-200 px-4 py-2 rounded-xl flex items-center gap-2.5">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div>
+                        <p class="text-[8px] font-black opacity-60 uppercase tracking-widest leading-none">Pending</p>
+                        <p id="today_pending" class="text-xs md:text-sm font-black leading-none mt-0.5">Rs. 0.00</p>
                     </div>
                 </div>
             </div>
@@ -370,7 +382,9 @@ check_auth('cashier');
         async function updateTodayTotal() {
             const res = await fetch(`sales_handler.php?action=get_today_total`);
             const data = await res.json();
-            document.getElementById('today_total').innerText = 'LKR ' + data.total;
+            document.getElementById('today_total').innerText = 'Rs. ' + data.total;
+            document.getElementById('today_approved').innerText = 'Rs. ' + data.approved;
+            document.getElementById('today_pending').innerText = 'Rs. ' + data.pending;
         }
         updateTodayTotal();
 

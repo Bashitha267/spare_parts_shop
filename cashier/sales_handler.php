@@ -91,6 +91,9 @@ if ($action === 'submit_sale') {
                 ->execute([$item['product_id'], $item['product_id']]);
         }
 
+        // 5. Log Action
+        log_action("New Sale", "Recorded TRX-$sale_id. Total: Rs. " . number_format($final_amount, 2));
+
         $pdo->commit();
         echo json_encode(['success' => true, 'sale_id' => $sale_id]);
     } catch (Exception $e) {
@@ -103,10 +106,28 @@ if ($action === 'submit_sale') {
 if ($action === 'get_today_total') {
     $user_id = $_SESSION['id'];
     $today = date('Y-m-d');
+    
+    // Total Today
     $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ?");
     $stmt->execute([$user_id, $today]);
     $total = $stmt->fetchColumn() ?: 0;
-    echo json_encode(['success' => true, 'total' => number_format($total, 2)]);
+
+    // Approved Today
+    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'approved'");
+    $stmt->execute([$user_id, $today]);
+    $approved = $stmt->fetchColumn() ?: 0;
+
+    // Pending/Rejected (Not Approved) Today
+    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status != 'approved'");
+    $stmt->execute([$user_id, $today]);
+    $pending = $stmt->fetchColumn() ?: 0;
+
+    echo json_encode([
+        'success' => true, 
+        'total' => number_format($total, 2),
+        'approved' => number_format($approved, 2),
+        'pending' => number_format($pending, 2)
+    ]);
     exit;
 }
 

@@ -267,37 +267,48 @@ $is_admin = ($_SESSION['role'] === 'admin');
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <form id="editForm" class="space-y-6">
+            <form id="editForm" class="space-y-4">
                 <input type="hidden" name="id" id="edit_id">
                 <input type="hidden" name="batch_id" id="edit_batch_id">
-                <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Spare Designation</label>
-                    <input type="text" name="name" id="edit_name" class="w-full px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-slate-300 font-bold" placeholder="Product Name">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Brand Identity</label>
-                    <input type="text" name="brand" id="edit_brand" class="w-full px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-slate-300 font-bold" placeholder="Brand Name">
-                </div>
-                <div>
-                   <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Fittings Profile</label>
-                   <input type="text" name="v_types" id="edit_v_types" class="w-full px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-slate-300 font-bold" placeholder="Universal / Specific">
-                </div>
-                <div class="grid grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+                
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Buying Price</label>
-                        <input type="number" step="0.01" name="b_price" id="edit_b_price" class="w-full px-6 py-4 rounded-2xl outline-none transition-all font-bold border border-slate-100 focus:border-indigo-500">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Barcode / Part Number</label>
+                        <input type="text" name="barcode" id="edit_barcode" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all placeholder:text-slate-300 font-black bg-indigo-50 border-2 border-indigo-100 focus:border-indigo-500 text-sm">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Labeled Price</label>
-                        <input type="number" step="0.01" name="s_price" id="edit_s_price" class="w-full px-6 py-4 rounded-2xl outline-none transition-all font-bold border border-slate-100 focus:border-indigo-500">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Spare Designation</label>
+                        <input type="text" name="name" id="edit_name" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all placeholder:text-slate-300 font-bold border border-slate-200 text-sm" placeholder="Product Name">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Brand Identity</label>
+                        <input type="text" name="brand" id="edit_brand" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all placeholder:text-slate-300 font-bold border border-slate-200 text-sm" placeholder="Brand Name">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-3 ml-1">Est. Selling Price</label>
-                        <input type="number" step="0.01" name="est_price" id="edit_est_price" class="w-full px-6 py-4 rounded-2xl border-2 border-indigo-50 font-black text-indigo-700 outline-none transition-all">
+                       <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Fittings Profile</label>
+                       <input type="text" name="v_types" id="edit_v_types" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all placeholder:text-slate-300 font-bold border border-slate-200 text-sm" placeholder="Universal / Specific">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Buying Price</label>
+                        <input type="number" step="0.01" name="b_price" id="edit_b_price" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all font-bold border border-slate-100 focus:border-indigo-500 text-sm">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Current Stock (Qty)</label>
-                        <input type="number" step="0.01" name="qty" id="edit_qty" class="w-full px-6 py-4 rounded-2xl outline-none transition-all font-black bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Labeled Price</label>
+                        <input type="number" step="0.01" name="s_price" id="edit_s_price" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all font-bold border border-slate-100 focus:border-indigo-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-2 ml-1">Est. Selling Price</label>
+                        <input type="number" step="0.01" name="est_price" id="edit_est_price" class="w-full px-6 py-3.5 rounded-xl border-2 border-indigo-50 font-black text-indigo-700 outline-none transition-all text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Current Stock (Qty)</label>
+                        <input type="number" step="0.01" name="qty" id="edit_qty" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all font-black bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 text-sm">
                     </div>
                 </div>
                 <div class="flex flex-col gap-3 mt-10">
@@ -556,6 +567,7 @@ $is_admin = ($_SESSION['role'] === 'admin');
         function editProduct(p) {
             document.getElementById('edit_id').value = p.product_id;
             document.getElementById('edit_batch_id').value = p.id;
+            document.getElementById('edit_barcode').value = p.p_barcode || p.barcode;
             document.getElementById('edit_name').value = p.name;
             document.getElementById('edit_brand').value = p.brand;
             document.getElementById('edit_v_types').value = p.vehicle_compatibility;

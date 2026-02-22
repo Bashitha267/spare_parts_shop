@@ -50,11 +50,22 @@ if ($action === 'update_payment_status') {
     $sale_id = $_POST['sale_id'];
     $status = $_POST['status']; // approved or rejected
 
-    $stmt = $pdo->prepare("UPDATE sales SET payment_status = ? WHERE id = ?");
-    if ($stmt->execute([$status, $sale_id])) {
-        echo json_encode(['success' => true]);
+    // Get sale data for logging
+    $stmt = $pdo->prepare("SELECT payment_status, payment_method, final_amount FROM sales WHERE id = ?");
+    $stmt->execute([$sale_id]);
+    $sale = $stmt->fetch();
+
+    if ($sale) {
+        $old_status = $sale['payment_status'];
+        $stmt = $pdo->prepare("UPDATE sales SET payment_status = ? WHERE id = ?");
+        if ($stmt->execute([$status, $sale_id])) {
+            log_action("Payment Update", "TRX-$sale_id | Method: {$sale['payment_method']} | Amount: Rs. " . number_format($sale['final_amount'], 2) . " | Status: ~~{$old_status}~~ " . ucfirst($status));
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update status']);
+        }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Failed to update status']);
+        echo json_encode(['success' => false, 'message' => 'Sale not found']);
     }
     exit;
 }
