@@ -193,6 +193,14 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
                     </div>
                     <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">System Logs</span>
                 </a>
+
+                <!-- Sale Items History -->
+                <a href="item_sales.php" class="p-8 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden">
+                    <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
+                        <svg class="w-12 h-12 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    </div>
+                    <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Sale Items History</span>
+                </a>
             </div>
         </div>
     </div>

@@ -36,13 +36,13 @@ if ($action === 'search_product') {
     $stmt = $pdo->prepare("SELECT p.* FROM products p 
                            WHERE (p.barcode LIKE ? OR p.name LIKE ?) 
                            AND p.is_active = 1 
-                           AND (SELECT SUM(current_qty) FROM batches WHERE product_id = p.id) > 0
+                           AND (SELECT COUNT(*) FROM batches WHERE product_id = p.id AND current_qty > 0 AND is_active = 1) > 0
                            LIMIT 10");
     $stmt->execute(["%$query%", "%$query%"]);
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($products as &$product) {
-        $stmt_batch = $pdo->prepare("SELECT * FROM batches WHERE product_id = ? AND current_qty > 0 ORDER BY expire_date ASC");
+        $stmt_batch = $pdo->prepare("SELECT * FROM batches WHERE product_id = ? AND current_qty > 0 AND is_active = 1 ORDER BY id ASC");
         $stmt_batch->execute([$product['id']]);
         $product['batches'] = $stmt_batch->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -53,7 +53,7 @@ if ($action === 'search_product') {
 
 if ($action === 'get_batches') {
     $product_id = $_GET['product_id'];
-    $stmt = $pdo->prepare("SELECT * FROM batches WHERE product_id = ? AND current_qty > 0 ORDER BY expire_date ASC");
+    $stmt = $pdo->prepare("SELECT * FROM batches WHERE product_id = ? AND current_qty > 0 AND is_active = 1 ORDER BY id ASC");
     $stmt->execute([$product_id]);
     echo json_encode(['success' => true, 'batches' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
     exit;

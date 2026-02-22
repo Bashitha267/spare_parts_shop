@@ -83,9 +83,9 @@ if ($action === 'fetch_inventory') {
     $params = [];
     
     if ($status_filter === 'active') {
-        $whereClause .= " AND p.is_active = 1";
+        $whereClause .= " AND b.is_active = 1";
     } else if ($status_filter === 'out_of_stock') {
-        $whereClause .= " AND p.is_active = 0";
+        $whereClause .= " AND b.is_active = 0";
     }
 
     if (!empty($type)) {
@@ -114,59 +114,50 @@ if ($action === 'fetch_inventory') {
 
     // If filtering by low stock, we need to wrap the count query
     if ($low_stock) {
-        $countSql = "SELECT COUNT(*) FROM (
-                        SELECT p.id, COALESCE(SUM(b.current_qty), 0) as total_stock 
-                        FROM products p 
-                        LEFT JOIN batches b ON p.id = b.product_id 
-                        $whereClause 
-                        GROUP BY p.id 
-                        $havingClause
-                        ORDER BY $orderBy
-                     ) as subquery";
+        $countSql = "SELECT COUNT(*) FROM batches b INNER JOIN products p ON b.product_id = p.id $whereClause AND b.current_qty < 5";
     } else {
-        $countSql = "SELECT COUNT(*) FROM products p $whereClause";
+        $countSql = "SELECT COUNT(*) FROM batches b INNER JOIN products p ON b.product_id = p.id $whereClause";
     }
 
     $countStmt = $pdo->prepare($countSql);
     $countStmt->execute($params);
-    $totalProducts = $countStmt->fetchColumn();
-    $totalPages = ceil($totalProducts / $limit);
+    $totalBatches = $countStmt->fetchColumn();
+    $totalPages = ceil($totalBatches / $limit);
 
     // Fetch Grand Total Inventory Value (matching filters, ignoring pagination)
     $valSql = "SELECT SUM(b.current_qty * b.buying_price) as grand_total 
-               FROM products p 
-               INNER JOIN batches b ON p.id = b.product_id 
+               FROM batches b
+               INNER JOIN products p ON b.product_id = p.id 
                $whereClause";
     $valStmt = $pdo->prepare($valSql);
     $valStmt->execute($params);
     $grandTotalValue = $valStmt->fetchColumn() ?: 0;
 
-    // Fetch Products with Stock Levels and Valuation
-    $sql = "SELECT p.*, 
-            COALESCE(SUM(b.current_qty), 0) as total_stock,
-            COALESCE(SUM(b.current_qty * b.buying_price), 0) as total_value,
-            (SELECT buying_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as buying_price,
-            (SELECT selling_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as selling_price,
-            (SELECT estimated_selling_price FROM batches b2 WHERE b2.product_id = p.id ORDER BY b2.id DESC LIMIT 1) as estimated_selling_price
-            FROM products p 
-            LEFT JOIN batches b ON p.id = b.product_id 
+    // Fetch Batches with Product Details
+    $orderBy = "b.id DESC"; // Default for batch view
+    if ($sort === 'low_value') $orderBy = "(b.current_qty * b.buying_price) ASC";
+    else if ($sort === 'high_value') $orderBy = "(b.current_qty * b.buying_price) DESC";
+    else if ($sort === 'name_asc') $orderBy = "p.name ASC";
+
+    $sql = "SELECT b.*, p.name, p.barcode as p_barcode, p.type, p.oil_type, p.brand, p.vehicle_compatibility,
+            (b.current_qty * b.buying_price) as total_value
+            FROM batches b 
+            INNER JOIN products p ON b.product_id = p.id
             $whereClause 
-            GROUP BY p.id 
-            $havingClause
             ORDER BY $orderBy 
             LIMIT $limit OFFSET $offset";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $batches = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
-        'products' => $products,
+        'products' => $batches, // Keep key name for frontend compatibility
         'grand_total_value' => $grandTotalValue,
         'pagination' => [
             'current_page' => $page,
             'total_pages' => $totalPages,
-            'total_items' => $totalProducts
+            'total_items' => $totalBatches
         ]
     ]);
     exit;
@@ -176,17 +167,19 @@ if ($action === 'toggle_status') {
     $id = $_POST['id'];
     $status = $_POST['status']; // 1 or 0
     
-    $stmt = $pdo->prepare("UPDATE products SET is_active = ? WHERE id = ?");
+    // Update batch status instead of product status
+    $stmt = $pdo->prepare("UPDATE batches SET is_active = ? WHERE id = ?");
     if ($stmt->execute([$status, $id])) {
         echo json_encode(['success' => true]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Failed to update status']);
+        echo json_encode(['success' => false, 'message' => 'Failed to update batch status']);
     }
     exit;
 }
 
 if ($action === 'update_product') {
     $id = $_POST['id'];
+    $batch_id = $_POST['batch_id'] ?? null;
     $name = $_POST['name'];
     $brand = $_POST['brand'];
     $v_types = $_POST['v_types'];
@@ -201,12 +194,15 @@ if ($action === 'update_product') {
         $stmt = $pdo->prepare("UPDATE products SET name = ?, brand = ?, vehicle_compatibility = ? WHERE id = ?");
         $stmt->execute([$name, $brand, $v_types, $id]);
 
-        // 2. Update Latest Batch Details (if prices/qty provided)
+        // 2. Update Batch Details (if prices/qty provided)
         if ($qty !== null || $b_price !== null || $s_price !== null || $est_price !== null) {
-            // Find the latest batch
-            $stmt = $pdo->prepare("SELECT id FROM batches WHERE product_id = ? ORDER BY id DESC LIMIT 1");
-            $stmt->execute([$id]);
-            $batch_id = $stmt->fetchColumn();
+            // Find the batch to update
+            if (!$batch_id) {
+                // Fallback to latest batch if ID not provided
+                $stmt = $pdo->prepare("SELECT id FROM batches WHERE product_id = ? ORDER BY id DESC LIMIT 1");
+                $stmt->execute([$id]);
+                $batch_id = $stmt->fetchColumn();
+            }
 
             if ($batch_id) {
                 // Update specific batch fields
@@ -266,7 +262,13 @@ if ($action === 'delete_product') {
 
 if ($action === 'quick_add_stock') {
     $p_id = $_POST['product_id'] ?? null;
+    $target_batch_id = $_POST['target_batch_id'] ?? null;
     $barcode = $_POST['barcode'] ?? '';
+    
+    // Auto-generate barcode if empty (Numeric only)
+    if (empty($barcode)) {
+        $barcode = date('His') . rand(100, 999);
+    }
     
     $pdo->beginTransaction();
     try {
@@ -291,17 +293,26 @@ if ($action === 'quick_add_stock') {
             $p_id = $pdo->lastInsertId();
         }
 
-        // 3. Check for existing batch to merge (if buying price matches)
-        $stmt = $pdo->prepare("SELECT id, invoice_id, buying_price, current_qty, original_qty FROM batches WHERE product_id = ? ORDER BY id DESC LIMIT 1");
-        $stmt->execute([$p_id]);
-        $latest_batch = $stmt->fetch(PDO::FETCH_ASSOC);
-
         $new_b_price = $_POST['b_price'];
         $new_qty = $_POST['qty'];
         $new_s_price = $_POST['s_price'];
         $new_est_price = $_POST['est_price'];
 
-        if ($latest_batch && (float)$latest_batch['buying_price'] == (float)$new_b_price) {
+        // 3. Check for batch to merge (ALL prices must match)
+        // Check target batch first if provided, else check latest
+        if ($target_batch_id) {
+            $stmt = $pdo->prepare("SELECT id, invoice_id, buying_price, selling_price, estimated_selling_price FROM batches WHERE id = ?");
+            $stmt->execute([$target_batch_id]);
+        } else {
+            $stmt = $pdo->prepare("SELECT id, invoice_id, buying_price, selling_price, estimated_selling_price FROM batches WHERE product_id = ? ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$p_id]);
+        }
+        $latest_batch = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($latest_batch && 
+            (float)$latest_batch['buying_price'] == (float)$new_b_price && 
+            (float)$latest_batch['selling_price'] == (float)$new_s_price && 
+            (float)$latest_batch['estimated_selling_price'] == (float)$new_est_price) {
             // MERGE PATH: Update existing batch
             $batch_id = $latest_batch['id'];
             $invoice_id = $latest_batch['invoice_id'];

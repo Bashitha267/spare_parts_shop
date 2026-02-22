@@ -186,6 +186,7 @@ $is_admin = ($_SESSION['role'] === 'admin');
             </div>
             <form id="quickBatchForm" class="space-y-4">
                 <input type="hidden" name="product_id" id="qb_product_id">
+                <input type="hidden" name="target_batch_id" id="qb_target_batch_id">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Buying Price</label>
@@ -221,7 +222,10 @@ $is_admin = ($_SESSION['role'] === 'admin');
                 <div class="grid grid-cols-2 gap-4">
                     <div class="col-span-2">
                         <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Barcode / Scan Point</label>
-                        <input type="text" name="barcode" id="np_barcode" required class="w-full px-5 py-3 rounded-xl border border-slate-200 font-black text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Scan or enter barcode...">
+                        <div class="flex gap-2">
+                            <input type="text" name="barcode" id="np_barcode" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="flex-grow px-5 py-3 rounded-xl border border-slate-200 font-black text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Enter numbers only...">
+                            <button type="button" onclick="generateBarcode('np_barcode')" class="px-4 py-3 bg-blue-50 text-blue-600 border-2 border-blue-200 rounded-xl text-[10px] font-black uppercase hover:bg-blue-100 transition-all">Generate</button>
+                        </div>
                     </div>
                     <div class="col-span-2">
                         <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Product Name</label>
@@ -237,7 +241,11 @@ $is_admin = ($_SESSION['role'] === 'admin');
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Brand</label>
-                        <input type="text" name="brand" class="w-full px-5 py-3 rounded-xl border border-slate-200 font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                        <input type="text" name="brand" class="w-full px-5 py-3 rounded-xl border border-slate-200 font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Shell, Castrol...">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Vehicle Compatibility</label>
+                        <input type="text" name="v_types" class="w-full px-5 py-3 rounded-xl border border-slate-200 font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Toyota, Honda, Universal...">
                     </div>
                     <div class="pt-2 col-span-2 border-t border-slate-100 mt-2">
                         <p class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-4">Initial Batch Entry</p>
@@ -275,6 +283,7 @@ $is_admin = ($_SESSION['role'] === 'admin');
             </div>
             <form id="editForm" class="space-y-6">
                 <input type="hidden" name="id" id="edit_id">
+                <input type="hidden" name="batch_id" id="edit_batch_id">
                 <div>
                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Product Designation</label>
                     <input type="text" name="name" id="edit_name" class="w-full px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-slate-300 font-bold" placeholder="Product Name">
@@ -415,26 +424,29 @@ $is_admin = ($_SESSION['role'] === 'admin');
             data.products.forEach(p => {
                 let qtyDisplay = '';
                 if(p.type === 'oil') {
-                    if(p.oil_type === 'can') qtyDisplay = `<span class="font-black text-blue-800">${p.total_stock}</span> <span class="text-blue-900 font-bold">Cans</span>`;
-                    else qtyDisplay = `<span class="font-black text-amber-800">${p.total_stock}</span> <span class="text-amber-900 font-bold">Liters</span>`;
+                    if(p.oil_type === 'can') qtyDisplay = `<span class="font-black text-blue-800">${Math.round(p.current_qty)}</span> <span class="text-blue-900 font-bold">Cans</span>`;
+                    else qtyDisplay = `<span class="font-black text-amber-800">${p.current_qty}</span> <span class="text-amber-900 font-bold">Liters</span>`;
                 } else {
-                    qtyDisplay = `<span class="font-black text-blue-900">${p.total_stock}</span> <span class="text-blue-950 font-bold">Units</span>`;
+                    qtyDisplay = `<span class="font-black text-blue-900">${Math.round(p.current_qty)}</span> <span class="text-blue-950 font-bold">Units</span>`;
                 }
 
-                let statusBadge = p.is_active == 1 
-                    ? '<span class="px-3 py-1 bg-emerald-500/15 text-emerald-800 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest">Active</span>'
-                    : '<span class=" py-1  text-red-600  rounded-lg text-[10px] font-black uppercase ">Out of Stock</span>';
+                let statusBadge = p.current_qty > 0 
+                    ? '<span class="px-3 py-1 bg-emerald-500/15 text-emerald-800 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest">In Stock</span>'
+                    : '<span class=" py-1  text-red-600  rounded-lg text-[10px] font-black uppercase ">Finished</span>';
 
                 let statusBtn = p.is_active == 1
                     ? `<button onclick="toggleStatus(${p.id}, 0); event.stopPropagation();" class="text-xs font-black text-emerald-800 hover:text-emerald-950 transition-colors uppercase tracking-tighter" title="Mark Out of Stock">Active</button>`
-                    : `<button onclick="toggleStatus(${p.id}, 1); event.stopPropagation();" class="text-[10px] font-black transition-colors uppercase tracking-tight bg-red-400 text-white hover:bg-red-600 px-2 py-1 rounded-lg" title="Activate">Out of Stock</button>`;
+                    : `<button onclick="toggleStatus(${p.id}, 1); event.stopPropagation();" class="text-[10px] font-black transition-colors uppercase tracking-tight bg-red-400 text-white hover:bg-red-400 px-2 py-1 rounded-lg" title="Activate">Out of Stock</button>`;
+
+                const rowClass = (p.current_qty <= 0 || p.is_active == 0) ? 'bg-red-300 hover:bg-red-400' : 'hover:bg-slate-50';
 
                 const row = `
-                    <tr class="hover:bg-slate-50 transition-all group" onclick="openQuickBatchModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">
+                    <tr class="${rowClass} transition-all group cursor-pointer" onclick="openQuickBatchModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">
                         <td class="px-8 py-5">
-                            <p class="font-black  text-sm tracking-tight text-slate-900">${p.name}</p>
+                            <p class="font-black  text-sm tracking-tight text-red-950">${p.name}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[11px] font-mono text-blue-800 font-bold uppercase tracking-tight">${p.barcode}</span>
+                                <span class="text-[11px] font-mono text-blue-800 font-bold uppercase tracking-tight">${p.p_barcode || p.barcode}</span>
+                              
                             </div>
                         </td>
                         <td class="px-8 py-5">
@@ -459,18 +471,21 @@ $is_admin = ($_SESSION['role'] === 'admin');
                         <td class="px-2 py-5 text-right font-mono font-black text-emerald-800">
                              ${parseFloat(p.total_value || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </td>
-                        <td class="px-8 py-5 text-center">
+                        <td class="px-3 py-5 text-center">
                             ${statusBadge}
                         </td>
                         <td class="px-8 py-5 text-center flex justify-center items-center gap-2" onclick="event.stopPropagation()">
                             <button onclick='showCompatibility(${JSON.stringify(p)})' class="p-2 text-blue-800 border border-transparent hover:border-blue-200 hover:bg-white rounded-lg transition-all" title="View Compatibility">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </button>
+                            <button onclick="printBarcode('${p.p_barcode || p.barcode}', '${p.name.replace(/'/g, "\\'")}', '${p.brand ? p.brand.replace(/'/g, "\\'") : ''}')" class="p-2 text-slate-400 hover:text-blue-600 rounded-lg transition-all" title="Print Barcode">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path></svg>
+                            </button>
                             ${isAdmin ? `
                             <button onclick='editProduct(${JSON.stringify(p)})' class="p-2 text-slate-400 hover:text-indigo-600 rounded-lg transition-all" title="Edit Info">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </button>
-                            <button onclick='deleteProduct(${p.id})' class="p-2 text-slate-400 hover:text-rose-600 rounded-lg transition-all" title="Delete Product">
+                            <button onclick='deleteProduct(${p.id})' class="p-2 text-slate-400 hover:text-rose-600 rounded-lg transition-all" title="Delete Batch">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                             ` : ''}
@@ -555,9 +570,10 @@ $is_admin = ($_SESSION['role'] === 'admin');
         }
 
         function openQuickBatchModal(p) {
-            document.getElementById('qb_product_id').value = p.id;
+            document.getElementById('qb_product_id').value = p.product_id;
+            document.getElementById('qb_target_batch_id').value = p.id;
             document.getElementById('qb_title').innerText = p.name;
-            document.getElementById('qb_subtitle').innerText = `Barcode: ${p.barcode}`;
+            document.getElementById('qb_subtitle').innerText = `Batch #${p.id} | Barcode: ${p.p_barcode || p.barcode}`;
             document.getElementById('qb_b_price').value = p.buying_price || '';
             document.getElementById('qb_s_price').value = p.selling_price || '';
             document.getElementById('qb_est_price').value = p.estimated_selling_price || '';
@@ -589,7 +605,8 @@ $is_admin = ($_SESSION['role'] === 'admin');
         }
 
         function editProduct(p) {
-            document.getElementById('edit_id').value = p.id;
+            document.getElementById('edit_id').value = p.product_id;
+            document.getElementById('edit_batch_id').value = p.id;
             document.getElementById('edit_name').value = p.name;
             document.getElementById('edit_brand').value = p.brand;
             document.getElementById('edit_v_types').value = p.vehicle_compatibility;
@@ -598,9 +615,17 @@ $is_admin = ($_SESSION['role'] === 'admin');
             document.getElementById('edit_b_price').value = p.buying_price || 0;
             document.getElementById('edit_s_price').value = p.selling_price || 0;
             document.getElementById('edit_est_price').value = p.estimated_selling_price || 0;
-            document.getElementById('edit_qty').value = p.total_stock || 0;
+            const isLoose = p.type === 'oil' && p.oil_type === 'loose';
+            document.getElementById('edit_qty').value = isLoose ? (p.current_qty || 0) : (Math.round(p.current_qty) || 0);
             
             document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function generateBarcode(inputId) {
+            const timestamp = Date.now().toString().slice(-8);
+            const random = Math.floor(Math.random() * 900 + 100).toString();
+            const barcode = timestamp + random;
+            document.getElementById(inputId).value = barcode;
         }
 
         async function deleteProduct(id) {

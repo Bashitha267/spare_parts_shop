@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 21, 2026 at 09:18 AM
+-- Generation Time: Feb 22, 2026 at 07:06 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -76,26 +76,29 @@ CREATE TABLE `batches` (
   `original_qty` decimal(10,2) NOT NULL,
   `current_qty` decimal(10,2) NOT NULL,
   `expire_date` date DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `created_at` datetime DEFAULT current_timestamp(),
+  `is_active` tinyint(4) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `batches`
 --
 
-INSERT INTO `batches` (`id`, `product_id`, `invoice_id`, `buying_price`, `selling_price`, `estimated_selling_price`, `original_qty`, `current_qty`, `expire_date`, `created_at`) VALUES
-(2, 1, 4, 1250.00, 1450.00, 0.00, 5.00, 0.00, NULL, '2026-02-17 11:03:15'),
-(3, 8, 8, 4500.00, 5000.00, 0.00, 14.00, 0.00, NULL, '2026-02-17 13:34:59'),
-(5, 11, 13, 1250.00, 1500.00, 0.00, 10.00, 6.00, NULL, '2026-02-19 14:56:16'),
-(6, 11, 14, 1450.00, 1550.00, 0.00, 10.00, 10.00, NULL, '2026-02-19 14:56:43'),
-(7, 14, 15, 1500.00, 1900.00, 0.00, 10.00, 9.00, NULL, '2026-02-19 16:27:46'),
-(8, 11, 19, 1450.00, 1850.00, 0.00, 1.00, 1.00, NULL, '2026-02-19 22:02:05'),
-(10, 11, 20, 1234.00, 2345.00, 0.00, 1.00, 1.00, NULL, '2026-02-19 22:15:00'),
-(11, 11, 26, 1234.00, 2345.00, 1600.00, 1.00, 1.00, NULL, '2026-02-20 13:31:00'),
-(12, 11, 27, 1234.00, 2345.00, 1600.00, 10.00, 10.00, NULL, '2026-02-20 13:31:09'),
-(15, 24, 30, 1500.00, 1800.00, 1700.00, 25.00, 10.00, NULL, '2026-02-20 13:58:08'),
-(16, 25, 31, 1700.00, 2000.00, 1900.00, 1.00, 1.00, NULL, '2026-02-20 14:13:22'),
-(17, 26, 32, 5000.00, 7000.00, 6500.00, 1.00, 1.00, NULL, '2026-02-20 14:13:48');
+INSERT INTO `batches` (`id`, `product_id`, `invoice_id`, `buying_price`, `selling_price`, `estimated_selling_price`, `original_qty`, `current_qty`, `expire_date`, `created_at`, `is_active`) VALUES
+(2, 1, 4, 1250.00, 1450.00, 0.00, 5.00, 0.00, NULL, '2026-02-17 11:03:15', 1),
+(3, 8, 8, 4500.00, 5000.00, 0.00, 14.00, 0.00, NULL, '2026-02-17 13:34:59', 1),
+(5, 11, 13, 1250.00, 1500.00, 0.00, 10.00, 6.00, NULL, '2026-02-19 14:56:16', 1),
+(6, 11, 14, 1450.00, 1550.00, 0.00, 10.00, 10.00, NULL, '2026-02-19 14:56:43', 1),
+(7, 14, 15, 1500.00, 1900.00, 0.00, 20.00, 19.00, NULL, '2026-02-19 16:27:46', 1),
+(8, 11, 19, 1450.00, 1850.00, 0.00, 1.00, 1.00, NULL, '2026-02-19 22:02:05', 1),
+(10, 11, 20, 1234.00, 2345.00, 0.00, 1.00, 1.00, NULL, '2026-02-19 22:15:00', 1),
+(11, 11, 26, 1234.00, 2345.00, 1600.00, 1.00, 1.00, NULL, '2026-02-20 13:31:00', 1),
+(12, 11, 27, 1234.00, 2345.00, 1600.00, 10.00, 10.00, NULL, '2026-02-20 13:31:09', 1),
+(15, 24, 30, 1500.00, 1800.00, 1700.00, 25.00, 10.00, NULL, '2026-02-20 13:58:08', 1),
+(16, 25, 31, 1700.00, 2000.00, 1900.00, 1.00, 1.00, NULL, '2026-02-20 14:13:22', 1),
+(17, 26, 32, 5000.00, 7000.00, 6500.00, 1.00, 1.00, NULL, '2026-02-20 14:13:48', 1),
+(18, 11, 33, 1450.00, 1550.00, 1500.00, 30.00, 20.00, NULL, '2026-02-22 11:14:52', 1),
+(19, 14, 34, 1500.00, 1900.00, 1800.00, 20.00, 20.00, NULL, '2026-02-22 11:27:02', 1);
 
 -- --------------------------------------------------------
 
@@ -149,7 +152,7 @@ INSERT INTO `invoices` (`id`, `invoice_no`, `user_id`, `supplier_name`, `invoice
 (12, 'STOCK-20260219-101116', 1, 'Local Supply', '2026-02-19', 0.00, 'draft', '2026-02-19 14:41:16'),
 (13, 'STOCK-20260219-102527', 2, 'Local Supply', '2026-02-19', 12500.00, 'completed', '2026-02-19 14:55:27'),
 (14, 'STOCK-20260219-102628', 2, 'Local Supply', '2026-02-19', 14500.00, 'completed', '2026-02-19 14:56:28'),
-(15, 'STOCK-20260219-105803', 1, 'Local Supply', '2026-02-19', 15000.00, 'completed', '2026-02-19 15:28:03'),
+(15, 'STOCK-20260219-105803', 1, 'Local Supply', '2026-02-19', 30000.00, 'completed', '2026-02-19 15:28:03'),
 (16, 'STOCK-20260219-115622', 2, 'Local Supply', '2026-02-19', 0.00, 'draft', '2026-02-19 16:26:22'),
 (17, 'STOCK-20260219-115849', 1, 'Local Supply', '2026-02-19', 0.00, 'draft', '2026-02-19 16:28:49'),
 (18, 'STOCK-20260219-130454', 2, 'Local Supply', '2026-02-19', 0.00, 'draft', '2026-02-19 17:34:54'),
@@ -162,7 +165,9 @@ INSERT INTO `invoices` (`id`, `invoice_no`, `user_id`, `supplier_name`, `invoice
 (29, 'DIRECT-20260220-092304-524', 1, 'Direct Entry', '2026-02-20', 14500.00, 'completed', '2026-02-20 13:53:04'),
 (30, 'DIRECT-20260220-092808-356', 1, 'Direct Entry', '2026-02-20', 37500.00, 'completed', '2026-02-20 13:58:08'),
 (31, 'DIRECT-20260220-094322-879', 2, 'Direct Entry', '2026-02-20', 1700.00, 'completed', '2026-02-20 14:13:22'),
-(32, 'DIRECT-20260220-094348-220', 2, 'Direct Entry', '2026-02-20', 5000.00, 'completed', '2026-02-20 14:13:48');
+(32, 'DIRECT-20260220-094348-220', 2, 'Direct Entry', '2026-02-20', 5000.00, 'completed', '2026-02-20 14:13:48'),
+(33, 'DIRECT-20260222-064452-311', 1, 'Direct Entry', '2026-02-22', 43500.00, 'completed', '2026-02-22 11:14:52'),
+(34, 'DIRECT-20260222-065702-516', 1, 'Direct Entry', '2026-02-22', 30000.00, 'completed', '2026-02-22 11:27:02');
 
 -- --------------------------------------------------------
 
@@ -196,7 +201,7 @@ INSERT INTO `products` (`id`, `barcode`, `name`, `type`, `oil_type`, `brand`, `v
 (8, '100000000007', 'Mobil Super 15W-40 1L', 'oil', 'can', 'Mobil', 'Diesel Vehicles, Toyota Hilux', '2026-02-17 13:27:17', 1),
 (9, '100000000008', 'Shell Rimula R4 15W-40 5L', 'oil', 'can', 'Shell', 'Diesel Trucks & Buses', '2026-02-17 13:27:17', 1),
 (10, '100000000009', 'Castrol CRB 20W-50 1L', 'oil', 'can', 'Castrol', 'Diesel & Petrol Vehicles', '2026-02-17 13:27:17', 1),
-(11, '100000000010', 'Loose Engine Oil 20W-50', 'oil', 'loose', 'Generic', 'Three Wheelers, Motorcycles', '2026-02-17 13:27:17', 0),
+(11, '100000000010', 'Loose Engine Oil 20W-50', 'oil', 'loose', 'Generic', 'Three Wheelers, Motorcycles', '2026-02-17 13:27:17', 1),
 (12, '100000000011', 'Toyota Corolla Brake Pads Front', 'spare_part', 'none', 'Toyota Genuine', 'Toyota Corolla 121/141', '2026-02-17 13:27:17', 1),
 (13, '100000000012', 'Nissan FB15 Air Filter', 'spare_part', 'none', 'Nissan', 'Nissan Sunny FB15', '2026-02-17 13:27:17', 1),
 (14, '100000000013', 'Honda Fit Oil Filter', 'spare_part', 'none', 'Honda', 'Honda Fit GP1/GP5', '2026-02-17 13:27:17', 1),
@@ -439,7 +444,7 @@ ALTER TABLE `audit_logs`
 -- AUTO_INCREMENT for table `batches`
 --
 ALTER TABLE `batches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `customers`
@@ -451,7 +456,7 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT for table `invoices`
 --
 ALTER TABLE `invoices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `products`
