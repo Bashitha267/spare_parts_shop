@@ -20,6 +20,27 @@ $is_admin = ($_SESSION['role'] === 'admin');
             background: #f8fafc;
             color: #0f172a;
         }
+        .suggest-dropdown {
+            position: fixed;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 16px 40px -8px rgba(0,0,0,0.18);
+            z-index: 999999;
+            overflow: hidden;
+            animation: dropIn 0.15s ease-out;
+        }
+        @keyframes dropIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+        .suggest-item {
+            padding: 10px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.12s;
+        }
+        .suggest-item:last-child { border-bottom: none; }
+        .suggest-item:hover, .suggest-item.active { background: #eff6ff; }
+        .suggest-item .s-name { font-weight: 800; font-size: 13px; color: #0f172a; }
+        .suggest-item .s-meta { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; }
         .bg-main {
             background:  url('public/admin_background.jpg');
             background-size: cover;
@@ -118,11 +139,11 @@ $is_admin = ($_SESSION['role'] === 'admin');
                 <h2 id="grand_inventory_value" class="text-2xl font-black tracking-tighter">Rs. 0.00</h2>
             </div>
             <div class="md:col-span-3 glass-card p-6 rounded-[2rem] flex flex-col lg:flex-row gap-6 items-center border-2 border-white">
-                <div class="relative flex-grow w-full">
+                <div class="relative flex-grow w-full" id="searchOilWrapper">
                     <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <input type="text" id="searchInventory" class="block w-full pl-14 pr-6 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 text-sm font-bold" placeholder="Find product by name or barcode...">
+                    <input type="text" id="searchInventory" autocomplete="off" class="block w-full pl-14 pr-6 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 text-sm font-bold" placeholder="Find product by name or barcode...">
                 </div>
 
                 <div class="flex items-center gap-4 w-full lg:w-auto">
@@ -141,6 +162,10 @@ $is_admin = ($_SESSION['role'] === 'admin');
                         <option value="low_value">Value: Low to High</option>
                         <option value="name_asc">Alphabetical (A-Z)</option>
                     </select>
+                    <button onclick="resetFilters()" title="Reset Filters" class="shrink-0 flex items-center gap-2 px-5 py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Reset
+                    </button>
                 </div>
             </div>
         </div>
@@ -344,13 +369,83 @@ $is_admin = ($_SESSION['role'] === 'admin');
         document.addEventListener('DOMContentLoaded', () => {
             loadInventory(1);
 
-            document.getElementById('searchInventory').addEventListener('input', function() {
+            const oilSearchInput = document.getElementById('searchInventory');
+            let oilSuggestTimer;
+            let oilActiveIdx = -1;
+
+            // Create dropdown appended to body to escape stacking context
+            const oilDropdown = document.createElement('div');
+            oilDropdown.className = 'suggest-dropdown';
+            oilDropdown.style.display = 'none';
+            document.body.appendChild(oilDropdown);
+
+            function positionOilDropdown() {
+                const rect = oilSearchInput.getBoundingClientRect();
+                oilDropdown.style.left = rect.left + 'px';
+                oilDropdown.style.top  = (rect.bottom + 6) + 'px';
+                oilDropdown.style.width = rect.width + 'px';
+            }
+
+            oilSearchInput.addEventListener('input', function() {
                 clearTimeout(debounceTimer);
+                clearTimeout(oilSuggestTimer);
+                const q = this.value.trim();
                 debounceTimer = setTimeout(() => {
                     currentPage = 1;
-                    loadInventory(1, this.value, currentStatus);
+                    loadInventory(1, q, currentStatus);
                 }, 300);
+                if (q.length < 1) { oilDropdown.style.display = 'none'; return; }
+                oilSuggestTimer = setTimeout(() => fetchOilSuggestions(q), 180);
             });
+
+            oilSearchInput.addEventListener('keydown', function(e) {
+                const items = oilDropdown.querySelectorAll('.suggest-item');
+                if (!items.length) return;
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    oilActiveIdx = Math.min(oilActiveIdx + 1, items.length - 1);
+                    items.forEach((el, i) => el.classList.toggle('active', i === oilActiveIdx));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    oilActiveIdx = Math.max(oilActiveIdx - 1, 0);
+                    items.forEach((el, i) => el.classList.toggle('active', i === oilActiveIdx));
+                } else if (e.key === 'Enter' && oilActiveIdx >= 0) {
+                    e.preventDefault();
+                    items[oilActiveIdx].click();
+                } else if (e.key === 'Escape') {
+                    oilDropdown.style.display = 'none';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!document.getElementById('searchOilWrapper').contains(e.target) && !oilDropdown.contains(e.target)) {
+                    oilDropdown.style.display = 'none';
+                }
+            });
+
+            window.addEventListener('scroll', () => { if (oilDropdown.style.display !== 'none') positionOilDropdown(); }, true);
+            window.addEventListener('resize', () => { if (oilDropdown.style.display !== 'none') positionOilDropdown(); });
+
+            async function fetchOilSuggestions(q) {
+                const res = await fetch(`manage_handler.php?action=search_suggest&q=${encodeURIComponent(q)}&type=oil`);
+                const data = await res.json();
+                oilDropdown.innerHTML = '';
+                oilActiveIdx = -1;
+                if (!data.suggestions.length) { oilDropdown.style.display = 'none'; return; }
+                data.suggestions.forEach(s => {
+                    const el = document.createElement('div');
+                    el.className = 'suggest-item';
+                    el.innerHTML = `<div class="s-name">${s.name}</div><div class="s-meta">${s.barcode}${s.brand ? ' &nbsp;·&nbsp; ' + s.brand : ''}</div>`;
+                    el.onclick = () => {
+                        oilSearchInput.value = s.name;
+                        oilDropdown.style.display = 'none';
+                        loadInventory(1, s.name, currentStatus);
+                    };
+                    oilDropdown.appendChild(el);
+                });
+                positionOilDropdown();
+                oilDropdown.style.display = 'block';
+            }
 
             document.getElementById('statusFilter').addEventListener('change', function() {
                 currentStatus = this.value;
@@ -366,6 +461,18 @@ $is_admin = ($_SESSION['role'] === 'admin');
                 currentSort = this.value;
                 loadInventory(1, document.getElementById('searchInventory').value, currentStatus);
             });
+
+            window.resetFilters = function() {
+                document.getElementById('searchInventory').value = '';
+                document.getElementById('oilTypeFilter').value = 'all';
+                document.getElementById('statusFilter').value = 'all';
+                document.getElementById('sortFilter').value = 'high_value';
+                currentStatus = 'all';
+                currentOilType = 'all';
+                currentSort = 'high_value';
+                oilDropdown.style.display = 'none';
+                loadInventory(1, '', 'all');
+            };
 
             document.getElementById('editForm').onsubmit = async (e) => {
                 e.preventDefault();

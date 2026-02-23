@@ -65,6 +65,52 @@ check_auth('cashier');
         }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .pos-dropdown {
+            position: fixed;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.18);
+            z-index: 999999;
+            overflow: hidden;
+            animation: dropIn 0.15s ease-out;
+        }
+        @keyframes dropIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+        .pos-suggest-item {
+            padding: 9px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.1s;
+        }
+        .pos-suggest-item:last-child { border-bottom: none; }
+        .pos-suggest-item:hover { background: #eff6ff; }
+        /* Name-only fast overlay */
+        .pos-name-dropdown {
+            position: fixed;
+            background: white;
+            border: 2px solid #2563eb;
+            border-radius: 1rem;
+            box-shadow: 0 24px 60px -10px rgba(37,99,235,0.25);
+            z-index: 9999999;
+            overflow: hidden;
+            animation: dropIn 0.12s ease-out;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+        .pos-name-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: background 0.08s;
+        }
+        .pos-name-item:last-child { border-bottom: none; }
+        .pos-name-item:hover, .pos-name-item.name-active { background: #eff6ff; }
+        .pos-name-item .pname { font-size: 12px; font-weight: 900; color: #0f172a; text-transform: uppercase; letter-spacing: 0.02em; }
+        .pos-name-item .pbar  { font-size: 9px; font-family: monospace; color: #94a3b8; font-weight: 600; }
     </style>
 </head>
 <body class="bg-main h-screen overflow-hidden flex flex-col relative ">
@@ -134,9 +180,8 @@ check_auth('cashier');
                         </div>
                         <div class="flex-1 min-w-0">
                             <div id="custSearchArea" class="flex items-center gap-2">
-                                <div class="relative w-full max-w-sm">
-                                    <input type="text" id="custSearch" class="block w-full px-3 py-2 bg-slate-50/50 border border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-[11px] outline-none font-bold placeholder:text-slate-300 transition-all uppercase tracking-wider" placeholder="Search by name or contact...">
-                                    <div id="custResults" class="absolute left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-slate-100 z-50 hidden max-h-48 overflow-y-auto p-1"></div>
+                                <div class="relative w-full max-w-sm" id="custSearchWrapper">
+                                    <input type="text" id="custSearch" autocomplete="off" class="block w-full px-3 py-2 bg-slate-50/50 border border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-[11px] outline-none font-bold placeholder:text-slate-300 transition-all uppercase tracking-wider" placeholder="Search by name or contact...">
                                 </div>
                             </div>
                             <div id="selectedCustArea" class="hidden flex items-center gap-6 animate-fade-in overflow-hidden">
@@ -171,12 +216,11 @@ check_auth('cashier');
 
             <!-- Section 2: Product Search Bar -->
             <div id="pos_search_area" class="transition-all duration-300 shrink-0">
-                <div class="relative group">
+                <div class="relative group" id="prodSearchWrapper">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <input type="text" id="prodSearch" class="block w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 text-sm font-medium outline-none transition-all placeholder:text-xs sm:placeholder:text-sm" placeholder="Scan Barcode or Search Product by Name...">
-                    <div id="prodList" class="absolute left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-slate-100 z-50 hidden max-h-60 overflow-y-auto p-1 space-y-1"></div>
+                    <input type="text" id="prodSearch" autocomplete="off" class="block w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 text-sm font-medium outline-none transition-all placeholder:text-xs sm:placeholder:text-sm" placeholder="Scan Barcode or Search Product by Name...">
                 </div>
             </div>
 
@@ -533,28 +577,55 @@ check_auth('cashier');
             });
         }
 
-        // Customer Logic
-        document.getElementById('custSearch').addEventListener('input', async function() {
-            const val = this.value.trim();
-            const results = document.getElementById('custResults');
-            if(val.length < 1) { results.classList.add('hidden'); return; }
+        // --- Customer Search (body-appended dropdown) ---
+        const custSearchInput = document.getElementById('custSearch');
+        const custDropdown = document.createElement('div');
+        custDropdown.className = 'pos-dropdown';
+        custDropdown.style.display = 'none';
+        custDropdown.style.minWidth = '260px';
+        custDropdown.style.maxHeight = '220px';
+        custDropdown.style.overflowY = 'auto';
+        document.body.appendChild(custDropdown);
 
+        function positionCustDropdown() {
+            const rect = custSearchInput.getBoundingClientRect();
+            custDropdown.style.left  = rect.left + 'px';
+            custDropdown.style.top   = (rect.bottom + 4) + 'px';
+            custDropdown.style.width = rect.width + 'px';
+        }
+
+        custSearchInput.addEventListener('input', async function() {
+            const val = this.value.trim();
+            if (val.length < 1) { custDropdown.style.display = 'none'; return; }
             const data = await fetchAPI('search_customer', { query: val });
-            results.innerHTML = '';
-            if(data.customers.length > 0) {
+            custDropdown.innerHTML = '';
+            if (data.customers.length > 0) {
                 data.customers.forEach(c => {
                     const row = document.createElement('div');
-                    row.className = 'px-4 py-2 hover:bg-slate-50 cursor-pointer text-sm border-b border-slate-50';
-                    row.innerHTML = `<p class="font-bold">${c.name}</p><p class="text-xs text-slate-400">${c.contact}</p>`;
-                    row.onclick = () => selectCustomer(c);
-                    results.appendChild(row);
+                    row.className = 'pos-suggest-item';
+                    row.innerHTML = `<p class="font-black text-[12px] text-slate-900 uppercase tracking-tight">${c.name}</p><p class="text-[10px] text-slate-400 font-bold mt-0.5">${c.contact}</p>`;
+                    row.onclick = () => { custDropdown.style.display = 'none'; selectCustomer(c); };
+                    custDropdown.appendChild(row);
                 });
-                results.classList.remove('hidden');
             } else {
-                results.innerHTML = '<div class="p-3 text-xs text-slate-400 italic">No customer found. Add new?</div>';
-                results.classList.remove('hidden');
+                custDropdown.innerHTML = '<div class="px-4 py-3 text-xs text-slate-400 italic font-bold">No customer found. Try registering?</div>';
+            }
+            positionCustDropdown();
+            custDropdown.style.display = 'block';
+        });
+
+        custSearchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') custDropdown.style.display = 'none';
+        });
+
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('custSearchWrapper');
+            if (wrapper && !wrapper.contains(e.target) && !custDropdown.contains(e.target)) {
+                custDropdown.style.display = 'none';
             }
         });
+
+        window.addEventListener('scroll', () => { if (custDropdown.style.display !== 'none') positionCustDropdown(); }, true);
 
         function selectCustomer(c) {
             selectedCustomer = c;
@@ -562,7 +633,7 @@ check_auth('cashier');
             document.getElementById('selectedCustArea').classList.remove('hidden');
             document.getElementById('selectedCustName').innerText = c.name;
             document.getElementById('selectedCustPhone').innerText = c.contact;
-            document.getElementById('custResults').classList.add('hidden');
+            custDropdown.style.display = 'none';
             
             setTimeout(() => {
                 if(isCheckingOut) {
@@ -593,16 +664,29 @@ check_auth('cashier');
             } else { Swal.fire('Error', data.message, 'error'); }
         };
 
-        // Product Logic
-        document.getElementById('prodSearch').addEventListener('input', async function() {
-            const val = this.value.trim();
-            const list = document.getElementById('prodList');
-            if(val.length < 2) { list.classList.add('hidden'); return; }
+        // --- Product Search (body-appended dropdown) ---
+        const prodSearchInput = document.getElementById('prodSearch');
+        const prodDropdown = document.createElement('div');
+        prodDropdown.className = 'pos-dropdown';
+        prodDropdown.style.display = 'none';
+        prodDropdown.style.overflowY = 'auto';
+        prodDropdown.style.maxHeight = '320px';
+        document.body.appendChild(prodDropdown);
 
+        function positionProdDropdown() {
+            const rect = prodSearchInput.getBoundingClientRect();
+            prodDropdown.style.left  = rect.left + 'px';
+            prodDropdown.style.top   = (rect.bottom + 4) + 'px';
+            prodDropdown.style.width = rect.width + 'px';
+        }
+
+        prodSearchInput.addEventListener('input', async function() {
+            const val = this.value.trim();
+            if (val.length < 2) { prodDropdown.style.display = 'none'; return; }
             const data = await fetchAPI('search_product', { query: val });
-            list.innerHTML = '';
-            if(data.products.length > 0) {
-                // Add Table Header
+            prodDropdown.innerHTML = '';
+            if (data.products.length > 0) {
+                // Header
                 const header = document.createElement('div');
                 header.className = 'px-4 py-3 blue-gradient-header border-b border-blue-700 flex items-center text-[9px] uppercase tracking-widest sticky top-0 z-10 rounded-t-xl';
                 header.innerHTML = `
@@ -614,79 +698,93 @@ check_auth('cashier');
                     <div class="w-[15%] text-right pr-2">Labeled</div>
                     <div class="w-[15%] text-right pr-2">Est. Selling</div>
                 `;
-                list.appendChild(header);
+                prodDropdown.appendChild(header);
 
                 data.products.forEach(p => {
                     p.batches.forEach(b => {
                         const div = document.createElement('div');
                         const isOil = p.type === 'oil';
                         let typeBadge = '';
-                        if(isOil) {
-                            if(p.oil_type === 'loose') {
-                                typeBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[8px] font-black border border-emerald-100 uppercase">
-                                    LOOSE
-                                </span>`;
-                            } else {
-                                typeBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[8px] font-black border border-blue-100 uppercase">
-                                    CAN
-                                </span>`;
-                            }
+                        if (isOil) {
+                            typeBadge = p.oil_type === 'loose'
+                                ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[8px] font-black border border-emerald-100 uppercase">LOOSE</span>`
+                                : `<span class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[8px] font-black border border-blue-100 uppercase">CAN</span>`;
                         } else {
-                            typeBadge = `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 text-slate-500 text-[8px] font-black border border-slate-100 uppercase">
-                                SPARE
-                            </span>`;
+                            typeBadge = `<span class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-slate-50 text-slate-500 text-[8px] font-black border border-slate-100 uppercase">SPARE</span>`;
                         }
-                        
-                        div.className = 'flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 active:bg-blue-100 transition-all m-0.5';
+                        div.className = 'flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 active:bg-blue-100 transition-all';
                         div.innerHTML = `
-                            <!-- Col 1: Name -->
-                            <div class="w-[22%] min-w-0">
-                                <p class="text-[12px] font-black text-slate-900 leading-tight uppercase truncate">${p.name}</p>
-                            </div>
-
-                            <!-- Col 2: Barcode -->
-                            <div class="w-[15%]">
-                                <p class="text-[12px] font-mono text-blue-500 font-black tracking-tight">${p.barcode}</p>
-                            </div>
-
-                            <!-- Col 3: Type -->
-                            <div class="w-[10%] text-center">
-                                ${typeBadge}
-                            </div>
-
-                            <!-- Col 4: Qty -->
-                            <div class="w-[8%] text-center">
-                                <span class="text-[12px] font-black text-slate-700">${b.current_qty}</span>
-                                <span class="text-[8px] text-slate-400 font-bold uppercase">${isOil ? (p.oil_type === 'loose' ? 'L' : 'C') : 'P'}</span>
-                            </div>
-
-                            <!-- Col 5: Buying -->
-                            <div class="w-[15%] text-right pr-2">
-                                <p class="text-[12px] font-mono font-bold text-slate-400 italic">${numberFormat(b.buying_price)}</p>
-                            </div>
-
-                            <!-- Col 6: Labeled -->
-                            <div class="w-[15%] text-right pr-2">
-                                <p class="text-[12px] font-mono font-bold text-slate-600">${numberFormat(b.selling_price)}</p>
-                            </div>
-
-                            <!-- Col 7: Estimated -->
-                            <div class="w-[15%] text-right pr-2">
-                                <p class="text-[12px] font-mono font-black text-blue-600">${numberFormat(b.estimated_selling_price)}</p>
-                            </div>
+                            <div class="w-[22%] min-w-0"><p class="text-[12px] font-black text-slate-900 leading-tight uppercase truncate">${p.name}</p></div>
+                            <div class="w-[15%]"><p class="text-[12px] font-mono text-blue-500 font-black tracking-tight">${p.barcode}</p></div>
+                            <div class="w-[10%] text-center">${typeBadge}</div>
+                            <div class="w-[8%] text-center"><span class="text-[12px] font-black text-slate-700">${b.current_qty}</span><span class="text-[8px] text-slate-400 font-bold uppercase">${isOil ? (p.oil_type === 'loose' ? 'L' : 'C') : 'P'}</span></div>
+                            <div class="w-[15%] text-right pr-2"><p class="text-[12px] font-mono font-bold text-slate-400 italic">${numberFormat(b.buying_price)}</p></div>
+                            <div class="w-[15%] text-right pr-2"><p class="text-[12px] font-mono font-bold text-slate-600">${numberFormat(b.selling_price)}</p></div>
+                            <div class="w-[15%] text-right pr-2"><p class="text-[12px] font-mono font-black text-blue-600">${numberFormat(b.estimated_selling_price)}</p></div>
                         `;
                         div.onclick = () => {
                             selectedProduct = p;
+                            prodDropdown.style.display = 'none';
+                            prodSearchInput.value = '';
                             openEntryModal(b);
                         };
-                        list.appendChild(div);
+                        prodDropdown.appendChild(div);
                     });
                 });
-                list.classList.remove('hidden');
             } else {
-                list.innerHTML = '<div class="text-center py-6 text-slate-400 italic text-sm">No active products found</div>';
-                list.classList.remove('hidden');
+                prodDropdown.innerHTML = '<div class="text-center py-6 text-slate-400 italic text-sm">No active products found</div>';
             }
+            positionProdDropdown();
+            prodDropdown.style.display = 'block';
+        });
+
+        let prodActiveIdx = -1;
+
+        function setProdActive(items, idx) {
+            items.forEach((el, i) => {
+                if (i === idx) {
+                    el.classList.add('bg-blue-50', 'ring-2', 'ring-inset', 'ring-blue-300');
+                    el.scrollIntoView({ block: 'nearest' });
+                } else {
+                    el.classList.remove('bg-blue-50', 'ring-2', 'ring-inset', 'ring-blue-300');
+                }
+            });
+        }
+
+        prodSearchInput.addEventListener('keydown', e => {
+            if (prodDropdown.style.display === 'none') return;
+            const items = prodDropdown.querySelectorAll('.pos-suggest-item');
+            if (!items.length) { if (e.key === 'Escape') prodDropdown.style.display = 'none'; return; }
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                prodActiveIdx = Math.min(prodActiveIdx + 1, items.length - 1);
+                setProdActive(items, prodActiveIdx);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                prodActiveIdx = Math.max(prodActiveIdx - 1, 0);
+                setProdActive(items, prodActiveIdx);
+            } else if ((e.key === 'Enter' || e.key === 'Tab') && prodActiveIdx >= 0) {
+                e.preventDefault();
+                items[prodActiveIdx].click();
+                prodActiveIdx = -1;
+            } else if (e.key === 'Escape') {
+                prodDropdown.style.display = 'none';
+                prodActiveIdx = -1;
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('prodSearchWrapper');
+            if (wrapper && !wrapper.contains(e.target) && !prodDropdown.contains(e.target)) {
+                prodDropdown.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('scroll', () => { if (prodDropdown.style.display !== 'none') positionProdDropdown(); }, true);
+        window.addEventListener('resize', () => {
+            if (custDropdown.style.display !== 'none') positionCustDropdown();
+            if (prodDropdown.style.display !== 'none') positionProdDropdown();
         });
 
         async function openBatchModal(p) {
@@ -842,8 +940,7 @@ check_auth('cashier');
             document.getElementById('entryModal').classList.add('hidden');
             document.getElementById('batchModal').classList.add('hidden');
             document.getElementById('prodSearch').value = '';
-            document.getElementById('prodList').innerHTML = '';
-            document.getElementById('prodList').classList.add('hidden');
+            prodDropdown.style.display = 'none';
         }
 
         function renderCart() {

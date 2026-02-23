@@ -84,6 +84,28 @@ check_auth('admin');
             border-bottom: 1px solid rgba(226, 232, 240, 0.5);
             color: #0f172a;
         }
+        .sh-suggest-dropdown {
+            position: fixed;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.18);
+            z-index: 99999;
+            overflow: hidden;
+            animation: shDropIn 0.13s ease-out;
+        }
+        @keyframes shDropIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+        .sh-suggest-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sh-suggest-item:last-child { border-bottom: none; }
+        .sh-suggest-item:hover, .sh-suggest-item.active { background: #eff6ff; }
     </style>
 </head>
 <body class="bg-main min-h-screen relative pb-20">
@@ -111,11 +133,11 @@ check_auth('admin');
         
         <!-- Search & Filter Bar -->
         <div class="glass-card p-6 rounded-[2.5rem] flex flex-col md:flex-row gap-6 items-center">
-            <div class="relative w-full md:flex-grow">
+            <div class="relative w-full md:flex-grow" id="searchWrapper">
                 <span class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </span>
-                <input type="text" id="search" placeholder="Locate by ID, Customer Identity..." class="w-full pl-16 pr-6 py-4 rounded-2xl text-sm font-bold placeholder:text-slate-300">
+                <input type="text" id="search" autocomplete="off" placeholder="Locate by ID, Name or Contact..." class="w-full pl-16 pr-6 py-4 rounded-2xl text-sm font-bold placeholder:text-slate-300">
             </div>
             <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
                 <input type="date" id="date_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none">
@@ -135,6 +157,10 @@ check_auth('admin');
                     <option value="rejected">Rejected</option>
                 </select>
 
+                <button onclick="resetFilters()" class="px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex flex-row gap-2 border border-slate-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Reset
+                </button>
                 <button onclick="loadHistory()" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:shadow-lg transition-all active:scale-95 flex flex-row gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Refresh</button>
             </div>
         </div>
@@ -222,10 +248,84 @@ check_auth('admin');
 
         document.addEventListener('DOMContentLoaded', () => loadHistory(1));
         
-        document.getElementById('search').addEventListener('input', () => {
-             currentPage = 1;
-             loadHistory(1);
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('date_filter').value = '';
+            document.getElementById('method_filter').value = 'all';
+            document.getElementById('status_filter').value = 'all';
+            currentPage = 1;
+            loadHistory(1);
+        }
+        
+        // ---- Autosuggest ----
+        const searchInput = document.getElementById('search');
+        const searchWrapper = document.getElementById('searchWrapper');
+        const suggestDropdown = document.createElement('div');
+        suggestDropdown.className = 'sh-suggest-dropdown';
+        suggestDropdown.style.display = 'none';
+        suggestDropdown.style.minWidth = '280px';
+        suggestDropdown.style.maxHeight = '280px';
+        suggestDropdown.style.overflowY = 'auto';
+        document.body.appendChild(suggestDropdown);
+        let suggestActiveIdx = -1;
+        let suggestItems = [];
+
+        function positionSuggest() {
+            const r = searchInput.getBoundingClientRect();
+            suggestDropdown.style.left = r.left + 'px';
+            suggestDropdown.style.top = (r.bottom + 4) + 'px';
+            suggestDropdown.style.width = r.width + 'px';
+        }
+
+        function hideSuggest() { suggestDropdown.style.display = 'none'; suggestActiveIdx = -1; }
+
+        function renderSuggest(items) {
+            suggestItems = items;
+            suggestDropdown.innerHTML = '';
+            suggestActiveIdx = -1;
+            if (!items.length) { hideSuggest(); return; }
+            items.forEach((s, i) => {
+                const div = document.createElement('div');
+                div.className = 'sh-suggest-item';
+                if (s.type === 'trx') {
+                    div.innerHTML = `<span class="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-lg bg-blue-50 text-blue-500"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></span><div><p class="font-mono font-black text-[11px] text-blue-600 tracking-widest">${s.label}</p><p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Transaction ID</p></div>`;
+                } else {
+                    div.innerHTML = `<span class="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-lg bg-emerald-50 text-emerald-500"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></span><div><p class="font-black text-[12px] text-slate-900 uppercase tracking-tight">${s.label}</p><p class="text-[9px] text-slate-400 font-bold mt-0.5">${s.sub || ''}</p></div>`;
+                }
+                div.onmousedown = (e) => { e.preventDefault(); searchInput.value = s.value; hideSuggest(); currentPage = 1; loadHistory(1); };
+                suggestDropdown.appendChild(div);
+            });
+            positionSuggest();
+            suggestDropdown.style.display = 'block';
+        }
+
+        let suggestTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(suggestTimeout);
+            const val = this.value.trim();
+            currentPage = 1;
+            loadHistory(1);
+            if (val.length < 1) { hideSuggest(); return; }
+            suggestTimeout = setTimeout(async () => {
+                const res = await fetch(`sales_history_handler.php?action=suggest&q=${encodeURIComponent(val)}`);
+                const data = await res.json();
+                renderSuggest(data.suggestions);
+            }, 180);
         });
+
+        searchInput.addEventListener('keydown', function(e) {
+            const items = suggestDropdown.querySelectorAll('.sh-suggest-item');
+            if (e.key === 'ArrowDown') { e.preventDefault(); suggestActiveIdx = Math.min(suggestActiveIdx + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('active', i === suggestActiveIdx)); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); suggestActiveIdx = Math.max(suggestActiveIdx - 1, -1); items.forEach((el, i) => el.classList.toggle('active', i === suggestActiveIdx)); }
+            else if (e.key === 'Enter' && suggestActiveIdx >= 0) { e.preventDefault(); items[suggestActiveIdx].onmousedown(e); }
+            else if (e.key === 'Escape') hideSuggest();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchWrapper.contains(e.target) && !suggestDropdown.contains(e.target)) hideSuggest();
+        });
+        window.addEventListener('scroll', () => { if (suggestDropdown.style.display !== 'none') positionSuggest(); }, true);
+        window.addEventListener('resize', () => { if (suggestDropdown.style.display !== 'none') positionSuggest(); });
         document.getElementById('date_filter').addEventListener('change', () => {
              currentPage = 1;
              loadHistory(1);

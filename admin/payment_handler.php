@@ -11,6 +11,35 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 $action = $_REQUEST['action'] ?? '';
 
+if ($action === 'suggest') {
+    $q = trim($_GET['q'] ?? '');
+    if (strlen($q) < 1) { echo json_encode(['suggestions' => []]); exit; }
+
+    $suggestions = [];
+
+    // Match TRX IDs
+    $idQuery = preg_replace('/^TRX-/i', '', $q);
+    if (is_numeric($idQuery)) {
+        $stmt = $pdo->prepare("SELECT s.id FROM sales s WHERE s.payment_method IN ('cheque','credit') AND s.id LIKE ? LIMIT 5");
+        $stmt->execute(["%$idQuery%"]);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $suggestions[] = ['label' => 'TRX-' . $row['id'], 'value' => $row['id'], 'type' => 'trx'];
+        }
+    }
+
+    // Match customer names or contact
+    $stmt = $pdo->prepare("SELECT DISTINCT c.name, c.contact FROM customers c
+                           INNER JOIN sales s ON s.customer_id = c.id
+                           WHERE s.payment_method IN ('cheque','credit') AND (c.name LIKE ? OR c.contact LIKE ?) LIMIT 6");
+    $stmt->execute(["%$q%", "%$q%"]);
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $suggestions[] = ['label' => $row['name'], 'sub' => $row['contact'], 'value' => $row['name'], 'type' => 'customer'];
+    }
+
+    echo json_encode(['suggestions' => array_slice($suggestions, 0, 8)]);
+    exit;
+}
+
 if ($action === 'fetch_pending_payments') {
     $method = $_GET['method'] ?? 'all';
     $search = $_GET['search'] ?? '';
@@ -29,7 +58,8 @@ if ($action === 'fetch_pending_payments') {
     }
 
     if ($search) {
-        $query .= " AND (s.id LIKE ? OR c.name LIKE ?) ";
+        $query .= " AND (s.id LIKE ? OR c.name LIKE ? OR c.contact LIKE ?) ";
+        $params[] = "%$search%";
         $params[] = "%$search%";
         $params[] = "%$search%";
     }
@@ -86,7 +116,8 @@ if ($action === 'fetch_payment_history') {
     $params = [];
 
     if ($search) {
-        $query .= " AND (s.id LIKE ? OR c.name LIKE ?) ";
+        $query .= " AND (s.id LIKE ? OR c.name LIKE ? OR c.contact LIKE ?) ";
+        $params[] = "%$search%";
         $params[] = "%$search%";
         $params[] = "%$search%";
     }

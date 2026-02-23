@@ -6,11 +6,29 @@ header('Content-Type: application/json');
 
 $action = $_REQUEST['action'] ?? '';
 
-if ($action === 'search_customer') {
+if ($action === 'search_product_names') {
     $query = $_GET['query'] ?? '';
-    $stmt = $pdo->prepare("SELECT * FROM customers WHERE name LIKE ? OR contact LIKE ? LIMIT 5");
+    $stmt = $pdo->prepare("SELECT id, name, barcode, type, oil_type FROM products
+                           WHERE (name LIKE ? OR barcode LIKE ?) AND is_active = 1
+                           AND (SELECT COUNT(*) FROM batches WHERE product_id = products.id AND current_qty > 0 AND is_active = 1) > 0
+                           ORDER BY name ASC LIMIT 12");
     $stmt->execute(["%$query%", "%$query%"]);
-    echo json_encode(['success' => true, 'customers' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    echo json_encode(['names' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    exit;
+}
+
+if ($action === 'search_customer') {
+    $query  = $_GET['query'] ?? '';
+    $page   = max(1, (int)($_GET['page'] ?? 1));
+    $limit  = 6;
+    $offset = ($page - 1) * $limit;
+    $fetch  = $limit + 1;
+    $stmt = $pdo->prepare("SELECT * FROM customers WHERE name LIKE ? OR contact LIKE ? LIMIT $fetch OFFSET $offset");
+    $stmt->execute(["%$query%", "%$query%"]);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $has_more = count($rows) > $limit;
+    if ($has_more) array_pop($rows);
+    echo json_encode(['success' => true, 'customers' => $rows, 'has_more' => $has_more, 'page' => $page]);
     exit;
 }
 
@@ -31,15 +49,23 @@ if ($action === 'add_customer') {
 }
 
 if ($action === 'search_product') {
-    $query = $_GET['query'];
-    // Fetch products that have at least one batch with stock
+    $query  = $_GET['query'] ?? '';
+    $page   = max(1, (int)($_GET['page'] ?? 1));
+    $limit  = 8;
+    $offset = ($page - 1) * $limit;
+    $fetch  = $limit + 1;
+
     $stmt = $pdo->prepare("SELECT p.* FROM products p 
                            WHERE (p.barcode LIKE ? OR p.name LIKE ?) 
                            AND p.is_active = 1 
                            AND (SELECT COUNT(*) FROM batches WHERE product_id = p.id AND current_qty > 0 AND is_active = 1) > 0
-                           LIMIT 10");
+                           ORDER BY p.name ASC
+                           LIMIT $fetch OFFSET $offset");
     $stmt->execute(["%$query%", "%$query%"]);
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $has_more = count($products) > $limit;
+    if ($has_more) array_pop($products);
 
     foreach ($products as &$product) {
         $stmt_batch = $pdo->prepare("SELECT * FROM batches WHERE product_id = ? AND current_qty > 0 AND is_active = 1 ORDER BY id ASC");
@@ -47,7 +73,7 @@ if ($action === 'search_product') {
         $product['batches'] = $stmt_batch->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    echo json_encode(['success' => true, 'products' => $products]);
+    echo json_encode(['success' => true, 'products' => $products, 'has_more' => $has_more, 'page' => $page]);
     exit;
 }
 
@@ -82,12 +108,16 @@ if ($action === 'submit_sale') {
             $stmt = $pdo->prepare("UPDATE batches SET current_qty = current_qty - ? WHERE id = ?");
             $stmt->execute([$item['qty'], $item['batch_id']]);
 
+            // Deactivate batch if qty becomes 0
+            $pdo->prepare("UPDATE batches SET is_active = 0 WHERE id = ? AND current_qty <= 0")
+                ->execute([$item['batch_id']]);
+
             // Save sale item
             $stmt = $pdo->prepare("INSERT INTO sale_items (sale_id, product_id, batch_id, qty, unit_price, discount, total_price) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$sale_id, $item['product_id'], $item['batch_id'], $item['qty'], $item['unit_price'], $item['discount'], $item['total_price']]);
 
-            // Auto-deactivate if total stock becomes 0
-            $pdo->prepare("UPDATE products SET is_active = 0 WHERE id = ? AND (SELECT SUM(current_qty) FROM batches WHERE product_id = ?) <= 0")
+            // Auto-deactivate product if total stock across all active batches becomes 0
+            $pdo->prepare("UPDATE products SET is_active = 0 WHERE id = ? AND (SELECT SUM(current_qty) FROM batches WHERE product_id = ? AND is_active = 1) <= 0")
                 ->execute([$item['product_id'], $item['product_id']]);
         }
 

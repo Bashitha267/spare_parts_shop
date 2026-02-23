@@ -19,6 +19,29 @@ check_auth('admin');
             background: #f8fafc;
             color: #1e293b;
         }
+        .suggest-dropdown {
+            position: absolute;
+            left: 0; right: 0;
+            top: calc(100% + 4px);
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.875rem;
+            box-shadow: 0 12px 32px -6px rgba(0,0,0,0.1);
+            z-index: 9999;
+            overflow: hidden;
+            animation: dropIn 0.14s ease-out;
+        }
+        @keyframes dropIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+        .suggest-item {
+            padding: 9px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.1s;
+        }
+        .suggest-item:last-child { border-bottom: none; }
+        .suggest-item:hover, .suggest-item.active { background: #eff6ff; }
+        .suggest-item .s-name { font-weight: 800; font-size: 12px; color: #0f172a; }
+        .suggest-item .s-meta { font-size: 9px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; }
         .bg-main {
             background: url('public/admin_background.jpg');
             background-size: cover;
@@ -93,12 +116,8 @@ check_auth('admin');
                 </div>
 
                 <div class="flex-grow md:flex-none">
-                    <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Time Period</label>
-                    <select id="periodFilter" onchange="loadSales()" class="w-full md:w-48 px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
-                        <option value="today">Today's Sales</option>
-                        <option value="monthly">This Month</option>
-                        <option value="yearly">This Year</option>
-                    </select>
+                    <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Date</label>
+                    <input type="date" id="dateFilter" onchange="loadSales()" class="w-full md:w-48 px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
                 </div>
 
                 <div class="flex-grow md:flex-none">
@@ -112,10 +131,18 @@ check_auth('admin');
 
                 <div class="flex-grow">
                     <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Quick Search</label>
-                    <div class="relative">
-                        <input type="text" id="searchInput" oninput="loadSales()" class="w-full px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all pl-12" placeholder="Search by name or barcode...">
+                    <div class="relative" id="itemSearchWrapper">
+                        <input type="text" id="searchInput" autocomplete="off" oninput="onItemSearchInput()" class="w-full px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all pl-12" placeholder="Search by name or barcode...">
                         <svg class="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <div id="itemSuggestDropdown" class="suggest-dropdown" style="display:none"></div>
                     </div>
+                </div>
+
+                <div class="flex-shrink-0 pt-6">
+                    <button onclick="resetFilters()" title="Reset Filters" class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Reset
+                    </button>
                 </div>
             </div>
         </div>
@@ -143,13 +170,66 @@ check_auth('admin');
     </main>
 
     <script>
+        let itemSuggestTimer;
+        let itemActiveIdx = -1;
+
+        // Set date input to today on load
+        document.getElementById('dateFilter').valueAsDate = new Date();
+
+        function onItemSearchInput() {
+            loadSales();
+            const q = document.getElementById('searchInput').value.trim();
+            clearTimeout(itemSuggestTimer);
+            if (q.length < 1) { document.getElementById('itemSuggestDropdown').style.display = 'none'; return; }
+            itemSuggestTimer = setTimeout(() => fetchItemSuggestions(q), 200);
+        }
+
+        function resetFilters() {
+            document.getElementById('typeFilter').value = 'all';
+            document.getElementById('dateFilter').valueAsDate = new Date();
+            document.getElementById('sortFilter').value = 'most_sold';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('itemSuggestDropdown').style.display = 'none';
+            loadSales();
+        }
+
+        async function fetchItemSuggestions(q) {
+            const type = document.getElementById('typeFilter').value;
+            const typeParam = type !== 'all' ? `&type=${type}` : '';
+            const res = await fetch(`../admin/manage_handler.php?action=search_suggest&q=${encodeURIComponent(q)}${typeParam}`);
+            const data = await res.json();
+            const dropdown = document.getElementById('itemSuggestDropdown');
+            dropdown.innerHTML = '';
+            itemActiveIdx = -1;
+            if (!data.suggestions.length) { dropdown.style.display = 'none'; return; }
+            data.suggestions.forEach(s => {
+                const el = document.createElement('div');
+                el.className = 'suggest-item';
+                el.innerHTML = `<div class="s-name">${s.name}</div><div class="s-meta">${s.barcode}${s.brand ? ' · ' + s.brand : ''}</div>`;
+                el.onclick = () => {
+                    document.getElementById('searchInput').value = s.name;
+                    dropdown.style.display = 'none';
+                    loadSales();
+                };
+                dropdown.appendChild(el);
+            });
+            dropdown.style.display = 'block';
+        }
+
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('itemSearchWrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                document.getElementById('itemSuggestDropdown').style.display = 'none';
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             loadSales();
         });
 
         async function loadSales() {
             const type = document.getElementById('typeFilter').value;
-            const period = document.getElementById('periodFilter').value;
+            const date = document.getElementById('dateFilter').value;
             const sort = document.getElementById('sortFilter').value;
             const search = document.getElementById('searchInput').value;
 
@@ -157,7 +237,7 @@ check_auth('admin');
             tableBody.innerHTML = '<tr><td colspan="6" class="px-8 py-10 text-center text-slate-400 font-bold uppercase tracking-widest animate-pulse italic">Analyzing sale data...</td></tr>';
 
             try {
-                const response = await fetch(`item_sales_handler.php?action=fetch_item_sales&type=${type}&period=${period}&sort=${sort}&search=${encodeURIComponent(search)}`);
+                const response = await fetch(`item_sales_handler.php?action=fetch_item_sales&type=${type}&date=${date}&sort=${sort}&search=${encodeURIComponent(search)}`);
                 const result = await response.json();
 
                 if (result.success) {
@@ -222,9 +302,9 @@ check_auth('admin');
 
         function exportExcel() {
             const type = document.getElementById('typeFilter').value;
-            const period = document.getElementById('periodFilter').value;
+            const date = document.getElementById('dateFilter').value;
             const search = document.getElementById('searchInput').value;
-            window.location.href = `item_sales_handler.php?action=export_excel&type=${type}&period=${period}&search=${encodeURIComponent(search)}`;
+            window.location.href = `item_sales_handler.php?action=export_excel&type=${type}&date=${date}&search=${encodeURIComponent(search)}`;
         }
     </script>
 </body>

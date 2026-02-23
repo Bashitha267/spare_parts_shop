@@ -62,6 +62,30 @@ check_auth('admin');
             border-bottom: 1px solid rgba(226, 232, 240, 0.5);
             color: #0f172a;
         }
+        .suggest-dropdown {
+            position: absolute;
+            left: 0; right: 0;
+            top: calc(100% + 4px);
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 28px -6px rgba(0,0,0,0.1);
+            z-index: 9999;
+            overflow: hidden;
+            animation: dropIn 0.13s ease-out;
+        }
+        @keyframes dropIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+        .suggest-item {
+            padding: 8px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 11px;
+            font-weight: 700;
+            color: #334155;
+            transition: background 0.1s;
+        }
+        .suggest-item:last-child { border-bottom: none; }
+        .suggest-item:hover, .suggest-item.active { background: #eff6ff; color: #2563eb; }
     </style>
 </head>
 <body class="bg-main min-h-screen relative">
@@ -80,10 +104,15 @@ check_auth('admin');
             </div>
             
             <div class="flex items-center gap-4">
-                <div class="relative">
-                    <input type="text" id="logSearch" class="pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none w-64" placeholder="Search logs...">
+                <div class="relative" id="logSearchWrapper">
+                    <input type="text" id="logSearch" autocomplete="off" class="pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none w-64" placeholder="Search logs...">
                     <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <div id="logSuggestDropdown" class="suggest-dropdown" style="display:none"></div>
                 </div>
+                <button onclick="resetLogFilters()" title="Reset" class="flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black hover:bg-slate-200 transition-all uppercase tracking-widest border border-slate-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Reset
+                </button>
                 <button onclick="loadLogs(1)" class="bg-blue-600 text-white px-8 py-2.5 rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">Refresh</button>
             </div>
         </div>
@@ -118,12 +147,85 @@ check_auth('admin');
         document.addEventListener('DOMContentLoaded', () => {
             loadLogs(1);
 
+            window.resetLogFilters = function() {
+                document.getElementById('logSearch').value = '';
+                document.getElementById('logSuggestDropdown').style.display = 'none';
+                loadLogs(1);
+            };
+
+            const LOG_ACTIONS = [
+                // Inventory items
+                'New Item Added',
+                'Update Registry',
+                // Batches / Stock
+                'New Batch Added',
+                'Activate Batch',
+                'Deactivate Batch',
+                // Sales
+                'New Sale',
+                'Edit Sale',
+                'Purge Sale',
+                // Payments
+                'Payment Update',
+                'Payment Approved',
+                'Payment Rejected',
+                // Users
+                'New Cashier',
+                'New Admin',
+                'Login',
+                'Logout',
+            ];
             let debounceTimer;
-            document.getElementById('logSearch').addEventListener('input', function() {
+            let logActiveIdx = -1;
+            const logSearch = document.getElementById('logSearch');
+            const logDropdown = document.getElementById('logSuggestDropdown');
+
+            logSearch.addEventListener('input', function() {
                 clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => {
-                    loadLogs(1);
-                }, 300);
+                debounceTimer = setTimeout(() => { loadLogs(1); }, 300);
+                const q = this.value.trim().toLowerCase();
+                logDropdown.innerHTML = '';
+                logActiveIdx = -1;
+                if (q.length < 1) { logDropdown.style.display = 'none'; return; }
+                const matches = LOG_ACTIONS.filter(a => a.toLowerCase().includes(q));
+                if (!matches.length) { logDropdown.style.display = 'none'; return; }
+                matches.forEach(a => {
+                    const el = document.createElement('div');
+                    el.className = 'suggest-item';
+                    el.textContent = a;
+                    el.onclick = () => {
+                        logSearch.value = a;
+                        logDropdown.style.display = 'none';
+                        loadLogs(1);
+                    };
+                    logDropdown.appendChild(el);
+                });
+                logDropdown.style.display = 'block';
+            });
+
+            logSearch.addEventListener('keydown', function(e) {
+                const items = logDropdown.querySelectorAll('.suggest-item');
+                if (!items.length) return;
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    logActiveIdx = Math.min(logActiveIdx + 1, items.length - 1);
+                    items.forEach((el, i) => el.classList.toggle('active', i === logActiveIdx));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    logActiveIdx = Math.max(logActiveIdx - 1, 0);
+                    items.forEach((el, i) => el.classList.toggle('active', i === logActiveIdx));
+                } else if (e.key === 'Enter' && logActiveIdx >= 0) {
+                    e.preventDefault();
+                    items[logActiveIdx].click();
+                } else if (e.key === 'Escape') {
+                    logDropdown.style.display = 'none';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!document.getElementById('logSearchWrapper').contains(e.target)) {
+                    logDropdown.style.display = 'none';
+                }
             });
         });
 

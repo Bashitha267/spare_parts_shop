@@ -6,6 +6,28 @@ header('Content-Type: application/json');
 
 $action = $_REQUEST['action'] ?? '';
 
+if ($action === 'search_suggest') {
+    $q = trim($_GET['q'] ?? '');
+    $type = $_GET['type'] ?? 'all';
+
+    if (strlen($q) < 1) { echo json_encode(['suggestions' => []]); exit; }
+
+    $typeCond = '';
+    $params = ["%$q%", "%$q%"];
+    if ($type === 'oil') { $typeCond = "AND p.type = 'oil'"; }
+    elseif ($type === 'spare_part') { $typeCond = "AND p.type = 'spare_part'"; }
+
+    $stmt = $pdo->prepare("SELECT p.name, p.barcode, p.brand, p.type, p.oil_type
+                           FROM products p
+                           WHERE (p.name LIKE ? OR p.barcode LIKE ?) $typeCond
+                           ORDER BY p.name ASC LIMIT 8");
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode(['suggestions' => $rows]);
+    exit;
+}
+
 if ($action === 'export_inventory') {
     $type = $_GET['type'] ?? 'oil';
     $filename = ($type === 'oil' ? 'Oil_Inventory_' : 'Spare_Parts_Inventory_') . date('Y-m-d') . '.csv';
@@ -227,9 +249,15 @@ if ($action === 'update_product') {
             }
 
             if ($batch_id) {
-                // Update specific batch fields
-                $stmt = $pdo->prepare("UPDATE batches SET buying_price = ?, selling_price = ?, estimated_selling_price = ?, current_qty = ? WHERE id = ?");
+                // Update specific batch fields and ensure active if qty > 0
+                $status_clause = ((float)$qty > 0) ? ", is_active = 1" : "";
+                $stmt = $pdo->prepare("UPDATE batches SET buying_price = ?, selling_price = ?, estimated_selling_price = ?, current_qty = ? $status_clause WHERE id = ?");
                 $stmt->execute([$b_price, $s_price, $est_price, $qty, $batch_id]);
+                
+                // Also ensure product is active if qty > 0
+                if ((float)$qty > 0) {
+                    $pdo->prepare("UPDATE products SET is_active = 1 WHERE id = ?")->execute([$id]);
+                }
                 $batch_details_updated = true;
             }
         }
@@ -366,8 +394,8 @@ if ($action === 'quick_add_stock') {
             $batch_id = $latest_batch['id'];
             $invoice_id = $latest_batch['invoice_id'];
 
-            // Update Batch Qty & Prices
-            $stmt = $pdo->prepare("UPDATE batches SET current_qty = current_qty + ?, original_qty = original_qty + ?, selling_price = ?, estimated_selling_price = ? WHERE id = ?");
+            // Update Batch Qty & Prices & Reactivate
+            $stmt = $pdo->prepare("UPDATE batches SET current_qty = current_qty + ?, original_qty = original_qty + ?, selling_price = ?, estimated_selling_price = ?, is_active = 1 WHERE id = ?");
             $stmt->execute([$new_qty, $new_qty, $new_s_price, $new_est_price, $batch_id]);
 
             // Update associated silent invoice total
@@ -382,7 +410,7 @@ if ($action === 'quick_add_stock') {
             $stmt->execute([$invoice_no, date('Y-m-d'), 'Direct Entry', $total_buying, $_SESSION['id']]);
             $invoice_id = $pdo->lastInsertId();
 
-            $stmt = $pdo->prepare("INSERT INTO batches (product_id, invoice_id, buying_price, selling_price, estimated_selling_price, original_qty, current_qty) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO batches (product_id, invoice_id, buying_price, selling_price, estimated_selling_price, original_qty, current_qty, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
             $stmt->execute([
                 $p_id,
                 $invoice_id,
@@ -415,6 +443,33 @@ if ($action === 'quick_add_stock') {
         $pdo->rollBack();
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
+    exit;
+}
+
+if ($action === 'search_suggest') {
+    $q = trim($_GET['q'] ?? '');
+    $type = $_GET['type'] ?? '';
+    if (strlen($q) < 1) { echo json_encode(['suggestions' => []]); exit; }
+
+    $params = ["%$q%", "%$q%", "%$q%"];
+    $typeClause = '';
+    if (!empty($type)) {
+        $typeClause = ' AND p.type = ?';
+        $params[] = $type;
+    }
+
+    $stmt = $pdo->prepare("
+        SELECT DISTINCT p.name, p.barcode, p.brand
+        FROM products p
+        WHERE (p.name LIKE ? OR p.barcode LIKE ? OR p.brand LIKE ?)
+        $typeClause
+        AND p.is_active = 1
+        ORDER BY p.name ASC
+        LIMIT 8
+    ");
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode(['suggestions' => $rows]);
     exit;
 }
 

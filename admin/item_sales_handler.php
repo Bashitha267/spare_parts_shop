@@ -7,8 +7,8 @@ header('Content-Type: application/json');
 $action = $_REQUEST['action'] ?? '';
 
 if ($action === 'fetch_item_sales') {
-    $type = $_GET['type'] ?? 'all'; // all, oil, spare_part
-    $period = $_GET['period'] ?? 'today'; // today, monthly, yearly
+    $type = $_GET['type'] ?? 'all';
+    $date = $_GET['date'] ?? date('Y-m-d'); // default today
     $sort = $_GET['sort'] ?? 'most_sold';
     $search = $_GET['search'] ?? '';
 
@@ -21,13 +21,10 @@ if ($action === 'fetch_item_sales') {
         $params[] = $type;
     }
 
-    // Filter by date
-    if ($period === 'today') {
-        $whereClauses[] = "DATE(s.created_at) = CURDATE()";
-    } elseif ($period === 'monthly') {
-        $whereClauses[] = "MONTH(s.created_at) = MONTH(CURDATE()) AND YEAR(s.created_at) = YEAR(CURDATE())";
-    } elseif ($period === 'yearly') {
-        $whereClauses[] = "YEAR(s.created_at) = YEAR(CURDATE())";
+    // Filter by specific date
+    if (!empty($date)) {
+        $whereClauses[] = "DATE(s.created_at) = ?";
+        $params[] = $date;
     }
 
     if (!empty($search)) {
@@ -73,15 +70,13 @@ if ($action === 'fetch_item_sales') {
 
 if ($action === 'export_excel') {
     $type = $_GET['type'] ?? 'all';
-    $period = $_GET['period'] ?? 'today';
+    $date = $_GET['date'] ?? date('Y-m-d');
     
     // Repeat same logic for export
     $whereClauses = [];
     $params = [];
     if ($type !== 'all') { $whereClauses[] = "p.type = ?"; $params[] = $type; }
-    if ($period === 'today') { $whereClauses[] = "DATE(s.created_at) = CURDATE()"; }
-    elseif ($period === 'monthly') { $whereClauses[] = "MONTH(s.created_at) = MONTH(CURDATE()) AND YEAR(s.created_at) = YEAR(CURDATE())"; }
-    elseif ($period === 'yearly') { $whereClauses[] = "YEAR(s.created_at) = YEAR(CURDATE())"; }
+    if (!empty($date)) { $whereClauses[] = "DATE(s.created_at) = ?"; $params[] = $date; }
     
     $search = $_GET['search'] ?? '';
     if (!empty($search)) {
