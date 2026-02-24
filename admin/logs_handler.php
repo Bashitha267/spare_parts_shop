@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
-check_auth('admin');
+check_auth(['admin', 'cashier']);
 
 $action = $_GET['action'] ?? '';
 

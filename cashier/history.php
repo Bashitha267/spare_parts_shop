@@ -105,6 +105,29 @@ check_auth('cashier');
             color: #2563eb;
         }
 
+        .suggest-dropdown {
+            position: absolute;
+            left: 0; right: 0;
+            top: calc(100% + 4px);
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 28px -6px rgba(0,0,0,0.1);
+            z-index: 100;
+            overflow: hidden;
+            animation: dropIn 0.13s ease-out;
+        }
+        @keyframes dropIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+        .suggest-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 11px;
+            transition: background 0.1s;
+        }
+        .suggest-item:last-child { border-bottom: none; }
+        .suggest-item:hover, .suggest-item.active { background: #eff6ff; color: #2563eb; }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -167,8 +190,45 @@ check_auth('cashier');
             </div>
         </div>
     </nav>
+    <div class="pt-32 px-3 md:px-6 max-w-7xl mx-auto animate-fade relative z-10 pb-8">
+        <!-- Filter Card -->
+        <div class="glass-card p-4 md:p-6 mb-8 mt-2">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                <div class="md:col-span-1 relative" id="searchWrapper">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Search</label>
+                    <input type="text" id="searchInput" autocomplete="off" placeholder="Cust. Name or Phone" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    <div id="suggestDropdown" class="suggest-dropdown" style="display:none"></div>
+                </div>
+                <div class="md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">From Date</label>
+                    <input type="date" id="dateFrom" onchange="loadSales(1)" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                </div>
+                <div class="md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">To Date</label>
+                    <input type="date" id="dateTo" onchange="loadSales(1)" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                </div>
+                <div class="md:col-span-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Payment Method</label>
+                    <select id="paymentMethod" onchange="loadSales(1)" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        <option value="">All Methods</option>
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="cheque">Cheque</option>
+                        <option value="credit">Credit</option>
+                    </select>
+                </div>
+                <div class="md:col-span-1 flex gap-2">
+                    <button onclick="resetFilters()" title="Reset" class="flex-1 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black hover:bg-slate-200 transition-all uppercase tracking-widest border border-slate-200 flex items-center justify-center gap-2 py-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Reset
+                    </button>
+                    <button onclick="loadSales(1)" class="flex-1 bg-blue-600 text-white rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest py-3 ring-4 ring-blue-600/10">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
 
-    <div class="pt-28 px-3 md:px-6 max-w-7xl mx-auto animate-fade relative z-10 pb-8">
         <!-- Table Card -->
         <div class="glass-card overflow-hidden">
             <div class="overflow-x-auto">
@@ -208,140 +268,15 @@ check_auth('cashier');
                             <th class="text-center">View</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php
-                        $user_id = $_SESSION['id'];
-                        
-                        // Pagination logic
-                        $limit = 10;
-                        $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-                        if ($page < 1) $page = 1;
-                        $offset = ($page - 1) * $limit;
-
-                        // Get total records
-                        $count_stmt = $pdo->prepare("SELECT COUNT(*) FROM sales WHERE user_id = ?");
-                        $count_stmt->execute([$user_id]);
-                        $total_records = $count_stmt->fetchColumn();
-                        $total_pages = ceil($total_records / $limit);
-
-                        $stmt = $pdo->prepare("SELECT s.*, c.name as cust_name, c.contact as cust_phone 
-                                              FROM sales s 
-                                              LEFT JOIN customers c ON s.customer_id = c.id 
-                                              WHERE s.user_id = ? 
-                                              ORDER BY s.created_at DESC 
-                                              LIMIT $limit OFFSET $offset");
-                        $stmt->execute([$user_id]);
-                        while($row = $stmt->fetch()):
-                        ?>
-                        <tr class="group">
-                            <td>
-                                <span class="bg-gradient-to-r from-blue-400 to-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black tracking-widest shadow-md shadow-blue-500/20">#<?php echo $row['id']; ?></span>
-                            </td>
-                            <td>
-                                <p class="text-sm font-bold text-slate-800"><?php echo date('d M, Y', strtotime($row['created_at'])); ?></p>
-                                <p class="text-[10px] text-slate-400 font-semibold mt-0.5"><?php echo date('h:i A', strtotime($row['created_at'])); ?></p>
-                            </td>
-                            <td>
-                                <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-black shadow-sm">
-                                        <?php echo strtoupper(substr($row['cust_name'] ?: 'G', 0, 1)); ?>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-slate-800"><?php echo htmlspecialchars($row['cust_name'] ?: 'Guest'); ?></p>
-                                        <p class="text-[10px] text-slate-400 font-medium"><?php echo htmlspecialchars($row['cust_phone'] ?: ''); ?></p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <?php
-                                $method = $row['payment_method'];
-                                $methodStyles = [
-                                    'cash'   => 'bg-emerald-500 text-white shadow-emerald-500/20',
-                                    'card'   => 'bg-blue-600 text-white shadow-blue-500/20',
-                                    'cheque' => 'bg-amber-500 text-white shadow-amber-500/20',
-                                    'credit' => 'bg-rose-500 text-white shadow-rose-500/20'
-                                ];
-                                $methodIcons = [
-                                    'cash'   => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>',
-                                    'card'   => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>',
-                                    'cheque' => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>',
-                                    'credit' => '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
-                                ];
-                                $style = $methodStyles[$method] ?? 'bg-slate-500 text-white';
-                                $icon = $methodIcons[$method] ?? '';
-                                ?>
-                                <span class="inline-flex items-center gap-1.5 text-[10px] font-black px-4 py-2 <?php echo $style; ?> rounded-full uppercase tracking-widest shadow-lg">
-                                    <?php echo $icon; ?>
-                                    <?php echo $method; ?>
-                                </span>
-                            </td>
-                            <td class="text-right">
-                                <p class="text-lg font-black text-blue-800 tracking-tight">Rs. <?php echo number_format($row['final_amount'], 2); ?></p>
-                                <?php if($row['discount'] > 0): ?>
-                                    <p class="text-xs text-rose-500 font-bold mt-0.5 flex items-center justify-end gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                                        Saved Rs. <?php echo number_format($row['discount'], 2); ?>
-                                    </p>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-center">
-                                <button onclick="viewDetails(<?php echo $row['id']; ?>)" class="p-2.5 text-white bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 transition-all active:scale-95" title="View Details">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                </button>
-                            </td>
-                        </tr>
-                        <?php endwhile; ?>
+                    <tbody id="salesBody">
+                        <!-- Loaded via AJAX -->
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination UI -->
-            <?php if ($total_pages > 1): ?>
-            <div class="px-6 py-5 bg-white/50 border-t border-slate-100 flex items-center justify-between gap-4 flex-wrap">
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                    Showing <span class="text-blue-600"><?php echo $offset + 1; ?></span> to 
-                    <span class="text-blue-600"><?php echo min($offset + $limit, $total_records); ?></span> of 
-                    <span class="text-blue-600"><?php echo $total_records; ?></span> sales
-                </p>
-                
-                <div class="flex items-center gap-1.5">
-                    <?php if ($page > 1): ?>
-                        <a href="?page=<?php echo $page - 1; ?>" class="pagination-btn pagination-inactive">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-                        </a>
-                    <?php endif; ?>
-
-                    <?php
-                    $start_page = max(1, $page - 2);
-                    $end_page = min($total_pages, $page + 2);
-
-                    if ($start_page > 1) {
-                        echo '<a href="?page=1" class="pagination-btn pagination-inactive">1</a>';
-                        if ($start_page > 2) echo '<span class="text-slate-400 font-bold px-1">...</span>';
-                    }
-
-                    for ($i = $start_page; $i <= $end_page; $i++):
-                    ?>
-                        <a href="?page=<?php echo $i; ?>" class="pagination-btn <?php echo $i == $page ? 'pagination-active' : 'pagination-inactive'; ?>">
-                            <?php echo $i; ?>
-                        </a>
-                    <?php endfor; ?>
-
-                    <?php
-                    if ($end_page < $total_pages) {
-                        if ($end_page < $total_pages - 1) echo '<span class="text-slate-400 font-bold px-1">...</span>';
-                        echo '<a href="?page='.$total_pages.'" class="pagination-btn pagination-inactive">'.$total_pages.'</a>';
-                    }
-                    ?>
-
-                    <?php if ($page < $total_pages): ?>
-                        <a href="?page=<?php echo $page + 1; ?>" class="pagination-btn pagination-inactive">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
-                        </a>
-                    <?php endif; ?>
-                </div>
+            <div id="pagination" class="px-6 py-5 bg-white/50 border-t border-slate-100 flex items-center justify-between gap-4 flex-wrap">
+                <!-- Pagination Buttons -->
             </div>
-            <?php endif; ?>
         </div>
     </div>
 
@@ -387,6 +322,192 @@ check_auth('cashier');
             document.getElementById('today_pending').innerText = 'Rs. ' + data.pending;
         }
         updateTodayTotal();
+
+        let currentPage = 1;
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSales(1);
+
+            const searchInput = document.getElementById('searchInput');
+            const suggestDropdown = document.getElementById('suggestDropdown');
+            let debounceTimer;
+            let activeIdx = -1;
+
+            window.resetFilters = function() {
+                searchInput.value = '';
+                document.getElementById('dateFrom').value = '';
+                document.getElementById('dateTo').value = '';
+                document.getElementById('paymentMethod').value = '';
+                suggestDropdown.style.display = 'none';
+                loadSales(1);
+            };
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                const q = this.value.trim();
+                activeIdx = -1;
+
+                debounceTimer = setTimeout(() => { loadSales(1); }, 300);
+
+                if (q.length < 2) {
+                    suggestDropdown.style.display = 'none';
+                    return;
+                }
+
+                fetch(`sales_handler.php?action=search_customer&query=${encodeURIComponent(q)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.customers.length > 0) {
+                            suggestDropdown.innerHTML = '';
+                            data.customers.forEach(c => {
+                                // Add by name
+                                const item1 = document.createElement('div');
+                                item1.className = 'suggest-item';
+                                item1.innerHTML = `<div class="font-bold">${c.name}</div><div class="text-[9px] opacity-60">${c.contact}</div>`;
+                                item1.onclick = () => {
+                                    searchInput.value = c.name;
+                                    suggestDropdown.style.display = 'none';
+                                    loadSales(1);
+                                };
+                                suggestDropdown.appendChild(item1);
+
+                                // Add by phone
+                                const item2 = document.createElement('div');
+                                item2.className = 'suggest-item';
+                                item2.innerHTML = `<div class="font-bold">${c.contact}</div><div class="text-[9px] opacity-60">${c.name}</div>`;
+                                item2.onclick = () => {
+                                    searchInput.value = c.contact;
+                                    suggestDropdown.style.display = 'none';
+                                    loadSales(1);
+                                };
+                                suggestDropdown.appendChild(item2);
+                            });
+                            suggestDropdown.style.display = 'block';
+                        } else {
+                            suggestDropdown.style.display = 'none';
+                        }
+                    });
+            });
+
+            searchInput.addEventListener('keydown', function(e) {
+                const items = suggestDropdown.querySelectorAll('.suggest-item');
+                if (!items.length) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    activeIdx = Math.min(activeIdx + 1, items.length - 1);
+                    items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    activeIdx = Math.max(activeIdx - 1, 0);
+                    items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+                } else if (e.key === 'Enter' && activeIdx >= 0) {
+                    e.preventDefault();
+                    items[activeIdx].click();
+                } else if (e.key === 'Escape') {
+                    suggestDropdown.style.display = 'none';
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!document.getElementById('searchWrapper').contains(e.target)) {
+                    suggestDropdown.style.display = 'none';
+                }
+            });
+        });
+
+        async function loadSales(page = 1) {
+            currentPage = page;
+            const search = document.getElementById('searchInput').value;
+            const from = document.getElementById('dateFrom').value;
+            const to = document.getElementById('dateTo').value;
+            const method = document.getElementById('paymentMethod').value;
+
+            const res = await fetch(`sales_handler.php?action=fetch_sales&page=${page}&search=${encodeURIComponent(search)}&from=${from}&to=${to}&method=${method}`);
+            const data = await res.json();
+            
+            const tbody = document.getElementById('salesBody');
+            tbody.innerHTML = '';
+            
+            if (!data.sales || data.sales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400 font-bold uppercase tracking-widest text-xs">No transactions found</td></tr>';
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            data.sales.forEach(row => {
+                const methodStyles = {
+                    'cash': 'bg-emerald-500 text-white shadow-emerald-500/20',
+                    'card': 'bg-blue-600 text-white shadow-blue-500/20',
+                    'cheque': 'bg-amber-500 text-white shadow-amber-500/20',
+                    'credit': 'bg-rose-500 text-white shadow-rose-500/20'
+                };
+                const style = methodStyles[row.payment_method] || 'bg-slate-500 text-white';
+                
+                tbody.innerHTML += `
+                    <tr class="group animate-fade">
+                        <td><span class="bg-gradient-to-r from-blue-400 to-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black tracking-widest shadow-md shadow-blue-500/20">#${row.id}</span></td>
+                        <td>
+                            <p class="text-sm font-bold text-slate-800">${formatDate(row.created_at)}</p>
+                            <p class="text-[10px] text-slate-400 font-semibold mt-0.5">${formatTime(row.created_at)}</p>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-black shadow-sm">
+                                    ${(row.cust_name || 'G').charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">${row.cust_name || 'Guest'}</p>
+                                    <p class="text-[10px] text-slate-400 font-medium">${row.cust_phone || ''}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="inline-flex items-center gap-1.5 text-[10px] font-black px-4 py-2 ${style} rounded-full uppercase tracking-widest shadow-lg">
+                                ${row.payment_method}
+                            </span>
+                        </td>
+                        <td class="text-right">
+                            <p class="text-lg font-black text-blue-800 tracking-tight">Rs. ${numberFormat(row.final_amount)}</p>
+                            ${row.discount > 0 ? `<p class="text-xs text-rose-500 font-bold mt-0.5">Saved Rs. ${numberFormat(row.discount)}</p>` : ''}
+                        </td>
+                        <td class="text-center">
+                            <button onclick="viewDetails(${row.id})" class="p-2.5 text-white bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 transition-all active:scale-95">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            renderPagination(data.pagination);
+        }
+
+        function renderPagination(pg) {
+            const container = document.getElementById('pagination');
+            let html = `<p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Page ${pg.current_page} of ${pg.total_pages}</p>`;
+            html += `<div class="flex items-center gap-1.5">`;
+            
+            for(let i = 1; i <= pg.total_pages; i++) {
+                if (pg.total_pages > 5 && (i > 3 && i < pg.total_pages)) {
+                   if (i === 4) html += `<span class="px-2">...</span>`;
+                   continue;
+                }
+                const active = i === pg.current_page ? 'pagination-active' : 'pagination-inactive';
+                html += `<button onclick="loadSales(${i})" class="pagination-btn ${active}">${i}</button>`;
+            }
+            
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function formatDate(str) { 
+            const d = new Date(str);
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+        function formatTime(str) {
+            const d = new Date(str);
+            return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
 
         async function viewDetails(id) {
             document.getElementById('modal_sale_id').innerText = '#SALE-' + id;

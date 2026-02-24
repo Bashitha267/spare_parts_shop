@@ -176,3 +176,65 @@ if ($action === 'fetch_sale_details') {
     echo json_encode(['success' => true, 'sale' => $sale, 'items' => $items]);
     exit;
 }
+
+if ($action === 'fetch_sales') {
+    $user_id = $_SESSION['id'];
+    $page = max(1, (int)($_GET['page'] ?? 1));
+    $limit = 10;
+    $offset = ($page - 1) * $limit;
+
+    $search = $_GET['search'] ?? '';
+    $from = $_GET['from'] ?? '';
+    $to = $_GET['to'] ?? '';
+    $method = $_GET['method'] ?? '';
+
+    $where = ["s.user_id = ?"];
+    $params = [$user_id];
+
+    if (!empty($search)) {
+        $where[] = "(c.name LIKE ? OR c.contact LIKE ? OR s.id LIKE ?)";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+    }
+    if (!empty($from)) {
+        $where[] = "DATE(s.created_at) >= ?";
+        $params[] = $from;
+    }
+    if (!empty($to)) {
+        $where[] = "DATE(s.created_at) <= ?";
+        $params[] = $to;
+    }
+    if (!empty($method)) {
+        $where[] = "s.payment_method = ?";
+        $params[] = $method;
+    }
+
+    $where_sql = implode(" AND ", $where);
+
+    // Count
+    $count_stmt = $pdo->prepare("SELECT COUNT(*) FROM sales s LEFT JOIN customers c ON s.customer_id = c.id WHERE $where_sql");
+    $count_stmt->execute($params);
+    $total = $count_stmt->fetchColumn();
+
+    // Data
+    $stmt = $pdo->prepare("SELECT s.*, c.name as cust_name, c.contact as cust_phone 
+                           FROM sales s 
+                           LEFT JOIN customers c ON s.customer_id = c.id 
+                           WHERE $where_sql 
+                           ORDER BY s.created_at DESC 
+                           LIMIT $limit OFFSET $offset");
+    $stmt->execute($params);
+    $sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode([
+        'success' => true,
+        'sales' => $sales,
+        'pagination' => [
+            'total_records' => $total,
+            'total_pages' => ceil($total / $limit),
+            'current_page' => $page
+        ]
+    ]);
+    exit;
+}
