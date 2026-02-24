@@ -9,9 +9,9 @@ check_auth(['admin', 'cashier']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batch History - Vehicle Square</title>
+    <title>Inventory Logs - Vehicle Square</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { 
@@ -20,7 +20,7 @@ check_auth(['admin', 'cashier']);
             color: #0f172a;
         }
         .bg-main {
-            background:  url('public/admin_background.jpg');
+            background: url('public/admin_background.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -28,14 +28,10 @@ check_auth(['admin', 'cashier']);
         }
         .colorful-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: 
-                radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+                radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
             pointer-events: none;
             z-index: 0;
         }
@@ -44,24 +40,13 @@ check_auth(['admin', 'cashier']);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 1.5rem;
+            border-radius: 2rem;
             box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.08);
-        }
-        .blue-gradient-card {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.3);
         }
         .glass-nav {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        input, select {
-            background: white !important;
-            border: 1px solid #e2e8f0 !important;
-            color: #0f172a !important;
-            outline: none !important;
         }
         th {
             background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
@@ -72,209 +57,238 @@ check_auth(['admin', 'cashier']);
             padding: 1.25rem 1.5rem !important;
             font-size: 10px;
         }
-        tr:nth-child(even) {
-            background-color: rgba(241, 245, 249, 0.5);
-        }
         td {
             padding: 1rem 1.5rem !important;
             border-bottom: 1px solid rgba(226, 232, 240, 0.5);
             color: #0f172a;
         }
+        .suggest-dropdown {
+            position: absolute;
+            left: 0; right: 0;
+            top: calc(100% + 4px);
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 28px -6px rgba(0,0,0,0.1);
+            z-index: 9999;
+            overflow: hidden;
+            animation: dropIn 0.13s ease-out;
+        }
+        @keyframes dropIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+        .suggest-item {
+            padding: 8px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 11px;
+            font-weight: 700;
+            color: #334155;
+            transition: background 0.1s;
+        }
+        .suggest-item:last-child { border-bottom: none; }
+        .suggest-item:hover, .suggest-item.active { background: #eff6ff; color: #2563eb; }
     </style>
 </head>
 <body class="bg-main min-h-screen relative">
     <div class="colorful-overlay"></div>
     
     <nav class="glass-nav sticky top-0 z-30">
-        <div class="px-4 md:px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4">
-                <a href="<?php echo $_SESSION['role'] === 'admin' ? 'dashboard.php' : '../cashier/dashboard.php'; ?>" class="p-2 hover:bg-blue-50 rounded-xl transition-all text-blue-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <div class="px-4 md:px-8 py-4 flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center gap-6">
+                <a href="<?php echo $_SESSION['role'] === 'admin' ? 'dashboard.php' : '../cashier/dashboard.php'; ?>" class="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Item Added History</h1>
+                <div>
+                   <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Inventory Logs</h1>
+                   <p class="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] mt-0.5">Stock & Registry Audit Trail</p>
+                </div>
             </div>
-
+            
+            <div class="flex items-center gap-4">
+                <div class="relative" id="logSearchWrapper">
+                    <input type="text" id="logSearch" autocomplete="off" class="pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none w-64" placeholder="Search logs...">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <div id="logSuggestDropdown" class="suggest-dropdown" style="display:none"></div>
+                </div>
+                <button onclick="resetLogFilters()" title="Reset" class="flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black hover:bg-slate-200 transition-all uppercase tracking-widest border border-slate-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Reset
+                </button>
+                <button onclick="loadLogs(1)" class="bg-blue-600 text-white px-8 py-2.5 rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">Refresh</button>
+            </div>
         </div>
     </nav>
 
     <main class="p-8 max-w-7xl mx-auto space-y-8 relative z-10">
-        
-        <!-- Filter Bar -->
-        <div class="glass-card p-6 rounded-[2rem] flex flex-wrap items-center gap-6">
-            <form method="GET" class="flex flex-wrap items-end gap-6 w-full">
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Arrival Date</label>
-                    <input type="date" name="date" onchange="this.form.submit()" value="<?php echo $_GET['date'] ?? ''; ?>" class="px-6 py-3 rounded-2xl text-sm font-bold w-full md:w-auto border border-slate-200">
-                </div>
-                
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Operator Profile</label>
-                    <select name="role" onchange="this.form.submit()" class="px-6 py-3 rounded-2xl text-sm font-bold min-w-[180px] border border-slate-200">
-                        <option value="">All Clearances</option>
-                        <option value="admin" <?php echo ($_GET['role'] ?? '') === 'admin' ? 'selected' : ''; ?>>Admin Entry</option>
-                        <option value="cashier" <?php echo ($_GET['role'] ?? '') === 'cashier' ? 'selected' : ''; ?>>Cashier Entry</option>
-                    </select>
-                </div>
-
-                <div class="flex items-end gap-3 pb-0.5">
-                    <?php if(isset($_GET['date']) || isset($_GET['role'])): ?>
-                    <a href="batchHistroy.php" class="px-6 py-3 bg-slate-100 text-slate-500 border border-slate-200 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Reset Filters</a>
-                    <?php endif; ?>
-                </div>
-            </form>
-        </div>
-
-        <!-- History Table -->
-        <div class="glass-card overflow-hidden">
+        <div class="glass-card rounded-[2.5rem] overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[800px]">
+                <table class="w-full text-left border-collapse min-w-[700px]">
                     <thead>
                         <tr>
-                            <th class="px-8 py-6">Arrival Date</th>
-                            <th class="px-8 py-6">Authorized Officer</th>
-                            <th class="px-8 py-6">Invoice Identifier</th>
-                            <th class="px-8 py-6 text-right">Total Amount</th>
-                            <th class="px-8 py-6 text-center">Actions</th>
+                            <th class="px-8 py-5">Timestamp</th>
+                            <th class="px-8 py-5">User</th>
+                            <th class="px-8 py-5">Action</th>
+                            <th class="px-8 py-5">Details</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <?php
-                        $where = "WHERE 1=1";
-                        $params = [];
-
-                        if(!empty($_GET['date'])) {
-                            $where .= " AND DATE(i.created_at) = :date";
-                            $params['date'] = $_GET['date'];
-                        }
-
-                        if(!empty($_GET['role'])) {
-                            $where .= " AND u.role = :role";
-                            $params['role'] = $_GET['role'];
-                        }
-
-                        $sql = "SELECT i.*, u.full_name, u.role 
-                                FROM invoices i 
-                                JOIN users u ON i.user_id = u.id 
-                                $where 
-                                ORDER BY i.created_at DESC";
-                        
-                        $stmt = $pdo->prepare($sql);
-                        $stmt->execute($params);
-                        $found = false;
-                        while($row = $stmt->fetch()): $found = true;
-                        ?>
-                        <tr class="hover:bg-slate-50 transition-all group">
-                            <td class="px-8 py-6">
-                                <p class="text-sm font-black text-slate-900 tracking-tight"><?php echo date('d M, Y', strtotime($row['created_at'])); ?></p>
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter mt-1"><?php echo date('h:i A', strtotime($row['created_at'])); ?></p>
-                            </td>
-                            <td class="px-8 py-6">
-                                <div class="flex items-center gap-2">
-                                    <span class="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest <?php echo $row['role'] === 'admin' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-100 text-blue-800 border border-blue-200'; ?>">
-                                        <?php echo $row['role']; ?>
-                                    </span>
-                                    <p class="text-[10px] font-bold text-slate-900 uppercase tracking-tight"><?php echo htmlspecialchars($row['full_name']); ?></p>
-                                </div>
-                            </td>
-                            <td class="px-8 py-6">
-                                <span class="font-mono text-xs font-black text-blue-800 tracking-tighter uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100"><?php echo htmlspecialchars($row['invoice_no']); ?></span>
-                            </td>
-                            <td class="px-8 py-6 text-right">
-                                <p class="text-base font-black text-blue-800 tracking-widest"><?php echo number_format($row['total_amount'], 2); ?></p>
-                            </td>
-                            <td class="px-8 py-6">
-                                <div class="flex justify-center items-center gap-3">
-                                    <button onclick="viewBatch(<?php echo $row['id']; ?>)" class="p-3 bg-blue-50 text-blue-800 border border-blue-100 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95" title="View Manifest">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    </button>
-                                    <?php if($_SESSION['role'] === 'admin'): ?>
-
-                                    <button onclick="deleteBatch(<?php echo $row['id']; ?>)" class="p-3 bg-rose-50 text-rose-800 border border-rose-100 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm active:scale-95" title="Purge Record">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    </button>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endwhile; if(!$found): ?>
-                        <tr><td colspan="5" class="px-8 py-12 text-center text-blue-900 font-black uppercase tracking-[0.2em] italic">No transaction logs captured for this period.</td></tr>
-                        <?php endif; ?>
+                    <tbody id="logsBody">
+                        <!-- Loaded via AJAX -->
                     </tbody>
                 </table>
+            </div>
+            <div id="pagination" class="p-6 border-t border-slate-100 flex justify-center gap-2">
+                <!-- Pagination Buttons -->
             </div>
         </div>
     </main>
 
     <script>
-        async function viewBatch(id) {
-            const res = await fetch(`manage_handler.php?action=fetch_batch_details&id=${id}`);
+        let currentPage = 1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLogs(1);
+
+            window.resetLogFilters = function() {
+                document.getElementById('logSearch').value = '';
+                document.getElementById('logSuggestDropdown').style.display = 'none';
+                loadLogs(1);
+            };
+
+            const LOG_ACTIONS = [
+                'New Item Added',
+                'Update Registry',
+                'New Batch Added',
+                'Activate Batch',
+                'Deactivate Batch',
+                'Delete Item'
+            ];
+            let debounceTimer;
+            let logActiveIdx = -1;
+            const logSearch = document.getElementById('logSearch');
+            const logDropdown = document.getElementById('logSuggestDropdown');
+
+            logSearch.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => { loadLogs(1); }, 300);
+                const q = this.value.trim().toLowerCase();
+                logDropdown.innerHTML = '';
+                logActiveIdx = -1;
+                if (q.length < 1) { logDropdown.style.display = 'none'; return; }
+                const matches = LOG_ACTIONS.filter(a => a.toLowerCase().includes(q));
+                if (!matches.length) { logDropdown.style.display = 'none'; return; }
+                matches.forEach(a => {
+                    const el = document.createElement('div');
+                    el.className = 'suggest-item';
+                    el.textContent = a;
+                    el.onclick = () => {
+                        logSearch.value = a;
+                        logDropdown.style.display = 'none';
+                        loadLogs(1);
+                    };
+                    logDropdown.appendChild(el);
+                });
+                logDropdown.style.display = 'block';
+            });
+
+            logSearch.addEventListener('keydown', function(e) {
+                const items = logDropdown.querySelectorAll('.suggest-item');
+                if (!items.length) return;
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    logActiveIdx = Math.min(logActiveIdx + 1, items.length - 1);
+                    items.forEach((el, i) => el.classList.toggle('active', i === logActiveIdx));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    logActiveIdx = Math.max(logActiveIdx - 1, 0);
+                    items.forEach((el, i) => el.classList.toggle('active', i === logActiveIdx));
+                } else if (e.key === 'Enter' && logActiveIdx >= 0) {
+                    e.preventDefault();
+                    items[logActiveIdx].click();
+                } else if (e.key === 'Escape') {
+                    logDropdown.style.display = 'none';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!document.getElementById('logSearchWrapper').contains(e.target)) {
+                    logDropdown.style.display = 'none';
+                }
+            });
+        });
+
+        async function loadLogs(page = 1) {
+            currentPage = page;
+            const search = document.getElementById('logSearch').value;
+            const res = await fetch(`logs_handler.php?action=fetch_logs&type=inventory&page=${page}&search=${search}`);
             const data = await res.json();
             
-            if(!data.success) return;
+            const tbody = document.getElementById('logsBody');
+            tbody.innerHTML = '';
+            
+            if(data.logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-16 text-slate-400 font-black uppercase tracking-widest text-xs italic">No activity logs found.</td></tr>';
+                return;
+            }
 
-            let html = `
-                <div class="overflow-x-auto mt-4 px-2">
-                    <table class="w-full text-left text-[11px] border-collapse">
-                        <thead>
-                            <tr class="text-slate-500 uppercase tracking-widest border-b border-slate-100 italic">
-                                <th class="py-2">Item</th>
-                                <th class="py-2 text-center">Qty</th>
-                                <th class="py-2 text-right">Unit Price</th>
-                                <th class="py-2 text-right">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-            `;
+            data.logs.forEach(log => {
+                const role = log.user_role ? log.user_role.toLowerCase() : 'system';
+                let roleClass = 'bg-slate-100 text-slate-500 border-slate-200';
+                
+                if (role === 'admin') {
+                    roleClass = 'bg-violet-100 text-violet-700 border-violet-200';
+                } else if (role === 'cashier') {
+                    roleClass = 'bg-emerald-100 text-emerald-700 border-emerald-200';
+                }
 
-            data.items.forEach(item => {
-                html += `
-                    <tr>
-                        <td class="py-3">
-                            <p class="font-black text-slate-900">${item.name}</p>
-                            <p class="text-[9px] text-slate-500">${item.barcode}</p>
+                const action = log.action.toLowerCase();
+                let actionClass = 'bg-blue-50 text-blue-700 border-blue-100'; 
+                
+                if (action.includes('payment')) {
+                    actionClass = 'bg-amber-50 text-amber-700 border-amber-200';
+                } else if (action.includes('delete')) {
+                    actionClass = 'bg-rose-50 text-rose-700 border-rose-200';
+                } else if (action.includes('sale')) {
+                    actionClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                } else if (action.includes('update')) {
+                    actionClass = 'bg-indigo-50 text-indigo-700 border-indigo-200';
+                } else if (action.includes('add')) {
+                    actionClass = 'bg-violet-50 text-violet-700 border-violet-200';
+                } else if (action.includes('activate') || action.includes('deactivate')) {
+                    actionClass = 'bg-cyan-50 text-cyan-700 border-cyan-200';
+                }
+
+                const row = `
+                    <tr class="hover:bg-slate-50 transition-all group border-b border-slate-50 last:border-0 text-sm">
+                        <td class="px-8 py-6">
+                            <p class="text-[11px] font-black text-slate-900 uppercase tracking-tight">${new Date(log.created_at).toLocaleDateString('en-GB')}</p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">${new Date(log.created_at).toLocaleTimeString()}</p>
                         </td>
-                        <td class="py-3 text-center font-bold text-slate-800">${item.original_qty}</td>
-                        <td class="py-3 text-right font-mono text-blue-800">${parseFloat(item.buying_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                        <td class="py-3 text-right font-mono text-emerald-800">${(item.original_qty * item.buying_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="px-8 py-6">
+                            <p class="font-black text-slate-900 text-sm tracking-tight">${log.user_name || 'System'}</p>
+                            <span class="px-2 py-0.5 border ${roleClass} rounded text-[8px] font-black uppercase tracking-widest">${role}</span>
+                        </td>
+                        <td class="px-8 py-6">
+                            <span class="px-3 py-1.5 border ${actionClass} rounded-lg text-[10px] font-black uppercase tracking-widest whitespace-nowrap shadow-sm">${log.action}</span>
+                        </td>
+                        <td class="px-8 py-6 max-w-md">
+                            <p class="text-[11px] font-medium text-slate-600 leading-relaxed whitespace-pre-wrap">${(log.details || '-').replace(/~~(.*?)~~\s(.*?)(?=, |$)/g, '<span class="line-through opacity-100 text-slate-800">$1</span> <span class="text-blue-400 font-bold mx-1">→</span> <span class="text-rose-600 font-black tracking-tight">$2</span>')}</p>
+                        </td>
                     </tr>
                 `;
+                tbody.innerHTML += row;
             });
 
-            html += `</tbody></table></div>`;
-
-            Swal.fire({
-                title: '<span class="text-xl font-black uppercase tracking-tighter">Itemized Manifest</span>',
-                html: html,
-                width: '600px',
-                confirmButtonText: 'Done',
-                confirmButtonColor: '#3b82f6',
-                customClass: { 
-                    popup: 'rounded-[2rem] bg-white text-slate-800 shadow-2xl border border-slate-100 px-4',
-                    confirmButton: 'rounded-xl font-black uppercase text-[10px] px-8 py-3 tracking-widest w-full bg-blue-600 text-white'
-                }
-            });
+            renderPagination(data.pagination);
         }
 
-
-
-        function deleteBatch(id) {
-            Swal.fire({
-                title: 'Confirm Purge?',
-                text: "CRITICAL: This will irreversibly subtract items from inventory levels.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#f43f5e',
-                cancelButtonColor: '#1e293b',
-                confirmButtonText: 'Yes, Delete & Reverse',
-                customClass: { 
-                    popup: 'rounded-[1.5rem] bg-white text-slate-800 shadow-xl border border-slate-100',
-                    confirmButton: 'rounded-xl font-black uppercase text-[10px] px-8 py-3 tracking-widest bg-rose-600 text-white'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = `batch_actions.php?action=delete&id=${id}`;
-                }
-            })
+        function renderPagination(pg) {
+            const container = document.getElementById('pagination');
+            let html = '';
+            
+            for(let i = 1; i <= pg.total_pages; i++) {
+                const activeClass = i === pg.current_page ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200';
+                html += `<button onclick="loadLogs(${i})" class="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black transition-all ${activeClass}">${i}</button>`;
+            }
+            container.innerHTML = html;
         }
     </script>
 </body>

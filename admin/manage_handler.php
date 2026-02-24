@@ -446,6 +446,66 @@ if ($action === 'quick_add_stock') {
     exit;
 }
 
+if ($action === 'delete_batch') {
+    $batch_id = $_POST['id'] ?? null;
+    if (!$batch_id) {
+        echo json_encode(['success' => false, 'message' => 'No Batch ID provided']);
+        exit;
+    }
+
+    $pdo->beginTransaction();
+    try {
+        // Fetch batch details
+        $stmt = $pdo->prepare("SELECT b.*, p.name as product_name FROM batches b JOIN products p ON b.product_id = p.id WHERE b.id = ?");
+        $stmt->execute([$batch_id]);
+        $batch = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$batch) {
+            throw new Exception("Batch not found.");
+        }
+
+        $qty_removed = $batch['current_qty'];
+        $value_removed = $qty_removed * $batch['buying_price'];
+
+        // Check if there are sales associated with this specific batch
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM sale_items WHERE batch_id = ?");
+        $stmt->execute([$batch_id]);
+        $sales_count = $stmt->fetchColumn();
+
+        if ($sales_count > 0) {
+            // Soft delete/zero-out to preserve sales history but remove from current inventory valuations
+            $stmt = $pdo->prepare("UPDATE batches SET current_qty = 0, is_active = 0 WHERE id = ?");
+            $stmt->execute([$batch_id]);
+            $action_log = "Soft deleted Batch #{$batch_id} for {$batch['product_name']} (Has Sales History). Deducted Qty: {$qty_removed}, Value: Rs. " . number_format($value_removed, 2);
+        } else {
+            // Safe to hard delete
+            $stmt = $pdo->prepare("DELETE FROM batches WHERE id = ?");
+            $stmt->execute([$batch_id]);
+            $action_log = "Hard deleted Batch #{$batch_id} for {$batch['product_name']}. Deducted Qty: {$qty_removed}, Value: Rs. " . number_format($value_removed, 2);
+        }
+
+        // Adjust the parent invoice total so report totals remain accurate
+        if ($value_removed > 0) {
+            $stmt = $pdo->prepare("UPDATE invoices SET total_amount = GREATEST(0, total_amount - ?) WHERE id = ?");
+            $stmt->execute([$value_removed, $batch['invoice_id']]);
+        }
+
+        // Auto-deactivate product if total stock is now 0
+        $pdo->prepare("UPDATE products SET is_active = 0 WHERE id = ? AND (SELECT COALESCE(SUM(current_qty), 0) FROM batches WHERE product_id = ?) <= 0")
+            ->execute([$batch['product_id'], $batch['product_id']]);
+
+        log_action("Delete Item", $action_log);
+
+        $pdo->commit();
+        echo json_encode(['success' => true, 'message' => 'Batch removed successfully.']);
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
 if ($action === 'search_suggest') {
     $q = trim($_GET['q'] ?? '');
     $type = $_GET['type'] ?? '';

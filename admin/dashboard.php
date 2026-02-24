@@ -144,7 +144,7 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
                     <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
                         <svg class="w-12 h-12 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Added Item Logs</span>
+                    <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Inventory Logs</span>
                 </a>
 
                 <!-- Manage Payments -->

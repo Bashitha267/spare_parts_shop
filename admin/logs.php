@@ -154,13 +154,6 @@ check_auth('admin');
             };
 
             const LOG_ACTIONS = [
-                // Inventory items
-                'New Item Added',
-                'Update Registry',
-                // Batches / Stock
-                'New Batch Added',
-                'Activate Batch',
-                'Deactivate Batch',
                 // Sales
                 'New Sale',
                 'Edit Sale',

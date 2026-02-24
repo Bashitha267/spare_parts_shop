@@ -603,7 +603,7 @@ $is_admin = ($_SESSION['role'] === 'admin');
                             <button onclick='editProduct(${JSON.stringify(p)})' class="p-2 text-slate-400 hover:text-indigo-600 rounded-lg transition-all" title="Edit Info">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </button>
-                            <button onclick='deleteProduct(${p.id})' class="p-2 text-slate-400 hover:text-rose-600 rounded-lg transition-all" title="Delete Batch">
+                            <button onclick='deleteBatch(${p.id})' class="p-2 text-slate-400 hover:text-rose-600 rounded-lg transition-all" title="Delete Batch">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                             ` : ''}
@@ -762,6 +762,34 @@ $is_admin = ($_SESSION['role'] === 'admin');
                 const formData = new FormData();
                 formData.append('action', 'delete_product');
                 formData.append('id', id);
+
+                const res = await fetch('manage_handler.php', { method: 'POST', body: formData });
+                const data = await res.json();
+                
+                if (data.success) {
+                    loadInventory(currentPage, document.getElementById('searchInventory').value, currentStatus);
+                    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: data.message, showConfirmButton: false, timer: 1500 });
+                } else {
+                    Swal.fire('Error', data.message, 'error');
+                }
+            }
+        }
+
+        async function deleteBatch(batchId) {
+            const { isConfirmed } = await Swal.fire({
+                title: 'Delete this Specific Batch?',
+                text: "This removes the stock/value from this exact batch. If there are past sales, it will be zeroed out instead of permanently deleted to protect history.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f43f5e',
+                confirmButtonText: 'Yes, Remove Batch',
+                customClass: { popup: 'rounded-3xl' }
+            });
+
+            if (isConfirmed) {
+                const formData = new FormData();
+                formData.append('action', 'delete_batch');
+                formData.append('id', batchId);
 
                 const res = await fetch('manage_handler.php', { method: 'POST', body: formData });
                 const data = await res.json();

@@ -21,6 +21,13 @@ if ($action === 'fetch_logs') {
             $params[] = "%$search%";
         }
 
+        $type = $_GET['type'] ?? '';
+        if ($type === 'inventory') {
+            $whereClause .= " AND sl.action IN ('Activate Batch', 'Deactivate Batch', 'Update Registry', 'Delete Item', 'New Item Added', 'New Batch Added')";
+        } else {
+            $whereClause .= " AND sl.action NOT IN ('Activate Batch', 'Deactivate Batch', 'Update Registry', 'Delete Item', 'New Item Added', 'New Batch Added')";
+        }
+
         // Count total for pagination
         $total_stmt = $pdo->prepare("SELECT COUNT(*) FROM system_logs sl LEFT JOIN users u ON sl.user_id = u.id $whereClause");
         $total_stmt->execute($params);
