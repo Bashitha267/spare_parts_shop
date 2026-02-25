@@ -85,23 +85,45 @@ if ($action === 'get_batches') {
     exit;
 }
 
-if ($action === 'submit_sale') {
+if ($action === 'submit_sale' || $action === 'save_draft') {
+    $sale_id = $_POST['draft_id'] ?? null;
     $customer_id = $_POST['customer_id'] ?: null;
     $user_id = $_SESSION['id'];
-    $total_amount = $_POST['total_amount'];
-    $discount = $_POST['discount'] ?: 0;
-    $final_amount = $_POST['final_amount'];
-    $payment_method = $_POST['payment_method'];
-    $items = json_decode($_POST['items'], true);
+    $total_amount = $_POST['total_amount'] ?? 0;
+    $discount = $_POST['discount'] ?? 0;
+    $final_amount = $_POST['final_amount'] ?? 0;
+    $payment_method = $_POST['payment_method'] ?? 'cash';
+    $items = json_decode($_POST['items'], true) ?? [];
+    
+    $is_draft = ($action === 'save_draft');
+    $status = $is_draft ? 'pending' : 'completed';
+    $payment_status = ($payment_method === 'cheque' || $payment_method === 'credit') ? 'pending' : 'approved';
 
     try {
         $pdo->beginTransaction();
 
-        $payment_status = ($payment_method === 'cheque' || $payment_method === 'credit') ? 'pending' : 'approved';
-
-        $stmt = $pdo->prepare("INSERT INTO sales (customer_id, user_id, total_amount, discount, final_amount, payment_method, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$customer_id, $user_id, $total_amount, $discount, $final_amount, $payment_method, $payment_status]);
-        $sale_id = $pdo->lastInsertId();
+        if ($sale_id) {
+            // Restore old quantities before deleting old items
+            $stmt = $pdo->prepare("SELECT batch_id, qty FROM sale_items WHERE sale_id = ?");
+            $stmt->execute([$sale_id]);
+            $old_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($old_items as $old) {
+                $pdo->prepare("UPDATE batches SET current_qty = current_qty + ?, is_active = 1 WHERE id = ?")->execute([$old['qty'], $old['batch_id']]);
+                // Ensure product is active
+                $pdo->prepare("UPDATE products p JOIN batches b ON p.id = b.product_id SET p.is_active = 1 WHERE b.id = ?")->execute([$old['batch_id']]);
+            }
+            // Delete old items
+            $pdo->prepare("DELETE FROM sale_items WHERE sale_id = ?")->execute([$sale_id]);
+            
+            // Update Header
+            $stmt = $pdo->prepare("UPDATE sales SET customer_id=?, user_id=?, total_amount=?, discount=?, final_amount=?, payment_method=?, payment_status=?, status=? WHERE id=?");
+            $stmt->execute([$customer_id, $user_id, $total_amount, $discount, $final_amount, $payment_method, $payment_status, $status, $sale_id]);
+        } else {
+            // Insert new Header
+            $stmt = $pdo->prepare("INSERT INTO sales (customer_id, user_id, total_amount, discount, final_amount, payment_method, payment_status, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$customer_id, $user_id, $total_amount, $discount, $final_amount, $payment_method, $payment_status, $status]);
+            $sale_id = $pdo->lastInsertId();
+        }
 
         foreach ($items as $item) {
             // Update batch qty
@@ -112,20 +134,52 @@ if ($action === 'submit_sale') {
             $pdo->prepare("UPDATE batches SET is_active = 0 WHERE id = ? AND current_qty <= 0")
                 ->execute([$item['batch_id']]);
 
-            // Save sale item
+            // Save sale item (handle 'per_item_discount' or 'discount' interchangeably)
+            $itemDisc = $item['per_item_discount'] ?? ($item['discount'] ?? 0);
             $stmt = $pdo->prepare("INSERT INTO sale_items (sale_id, product_id, batch_id, qty, unit_price, discount, total_price) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$sale_id, $item['product_id'], $item['batch_id'], $item['qty'], $item['unit_price'], $item['discount'], $item['total_price']]);
+            $stmt->execute([$sale_id, $item['product_id'], $item['batch_id'], $item['qty'], $item['unit_price'], $itemDisc, $item['total_price']]);
 
             // Auto-deactivate product if total stock across all active batches becomes 0
             $pdo->prepare("UPDATE products SET is_active = 0 WHERE id = ? AND (SELECT SUM(current_qty) FROM batches WHERE product_id = ? AND is_active = 1) <= 0")
                 ->execute([$item['product_id'], $item['product_id']]);
         }
 
-        // 5. Log Action
-        log_action("New Sale", "Recorded TRX-$sale_id. Total: Rs. " . number_format($final_amount, 2));
+        if (!$is_draft) {
+             log_action("New Sale", "Recorded TRX-$sale_id. Total: Rs. " . number_format($final_amount, 2));
+        }
 
         $pdo->commit();
         echo json_encode(['success' => true, 'sale_id' => $sale_id]);
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+if ($action === 'load_drafts') {
+    $user_id = $_SESSION['id'];
+    $stmt = $pdo->prepare("SELECT s.*, c.name as cust_name FROM sales s LEFT JOIN customers c ON s.customer_id = c.id WHERE s.status = 'pending' AND s.user_id = ? ORDER BY s.created_at DESC");
+    $stmt->execute([$user_id]);
+    echo json_encode(['success' => true, 'drafts' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    exit;
+}
+
+if ($action === 'discard_draft') {
+    $sale_id = $_POST['draft_id'];
+    try {
+        $pdo->beginTransaction();
+        $stmt = $pdo->prepare("SELECT batch_id, qty FROM sale_items WHERE sale_id = ?");
+        $stmt->execute([$sale_id]);
+        $old_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($old_items as $old) {
+            $pdo->prepare("UPDATE batches SET current_qty = current_qty + ?, is_active = 1 WHERE id = ?")->execute([$old['qty'], $old['batch_id']]);
+            $pdo->prepare("UPDATE products p JOIN batches b ON p.id = b.product_id SET p.is_active = 1 WHERE b.id = ?")->execute([$old['batch_id']]);
+        }
+        $pdo->prepare("DELETE FROM sale_items WHERE sale_id = ?")->execute([$sale_id]);
+        $pdo->prepare("DELETE FROM sales WHERE id = ?")->execute([$sale_id]);
+        $pdo->commit();
+        echo json_encode(['success' => true]);
     } catch (Exception $e) {
         $pdo->rollBack();
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
@@ -138,17 +192,17 @@ if ($action === 'get_today_total') {
     $today = date('Y-m-d');
     
     // Total Today
-    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ?");
+    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND status = 'completed'");
     $stmt->execute([$user_id, $today]);
     $total = $stmt->fetchColumn() ?: 0;
 
     // Approved Today
-    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'approved'");
+    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'approved' AND status = 'completed'");
     $stmt->execute([$user_id, $today]);
     $approved = $stmt->fetchColumn() ?: 0;
 
     // Pending Today (Awaiting Approval)
-    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'pending'");
+    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'pending' AND status = 'completed'");
     $stmt->execute([$user_id, $today]);
     $pending = $stmt->fetchColumn() ?: 0;
 
@@ -164,12 +218,12 @@ if ($action === 'get_today_total') {
 if ($action === 'fetch_sale_details') {
     $id = $_GET['id'];
     // Header
-    $stmt = $pdo->prepare("SELECT * FROM sales WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT s.*, c.id as c_id, c.name as cust_name, c.contact as cust_contact, c.address as cust_address FROM sales s LEFT JOIN customers c ON s.customer_id = c.id WHERE s.id = ?");
     $stmt->execute([$id]);
     $sale = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Items
-    $stmt = $pdo->prepare("SELECT si.*, p.name, p.brand FROM sale_items si JOIN products p ON si.product_id = p.id WHERE si.sale_id = ?");
+    $stmt = $pdo->prepare("SELECT si.*, p.name, p.brand, p.type, p.oil_type, b.buying_price, b.selling_price as labeled_price, b.estimated_selling_price as est_selling_price, b.current_qty as current_stock_qty FROM sale_items si JOIN products p ON si.product_id = p.id JOIN batches b ON si.batch_id = b.id WHERE si.sale_id = ?");
     $stmt->execute([$id]);
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -221,7 +275,7 @@ if ($action === 'fetch_sales') {
     $stmt = $pdo->prepare("SELECT s.*, c.name as cust_name, c.contact as cust_phone 
                            FROM sales s 
                            LEFT JOIN customers c ON s.customer_id = c.id 
-                           WHERE $where_sql 
+                           WHERE $where_sql AND s.status = 'completed'
                            ORDER BY s.created_at DESC 
                            LIMIT $limit OFFSET $offset");
     $stmt->execute($params);

@@ -7,8 +7,12 @@ check_auth('cashier');
 $inv_stmt = $pdo->query("SELECT SUM(current_qty * buying_price) FROM batches");
 $total_inventory = $inv_stmt->fetchColumn() ?: 0;
 
-$sales_stmt = $pdo->query("SELECT SUM(final_amount) FROM sales WHERE DATE(created_at) = CURDATE()");
+$sales_stmt = $pdo->query("SELECT SUM(final_amount) FROM sales WHERE DATE(created_at) = CURDATE() AND status = 'completed'");
 $today_sales = $sales_stmt->fetchColumn() ?: 0;
+
+$draft_stmt = $pdo->prepare("SELECT COUNT(*) FROM sales WHERE status = 'pending' AND user_id = ?");
+$draft_stmt->execute([$_SESSION['id']]);
+$draft_count = $draft_stmt->fetchColumn() ?: 0;
 ?>
 
 <!DOCTYPE html>
@@ -121,6 +125,17 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
                     <svg class="w-14 h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 </div>
                 <h3 class="text-sm font-black text-white uppercase tracking-[0.2em] relative z-10">Point of Sale</h3>
+            </a>
+
+            <!-- Pending Drafts Card -->
+            <a href="pos.php?open_drafts=1" class="p-10 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden text-center">
+                <?php if($draft_count > 0): ?>
+                <span class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-rose-500 text-white text-[11px] font-black rounded-full shadow-lg border-2 border-white animate-pulse"><?php echo $draft_count; ?></span>
+                <?php endif; ?>
+                <div class="mb-5 group-hover:-rotate-12 transition-transform relative z-10">
+                    <svg class="w-14 h-14 icon-svg border-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-sm font-black text-white uppercase tracking-[0.2em] relative z-10">Pending Drafts</h3>
             </a>
 
             <!-- History Card -->

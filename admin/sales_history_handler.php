@@ -87,6 +87,12 @@ if ($action === 'fetch') {
         $params[] = $status;
     }
 
+    $order_status = $_GET['order_status'] ?? 'all';
+    if ($order_status !== 'all') {
+        $whereClause .= " AND s.status = ? ";
+        $params[] = $order_status;
+    }
+
     // Count total items
     $countSql = "SELECT COUNT(*) FROM sales s 
                  LEFT JOIN customers c ON s.customer_id = c.id 

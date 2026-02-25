@@ -165,6 +165,7 @@ CREATE TABLE `sales` (
   `final_amount` decimal(15,2) NOT NULL,
   `payment_method` enum('cash','card','cheque','credit') NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
+  `status` enum('pending','completed') DEFAULT 'completed',
   `payment_status` enum('pending','approved','rejected') DEFAULT 'approved'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

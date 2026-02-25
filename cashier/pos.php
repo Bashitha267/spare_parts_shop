@@ -121,13 +121,17 @@ check_auth('cashier');
         <!-- Top Navigation Bar -->
         <header class="blue-gradient-header px-4 md:px-6 py-2 flex flex-col sm:flex-row items-center justify-between shadow-lg z-20 gap-3 sm:gap-0 border-b border-white/10">
             <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-8 text-sm font-medium text-white/70">
-                <div class="flex items-center gap-3">
-                    <a href="dashboard.php" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white">
+                <div class="flex items-center gap-4">
+                    <a href="dashboard.php" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white" title="Dashboard">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </a>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50 animate-pulse"></span>
-                        <span class="hidden lg:inline font-bold uppercase tracking-widest text-[9px] text-white">Online</span>
+                    <button onclick="openDraftsModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors border border-blue-400 shadow-sm" title="Saved Drafts">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="hidden sm:inline text-[9px] font-black uppercase tracking-widest text-white">Drafts</span>
+                    </button>
+                    <div class="flex items-center gap-2 px-2 py-1 bg-white/10 rounded-md">
+                        <span id="draft_saving_indicator" class="w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50"></span>
+                        <span id="draft_status_text" class="font-bold uppercase tracking-widest text-[9px] text-white/90">Online</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -294,7 +298,7 @@ check_auth('cashier');
                             </div>
                             
                             <div class="flex gap-3 w-full md:w-auto">
-                                <button onclick="clearCart()" class="flex-1 md:flex-none px-6 py-3 bg-slate-50 text-slate-400 rounded-xl font-black text-[10px] hover:bg-red-50 hover:text-red-500 border border-slate-100 transition-all uppercase tracking-widest shadow-sm">Discard</button>
+                                <button onclick="discardCart()" class="flex-1 md:flex-none px-6 py-3 bg-slate-50 text-slate-400 rounded-xl font-black text-[10px] hover:bg-red-50 hover:text-red-500 border border-slate-100 transition-all uppercase tracking-widest shadow-sm">Discard</button>
                                 <button onclick="checkout()" class="flex-1 md:flex-none px-10 py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] hover:bg-blue-700 transition-all uppercase tracking-[0.2em] shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-[0.98] border border-blue-500/50">Complete Order</button>
                             </div>
                         </div>
@@ -397,6 +401,29 @@ check_auth('cashier');
 
     <!-- Modal: Sale Entry Details Removed -->
 
+    <!-- Modal: Drafts List -->
+    <div id="draftsModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white/80 backdrop-blur-xl w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden anim-pop border border-white/50 flex flex-col max-h-[85vh]">
+            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/50 shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Pending Drafts</h3>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1.5 opacity-80">Saved orders waiting for completion</p>
+                    </div>
+                </div>
+                <button onclick="closeDraftsModal()" class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400">
+                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 min-h-[300px]" id="draftsList">
+                <!-- Drafts injected here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: New Customer -->
     <div id="newCustModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-white/80 backdrop-blur-xl w-full max-w-[400px] rounded-3xl shadow-2xl p-6 border border-white/50 relative anim-pop">
@@ -482,6 +509,10 @@ check_auth('cashier');
         let selectedProduct = null;
         let selectedBatch = null;
         let isCheckingOut = false;
+        
+        let currentDraftId = null;
+        let autoSaveTimeout = null;
+        let isAutoSaving = false;
 
         // Header Time/Date
         setInterval(() => {
@@ -581,6 +612,7 @@ check_auth('cashier');
                 } else {
                     document.getElementById('prodSearch').focus();
                 }
+            triggerAutoSave();
         }
 
         function clearCustomer() {
@@ -589,6 +621,7 @@ check_auth('cashier');
             document.getElementById('selectedCustArea').classList.add('hidden');
             document.getElementById('custSearchArea').classList.remove('hidden');
             document.getElementById('custSearch').value = '';
+            triggerAutoSave();
         }
 
         function openNewCustomerModal(useSearchValue = false) { 
@@ -903,6 +936,7 @@ check_auth('cashier');
             if(cart.length === 0) {
                  body.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-slate-300"><p class="text-[10px] font-bold uppercase tracking-widest opacity-40">Scan an item to begin</p></div>`;
                  updateSummary(0, 0);
+                 triggerAutoSave();
                  return;
             }
 
@@ -1005,6 +1039,7 @@ check_auth('cashier');
 
             document.getElementById('item_count_label').innerText = `${cart.length} ${cart.length === 1 ? 'Item' : 'Items'} in Cart`;
             updateSummary(subtotal, total_discount);
+            triggerAutoSave();
         }
 
         function updateQty(index, delta) {
@@ -1100,6 +1135,8 @@ check_auth('cashier');
             
             const pModalEl = document.getElementById('final_pay_modal_total');
             if (pModalEl) pModalEl.innerText = 'Rs. ' + numberFormat(final);
+            
+            triggerAutoSave();
         }
 
         function applyPercentageDiscount(pct) {
@@ -1128,6 +1165,7 @@ check_auth('cashier');
                     const final = (sub - itemDiscount) - wDiscount;
 
                     const fd = new FormData();
+                    if (currentDraftId) fd.append('draft_id', currentDraftId);
                     fd.append('customer_id', selectedCustomer.id);
                     fd.append('total_amount', sub);
                     fd.append('discount', itemDiscount + wDiscount); // Total discount = Item-wise + Wholesale
@@ -1146,6 +1184,7 @@ check_auth('cashier');
                     if(data.success) {
                         const wDiscountForPrint = wDiscount; // Store for print
                         closePaymentModal();
+                        currentDraftId = null; // Clear out drafting lock since sale is completed
                         document.getElementById('wholesale_discount').value = "0.00";
                         printReceipt(data.sale_id, payMethod, wDiscountForPrint);
                         
@@ -1167,6 +1206,14 @@ check_auth('cashier');
                         
                         // Clear search inputs and results after sale
                         document.getElementById('prodSearch').value = '';
+                        
+                        // Reset Indicator to Online silently without saving null
+                        clearTimeout(autoSaveTimeout);
+                        const ind = document.getElementById('draft_saving_indicator');
+                        const txt = document.getElementById('draft_status_text');
+                        ind.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50 animate-pulse';
+                        txt.innerText = 'Online';
+                        txt.className = 'font-bold uppercase tracking-widest text-[9px] text-white/90';
                     } else {
                         Swal.fire('Error', data.message, 'error');
                     }
@@ -1215,9 +1262,236 @@ check_auth('cashier');
             }, 500);
         }
 
+        function triggerAutoSave() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => saveDraft(), 1000);
+            
+            const ind = document.getElementById('draft_saving_indicator');
+            const txt = document.getElementById('draft_status_text');
+            ind.className = 'w-2 h-2 rounded-full bg-amber-400 shadow-lg shadow-amber-400/50 animate-pulse';
+            txt.innerText = 'Saving...';
+            txt.className = 'font-bold uppercase tracking-widest text-[9px] text-amber-400/90';
+        }
+
+        async function saveDraft() {
+            if (cart.length === 0 && !selectedCustomer && !parseFloat(document.getElementById('wholesale_discount').value)) {
+                // Return to online if empty
+                const ind = document.getElementById('draft_saving_indicator');
+                const txt = document.getElementById('draft_status_text');
+                ind.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50 animate-pulse';
+                txt.innerText = 'Online';
+                txt.className = 'font-bold uppercase tracking-widest text-[9px] text-white/90';
+                return;
+            }
+            if (isCheckingOut) return;
+            
+            isAutoSaving = true;
+
+            const sub = cart.reduce((a, b) => a + (b.qty * b.unit_price), 0);
+            const itemDiscount = cart.reduce((a, b) => a + b.total_discount, 0);
+            const wDiscount = parseFloat(document.getElementById('wholesale_discount').value) || 0;
+            const final = (sub - itemDiscount) - wDiscount;
+
+            const fd = new FormData();
+            if(currentDraftId) fd.append('draft_id', currentDraftId);
+            fd.append('customer_id', selectedCustomer ? selectedCustomer.id : '');
+            fd.append('total_amount', sub);
+            fd.append('discount', itemDiscount + wDiscount);
+            fd.append('final_amount', final);
+            fd.append('payment_method', 'cash'); 
+            fd.append('items', JSON.stringify(cart.map(i => ({
+                product_id: i.product_id,
+                batch_id: i.batch_id,
+                qty: i.qty,
+                unit_price: i.unit_price,
+                discount: i.total_discount,
+                per_item_discount: i.per_item_discount,
+                total_price: i.total_price
+            }))));
+
+            const res = await fetch(`sales_handler.php`, { method: 'POST', body: (() => { fd.append('action', 'save_draft'); return fd; })() });
+            const data = await res.json();
+            
+            isAutoSaving = false;
+            
+            const ind = document.getElementById('draft_saving_indicator');
+            const txt = document.getElementById('draft_status_text');
+            
+            if(data.success && data.sale_id) {
+                currentDraftId = data.sale_id;
+                ind.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50';
+                txt.innerText = 'Saved Draft';
+                txt.className = 'font-bold uppercase tracking-widest text-[9px] text-emerald-400/90';
+            } else {
+                ind.className = 'w-2 h-2 rounded-full bg-red-500 shadow-lg shadow-red-500/50';
+                txt.innerText = 'Save Error';
+                txt.className = 'font-bold uppercase tracking-widest text-[9px] text-red-500/90';
+            }
+        }
+
+        async function discardCart() {
+            if(currentDraftId) {
+                const fd = new FormData();
+                fd.append('draft_id', currentDraftId);
+                fd.append('action', 'discard_draft');
+                await fetch(`sales_handler.php`, { method: 'POST', body: fd });
+            }
+            clearTimeout(autoSaveTimeout);
+            currentDraftId = null;
+            cart = [];
+            
+            // clearCustomer without triggering autoSave
+            selectedCustomer = null;
+            isCheckingOut = false;
+            document.getElementById('selectedCustArea').classList.add('hidden');
+            document.getElementById('custSearchArea').classList.remove('hidden');
+            document.getElementById('custSearch').value = '';
+            
+            document.getElementById('wholesale_discount').value = "0.00";
+            
+            const body = document.getElementById('cartBody');
+            body.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-slate-300"><p class="text-[10px] font-bold uppercase tracking-widest opacity-40">Scan an item to begin</p></div>`;
+            document.getElementById('item_count_label').innerText = '0 Items Loaded';
+            updateSummary(0, 0);
+            
+            const ind = document.getElementById('draft_saving_indicator');
+            const txt = document.getElementById('draft_status_text');
+            ind.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50 animate-pulse';
+            txt.innerText = 'Online';
+            txt.className = 'font-bold uppercase tracking-widest text-[9px] text-white/90';
+        }
+
+        async function openDraftsModal() {
+            const data = await fetchAPI('load_drafts');
+            const list = document.getElementById('draftsList');
+            if (data.drafts.length === 0) {
+                list.innerHTML = '<div class="flex flex-col items-center justify-center py-20 opacity-50"><svg class="w-16 h-16 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><p class="text-xs text-slate-700 font-bold uppercase tracking-widest">No Active Drafts Found</p></div>';
+            } else {
+                let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+                data.drafts.forEach(d => {
+                    const dt = new Date(d.created_at).toLocaleString();
+                    html += `
+                        <div class="bg-white rounded-[1.5rem] p-6 border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all hover:-translate-y-1 group">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <span class="text-[9px] font-black uppercase tracking-[0.2em] text-blue-600 bg-blue-50 border border-blue-100 px-2 py-1 rounded-md mb-3 inline-block">ID-${d.id}</span>
+                                    <h4 class="text-base font-black text-slate-800 uppercase tracking-tight">${d.cust_name || 'Walk-in Customer'}</h4>
+                                </div>
+                                <span class="text-[9px] font-bold text-slate-400 block tracking-wider">${dt}</span>
+                            </div>
+                            <div class="flex justify-between items-end border-t border-slate-100 pt-4">
+                                <div>
+                                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest block mb-1">Items Total</span>
+                                    <p class="text-xl font-black text-slate-900 leading-none">Rs. ${numberFormat(d.final_amount)}</p>
+                                </div>
+                                <button onclick="resumeDraft(${d.id})" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2 group-hover:scale-105 active:scale-95">
+                                    Resume
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                list.innerHTML = html;
+            }
+            document.getElementById('draftsModal').classList.remove('hidden');
+        }
+        
+        function closeDraftsModal() { document.getElementById('draftsModal').classList.add('hidden'); }
+
+        async function resumeDraft(id) {
+            // Overwrite current POS. Discarding will not lock if `discardCart` executes safely
+            if (currentDraftId && currentDraftId != id) {
+                const fd = new FormData();
+                fd.append('draft_id', currentDraftId);
+                fd.append('action', 'discard_draft');
+                await fetch(`sales_handler.php`, { method: 'POST', body: fd });
+            }
+            
+            const data = await fetchAPI('fetch_sale_details', {id});
+            currentDraftId = id;
+            if(data.sale.customer_id) {
+                selectedCustomer = {
+                    id: data.sale.customer_id, 
+                    name: data.sale.cust_name, 
+                    contact: data.sale.cust_contact
+                };
+                document.getElementById('custSearchArea').classList.add('hidden');
+                document.getElementById('selectedCustArea').classList.remove('hidden');
+                document.getElementById('selectedCustName').innerText = selectedCustomer.name;
+                document.getElementById('selectedCustPhone').innerText = selectedCustomer.contact;
+            } else {
+                selectedCustomer = null;
+                isCheckingOut = false;
+                document.getElementById('selectedCustArea').classList.add('hidden');
+                document.getElementById('custSearchArea').classList.remove('hidden');
+                document.getElementById('custSearch').value = '';
+            }
+            
+            cart = data.items.map(i => {
+                const q = parseFloat(i.qty);
+                const isOil = i.type === 'oil';
+                return {
+                    product_id: i.product_id,
+                    batch_id: i.batch_id,
+                    max_qty: parseFloat(i.current_stock_qty) + q, 
+                    name: i.name,
+                    brand: i.brand,
+                    category: isOil ? 'Oil' : 'Spare parts',
+                    oil_type: isOil ? i.oil_type : 'Unit',
+                    qty: q,
+                    buying_price: parseFloat(i.buying_price),
+                    labeled_price: parseFloat(i.labeled_price),
+                    est_selling_price: parseFloat(i.est_selling_price),
+                    unit_price: parseFloat(i.unit_price), 
+                    per_item_discount: parseFloat(i.discount),
+                    total_discount: q * parseFloat(i.discount),
+                    total_price: parseFloat(i.total_price)
+                };
+            });
+            
+            const itemDisc = cart.reduce((a,b)=>a+b.total_discount,0);
+            const totalDiscSaved = parseFloat(data.sale.discount) || 0;
+            const wholeSale = totalDiscSaved - itemDisc;
+            document.getElementById('wholesale_discount').value = wholeSale > 0 ? wholeSale.toFixed(2) : "0.00";
+            
+            // Render cart silently without autosaving (clearTimeout to disable)
+            const body = document.getElementById('cartBody');
+            body.innerHTML = '';
+            let subtotal = 0;
+            let total_discount = 0;
+
+            if(cart.length === 0) {
+                 body.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-slate-300"><p class="text-[10px] font-bold uppercase tracking-widest opacity-40">Scan an item to begin</p></div>`;
+                 updateSummary(0, 0);
+            } else {
+                 // Trigger full re-render loop
+                 // `renderCart` will autoSave, which is fine since data is identical, but let's just use renderCart
+                 clearTimeout(autoSaveTimeout);
+                 renderCart();
+            }
+            
+            closeDraftsModal();
+            
+            const ind = document.getElementById('draft_saving_indicator');
+            const txt = document.getElementById('draft_status_text');
+            ind.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50';
+            txt.innerText = 'Saved Draft';
+            txt.className = 'font-bold uppercase tracking-widest text-[9px] text-emerald-400/90';
+        }
+
         function numberFormat(val) { return parseFloat(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
         updateTodayTotal();
+        
+        // Auto-open Drafts if param exists
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.get('open_drafts') === '1') {
+                openDraftsModal();
+            }
+        });
     </script>
 </body>
 </html>

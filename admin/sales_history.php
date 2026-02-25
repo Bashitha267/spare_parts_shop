@@ -151,10 +151,16 @@ check_auth('admin');
                 </select>
 
                 <select id="status_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
-                    <option value="all">All Status</option>
+                    <option value="all">Pay Status</option>
                     <option value="approved">Approved</option>
                     <option value="pending">Pending</option>
                     <option value="rejected">Rejected</option>
+                </select>
+
+                <select id="order_status_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
+                    <option value="all">Order Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Drafted/Pending</option>
                 </select>
 
                 <button onclick="resetFilters()" class="px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex flex-row gap-2 border border-slate-200">
@@ -179,7 +185,8 @@ check_auth('admin');
                         <th class="px-2 py-6">Payment</th>
                         <th class="px-8 py-6 text-right">Discount (LKR)</th>
                         <th class="px-8 py-6 text-right">Settlement (LKR)</th>
-                        <th class="px-8 py-6 text-center">Status</th>
+                        <th class="px-8 py-6 text-center">Order Status</th>
+                        <th class="px-8 py-6 text-center">Payment Status</th>
                         <th class="px-8 py-6 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -253,6 +260,7 @@ check_auth('admin');
             document.getElementById('date_filter').value = '';
             document.getElementById('method_filter').value = 'all';
             document.getElementById('status_filter').value = 'all';
+            document.getElementById('order_status_filter').value = 'all';
             currentPage = 1;
             loadHistory(1);
         }
@@ -338,6 +346,10 @@ check_auth('admin');
              currentPage = 1;
              loadHistory(1);
         });
+        document.getElementById('order_status_filter').addEventListener('change', () => {
+             currentPage = 1;
+             loadHistory(1);
+        });
 
         async function loadHistory(page = 1) {
             currentPage = page;
@@ -345,7 +357,8 @@ check_auth('admin');
             const date = document.getElementById('date_filter').value;
             const method = document.getElementById('method_filter').value;
             const status = document.getElementById('status_filter').value;
-            const res = await fetch(`sales_history_handler.php?action=fetch&search=${search}&date=${date}&method=${method}&status=${status}&page=${page}`);
+            const order_status = document.getElementById('order_status_filter').value;
+            const res = await fetch(`sales_history_handler.php?action=fetch&search=${search}&date=${date}&method=${method}&status=${status}&order_status=${order_status}&page=${page}`);
             const data = await res.json();
             const tbody = document.getElementById('historyBody');
             tbody.innerHTML = '';
@@ -395,6 +408,9 @@ check_auth('admin');
                         </td>
                         <td class="px-8 py-8 text-right font-black text-rose-600 tracking-widest text-sm">${parseFloat(sale.discount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                         <td class="px-8 py-8 text-right font-black text-blue-800 tracking-widest text-sm">${parseFloat(sale.final_amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="px-8 py-8 text-center text-nowrap">
+                            <span class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-600 border border-slate-200 bg-white shadow-sm">${sale.status === 'pending' ? 'DRAFTED' : 'COMPLETED'}</span>
+                        </td>
                         <td class="px-8 py-8 text-center text-nowrap">
                             <span class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest text-white ${statusClass} shadow-lg">${sale.payment_status}</span>
                         </td>
