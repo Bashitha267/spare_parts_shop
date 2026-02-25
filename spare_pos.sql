@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 23, 2026 at 08:23 PM
+-- Generation Time: Feb 25, 2026 at 07:52 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -64,12 +64,10 @@ CREATE TABLE `batches` (
 --
 
 INSERT INTO `batches` (`id`, `product_id`, `invoice_id`, `buying_price`, `selling_price`, `estimated_selling_price`, `original_qty`, `current_qty`, `expire_date`, `created_at`, `is_active`) VALUES
-(20, 27, 35, 1500.00, 1800.00, 1750.00, 41.00, 29.00, NULL, '2026-02-22 13:14:16', 1),
-(21, 28, 36, 4500.00, 6500.00, 6000.00, 30.00, 10.00, NULL, '2026-02-22 13:15:09', 1),
-(22, 28, 37, 5500.00, 7500.00, 6500.00, 1.00, 1.00, NULL, '2026-02-22 13:37:42', 0),
-(23, 29, 38, 1000.00, 1235.00, 1200.00, 1.00, 1.00, NULL, '2026-02-22 13:59:10', 1),
-(24, 30, 39, 1200.00, 1450.00, 1350.00, 10.00, 10.00, NULL, '2026-02-23 23:46:37', 1),
-(25, 31, 40, 1500.00, 1650.00, 1600.00, 1.00, 1.00, NULL, '2026-02-24 00:00:33', 1);
+(20, 27, 35, 1500.00, 1800.00, 1750.00, 51.00, 9.00, NULL, '2026-02-22 13:14:16', 1),
+(21, 28, 36, 4500.00, 6500.00, 6000.00, 30.00, 0.00, NULL, '2026-02-22 13:15:09', 0),
+(23, 29, 38, 1000.00, 1235.00, 1200.00, 1.00, 0.00, NULL, '2026-02-22 13:59:10', 1),
+(25, 31, 40, 1500.00, 1650.00, 1700.00, 11.00, 7.00, NULL, '2026-02-24 00:00:33', 1);
 
 -- --------------------------------------------------------
 
@@ -90,7 +88,9 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`id`, `name`, `contact`, `address`, `created_at`) VALUES
-(4, 'nimesh', '22222', '', '2026-02-22 13:18:19');
+(4, 'nimesh', '22222', '', '2026-02-22 13:18:19'),
+(5, 'bashitha', '2323232', '', '2026-02-24 01:07:37'),
+(6, 'nim bas', '0768368202', '', '2026-02-25 09:12:16');
 
 -- --------------------------------------------------------
 
@@ -114,12 +114,12 @@ CREATE TABLE `invoices` (
 --
 
 INSERT INTO `invoices` (`id`, `invoice_no`, `user_id`, `supplier_name`, `invoice_date`, `total_amount`, `status`, `created_at`) VALUES
-(35, 'DIRECT-20260222-084416-652', 2, 'Direct Entry', '2026-02-22', 61500.00, 'completed', '2026-02-22 13:14:16'),
+(35, 'DIRECT-20260222-084416-652', 2, 'Direct Entry', '2026-02-22', 76500.00, 'completed', '2026-02-22 13:14:16'),
 (36, 'DIRECT-20260222-084509-836', 1, 'Direct Entry', '2026-02-22', 135000.00, 'completed', '2026-02-22 13:15:09'),
-(37, 'DIRECT-20260222-090742-955', 1, 'Direct Entry', '2026-02-22', 5500.00, 'completed', '2026-02-22 13:37:42'),
+(37, 'DIRECT-20260222-090742-955', 1, 'Direct Entry', '2026-02-22', 0.00, 'completed', '2026-02-22 13:37:42'),
 (38, 'DIRECT-20260222-092910-320', 2, 'Direct Entry', '2026-02-22', 1000.00, 'completed', '2026-02-22 13:59:10'),
-(39, 'DIRECT-20260223-191637-307', 1, 'Direct Entry', '2026-02-23', 12000.00, 'completed', '2026-02-23 23:46:37'),
-(40, 'DIRECT-20260223-193033-303', 1, 'Direct Entry', '2026-02-23', 1500.00, 'completed', '2026-02-24 00:00:33');
+(39, 'DIRECT-20260223-191637-307', 1, 'Direct Entry', '2026-02-23', 0.00, 'completed', '2026-02-23 23:46:37'),
+(40, 'DIRECT-20260223-193033-303', 1, 'Direct Entry', '2026-02-23', 16500.00, 'completed', '2026-02-24 00:00:33');
 
 -- --------------------------------------------------------
 
@@ -145,9 +145,9 @@ CREATE TABLE `products` (
 
 INSERT INTO `products` (`id`, `barcode`, `name`, `type`, `oil_type`, `brand`, `vehicle_compatibility`, `created_at`, `is_active`) VALUES
 (27, '084416542', 'test cashier', 'oil', 'loose', '', 'Toyota', '2026-02-22 13:14:16', 1),
-(28, '084509644', 'brake ', 'spare_part', 'none', '', 'Honda', '2026-02-22 13:15:09', 1),
-(29, '48930335805', 'test can', 'oil', 'can', '', 'Toyota', '2026-02-22 13:59:10', 1),
-(30, '1245666', 'fggaggg', 'spare_part', 'none', '', '', '2026-02-23 23:46:37', 1),
+(28, '084509644', 'brake ', 'spare_part', 'none', '', 'Honda', '2026-02-22 13:15:09', 0),
+(29, '48930335805', 'test can', 'oil', 'can', '', 'Toyota', '2026-02-22 13:59:10', 0),
+(30, '1245666', 'fggaggg', 'spare_part', 'none', '', '', '2026-02-23 23:46:37', 0),
 (31, '45566', 'brake pad', 'spare_part', 'none', '', '', '2026-02-24 00:00:33', 1);
 
 -- --------------------------------------------------------
@@ -165,22 +165,30 @@ CREATE TABLE `sales` (
   `final_amount` decimal(15,2) NOT NULL,
   `payment_method` enum('cash','card','cheque','credit') NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
-  `status` enum('pending','completed') DEFAULT 'completed',
-  `payment_status` enum('pending','approved','rejected') DEFAULT 'approved'
+  `payment_status` enum('pending','approved','rejected') DEFAULT 'approved',
+  `status` enum('pending','completed') DEFAULT 'completed'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `sales`
 --
 
-INSERT INTO `sales` (`id`, `customer_id`, `user_id`, `total_amount`, `discount`, `final_amount`, `payment_method`, `created_at`, `payment_status`) VALUES
-(19, 4, 2, 55000.00, 5500.00, 49500.00, 'cash', '2026-02-22 13:22:25', 'approved'),
-(20, 4, 2, 19250.00, 1100.00, 18150.00, 'card', '2026-02-22 13:29:13', 'approved'),
-(21, 4, 2, 1750.00, 350.00, 1400.00, 'cheque', '2026-02-22 13:30:07', 'approved'),
-(22, 4, 2, 60000.00, 0.00, 60000.00, 'credit', '2026-02-22 13:38:14', 'approved'),
-(23, 4, 2, 1750.00, 0.00, 1750.00, 'cheque', '2026-02-22 13:42:04', 'approved'),
-(24, 4, 2, 12250.00, 0.00, 12250.00, 'credit', '2026-02-22 13:44:21', 'rejected'),
-(25, 4, 2, 1750.00, 100.00, 1650.00, 'credit', '2026-02-22 13:56:43', 'rejected');
+INSERT INTO `sales` (`id`, `customer_id`, `user_id`, `total_amount`, `discount`, `final_amount`, `payment_method`, `created_at`, `payment_status`, `status`) VALUES
+(19, 4, 2, 55000.00, 5500.00, 49500.00, 'cash', '2026-02-22 13:22:25', 'approved', 'completed'),
+(20, 4, 2, 19250.00, 1100.00, 18150.00, 'card', '2026-02-22 13:29:13', 'approved', 'completed'),
+(21, 4, 2, 1750.00, 350.00, 1400.00, 'cheque', '2026-02-22 13:30:07', 'approved', 'completed'),
+(22, 4, 2, 60000.00, 0.00, 60000.00, 'credit', '2026-02-22 13:38:14', 'approved', 'completed'),
+(23, 4, 2, 1750.00, 0.00, 1750.00, 'cheque', '2026-02-22 13:42:04', 'approved', 'completed'),
+(24, 4, 2, 12250.00, 0.00, 12250.00, 'credit', '2026-02-22 13:44:21', 'rejected', 'completed'),
+(25, 4, 2, 1750.00, 100.00, 1650.00, 'credit', '2026-02-22 13:56:43', 'rejected', 'completed'),
+(26, 4, 2, 1200.00, 0.00, 1200.00, 'cash', '2026-02-24 01:02:00', 'approved', 'completed'),
+(27, 4, 2, 50750.00, 0.00, 50750.00, 'card', '2026-02-24 01:04:07', 'approved', 'completed'),
+(28, 4, 2, 1600.00, 0.00, 1600.00, 'credit', '2026-02-24 01:06:07', 'rejected', 'completed'),
+(29, 5, 2, 60000.00, 0.00, 60000.00, 'cheque', '2026-02-24 01:07:47', 'approved', 'completed'),
+(30, 4, 2, 1700.00, 0.00, 1700.00, 'cheque', '2026-02-25 00:36:11', 'pending', 'completed'),
+(31, 4, 2, 1800.00, 137.50, 1662.50, 'cash', '2026-02-25 09:28:47', 'approved', 'completed'),
+(32, 4, 2, 1650.00, -50.00, 1700.00, 'cash', '2026-02-25 09:46:37', 'approved', 'completed'),
+(33, 4, 3, 1650.00, -50.00, 1700.00, 'cash', '2026-02-25 12:11:32', 'approved', 'completed');
 
 -- --------------------------------------------------------
 
@@ -210,7 +218,15 @@ INSERT INTO `sale_items` (`id`, `sale_id`, `product_id`, `batch_id`, `qty`, `uni
 (24, 22, 28, 21, 10.00, 6000.00, 0.00, 60000.00),
 (25, 23, 27, 20, 1.00, 1750.00, 0.00, 1750.00),
 (26, 24, 27, 20, 7.00, 1750.00, 0.00, 12250.00),
-(27, 25, 27, 20, 1.00, 1750.00, 100.00, 1650.00);
+(27, 25, 27, 20, 1.00, 1750.00, 100.00, 1650.00),
+(28, 26, 29, 23, 1.00, 1200.00, 0.00, 1200.00),
+(29, 27, 27, 20, 29.00, 1750.00, 0.00, 50750.00),
+(30, 28, 31, 25, 1.00, 1600.00, 0.00, 1600.00),
+(31, 29, 28, 21, 10.00, 6000.00, 0.00, 60000.00),
+(32, 30, 31, 25, 1.00, 1700.00, 0.00, 1700.00),
+(33, 31, 27, 20, 1.00, 1800.00, 50.00, 1750.00),
+(37, 32, 31, 25, 1.00, 1650.00, -50.00, 1700.00),
+(40, 33, 31, 25, 1.00, 1650.00, -50.00, 1700.00);
 
 -- --------------------------------------------------------
 
@@ -263,7 +279,28 @@ INSERT INTO `system_logs` (`id`, `user_id`, `action`, `details`, `created_at`) V
 (32, 1, 'New Item Added', 'Added new item: fggaggg (1245666) with initial stock 10 at 1200 each.', '2026-02-23 23:46:37'),
 (33, 1, 'Activate Batch', 'Batch #22 for brake  set to Active', '2026-02-23 23:48:51'),
 (34, 1, 'Deactivate Batch', 'Batch #22 for brake  set to Inactive', '2026-02-23 23:48:54'),
-(35, 1, 'New Item Added', 'Added new item: brake pad (45566) with initial stock 1 at 1500 each.', '2026-02-24 00:00:33');
+(35, 1, 'New Item Added', 'Added new item: brake pad (45566) with initial stock 1 at 1500 each.', '2026-02-24 00:00:33'),
+(36, 2, 'New Sale', 'Recorded TRX-26. Total: Rs. 1,200.00', '2026-02-24 01:02:00'),
+(37, 2, 'New Sale', 'Recorded TRX-27. Total: Rs. 50,750.00', '2026-02-24 01:04:07'),
+(38, 1, 'New Batch Added', 'Batch added for test cashier: Qty 10, Total Value Rs. 15,000.00', '2026-02-24 01:04:24'),
+(39, 1, 'Activate Batch', 'Batch #20 for test cashier set to Active', '2026-02-24 01:05:09'),
+(40, 1, 'Activate Batch', 'Batch #22 for brake  set to Active', '2026-02-24 01:05:21'),
+(41, 2, 'New Sale', 'Recorded TRX-28. Total: Rs. 1,600.00', '2026-02-24 01:06:07'),
+(42, 1, 'Activate Batch', 'Batch #25 for brake pad set to Active', '2026-02-24 01:06:25'),
+(43, 1, 'Deactivate Batch', 'Batch #25 for brake pad set to Inactive', '2026-02-24 01:06:28'),
+(44, 1, 'New Batch Added', 'Batch added for brake pad: Qty 10, Total Value Rs. 15,000.00', '2026-02-24 01:06:36'),
+(45, 2, 'New Sale', 'Recorded TRX-29. Total: Rs. 60,000.00', '2026-02-24 01:07:47'),
+(46, 1, 'Update Registry', 'brake pad | Estimated Price: ~~1,600~~ 1,700', '2026-02-24 17:09:10'),
+(47, 1, 'Delete Item', 'Soft deleted Batch #21 for brake  (Has Sales History). Deducted Qty: 0.00, Value: Rs. 0.00', '2026-02-24 17:15:12'),
+(48, 1, 'Delete Item', 'Soft deleted Batch #21 for brake  (Has Sales History). Deducted Qty: 0.00, Value: Rs. 0.00', '2026-02-24 17:15:33'),
+(49, 1, 'Delete Item', 'Hard deleted Batch #22 for brake . Deducted Qty: 1.00, Value: Rs. 5,500.00', '2026-02-24 17:15:52'),
+(50, 1, 'Delete Item', 'Hard deleted Batch #24 for fggaggg. Deducted Qty: 10.00, Value: Rs. 12,000.00', '2026-02-24 17:22:29'),
+(51, 1, 'Payment Update', 'TRX-29 | Method: cheque | Amount: Rs. 60,000.00 | Status: ~~pending~~ Approved', '2026-02-24 17:22:36'),
+(52, 1, 'Payment Update', 'TRX-28 | Method: credit | Amount: Rs. 1,600.00 | Status: ~~pending~~ Rejected', '2026-02-24 17:22:40'),
+(53, 2, 'New Sale', 'Recorded TRX-30. Total: Rs. 1,700.00', '2026-02-25 00:36:11'),
+(54, 2, 'New Sale', 'Recorded TRX-31. Total: Rs. 1,662.50', '2026-02-25 09:28:47'),
+(55, 2, 'New Sale', 'Recorded TRX-32. Total: Rs. 1,700.00', '2026-02-25 09:47:04'),
+(56, 3, 'New Sale', 'Recorded TRX-33. Total: Rs. 1,700.00', '2026-02-25 12:11:43');
 
 -- --------------------------------------------------------
 
@@ -396,7 +433,7 @@ ALTER TABLE `batches`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `invoices`
@@ -414,19 +451,19 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `sale_items`
 --
 ALTER TABLE `sale_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `system_logs`
 --
 ALTER TABLE `system_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `users`
