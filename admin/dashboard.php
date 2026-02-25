@@ -147,7 +147,7 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
                     <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Inventory Logs</span>
                 </a>
 
-                <!-- Manage Payments -->
+                <!-- Payment Management -->
                 <a href="manage_payments.php" class="p-8 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden">
                     <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10 flex flex-col items-center">
                         <svg class="w-12 h-12 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -159,7 +159,7 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
                         <span class="absolute -top-4 -right-4 bg-white text-blue-600 text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full ring-4 ring-blue-600"><?php echo $pending_count; ?></span>
                         <?php endif; ?>
                     </div>
-                    <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Cheque and Credits Approvals</span>
+                    <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Payment Management</span>
                 </a>
 
                 <!-- Reports -->
@@ -178,13 +178,7 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
                     <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Sales History</span>
                 </a>
 
-                <!-- Payments Approval History -->
-                <a href="payment_history.php" class="p-8 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden">
-                    <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
-                        <svg class="w-12 h-12 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                    </div>
-                    <span class="text-xs font-black text-white uppercase tracking-[0.2em] text-center relative z-10">Payments Approval History</span>
-                </a>
+
 
                 <!-- System Logs -->
                 <a href="logs.php" class="p-8 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden">

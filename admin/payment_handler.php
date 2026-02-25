@@ -44,35 +44,53 @@ if ($action === 'fetch_pending_payments') {
     $method = $_GET['method'] ?? 'all';
     $search = $_GET['search'] ?? '';
     $date = $_GET['date'] ?? '';
+    $page = (int)($_GET['page'] ?? 1);
+    $limit = 10;
+    $offset = ($page - 1) * $limit;
 
-    $query = "SELECT s.*, c.name as cust_name, u.full_name as cashier_name 
-              FROM sales s 
-              LEFT JOIN customers c ON s.customer_id = c.id 
-              JOIN users u ON s.user_id = u.id 
-              WHERE s.payment_status = 'pending' ";
+    $where = " s.payment_status = 'pending' ";
     $params = [];
 
     if ($method !== 'all') {
-        $query .= " AND s.payment_method = ? ";
+        $where .= " AND s.payment_method = ? ";
         $params[] = $method;
     }
 
     if ($search) {
-        $query .= " AND (s.id LIKE ? OR c.name LIKE ? OR c.contact LIKE ?) ";
+        $where .= " AND (s.id LIKE ? OR c.name LIKE ? OR c.contact LIKE ?) ";
         $params[] = "%$search%";
         $params[] = "%$search%";
         $params[] = "%$search%";
     }
 
     if ($date) {
-        $query .= " AND DATE(s.created_at) = ? ";
+        $where .= " AND DATE(s.created_at) = ? ";
         $params[] = $date;
     }
 
-    $query .= " ORDER BY s.created_at DESC";
+    // Get Total Count
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM sales s LEFT JOIN customers c ON s.customer_id = c.id WHERE $where");
+    $countStmt->execute($params);
+    $total_records = $countStmt->fetchColumn();
+    $total_pages = ceil($total_records / $limit);
+
+    $query = "SELECT s.*, c.name as cust_name, u.full_name as cashier_name 
+              FROM sales s 
+              LEFT JOIN customers c ON s.customer_id = c.id 
+              JOIN users u ON s.user_id = u.id 
+              WHERE $where 
+              ORDER BY s.created_at DESC 
+              LIMIT $limit OFFSET $offset";
+    
     $stmt = $pdo->prepare($query);
     $stmt->execute($params);
-    echo json_encode(['success' => true, 'sales' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    echo json_encode([
+        'success' => true, 
+        'sales' => $stmt->fetchAll(PDO::FETCH_ASSOC),
+        'total_pages' => $total_pages,
+        'current_page' => $page,
+        'total_records' => $total_records
+    ]);
     exit;
 }
 
@@ -107,45 +125,63 @@ if ($action === 'fetch_payment_history') {
     $date = $_GET['date'] ?? '';
     $month = $_GET['month'] ?? '';
     $year = $_GET['year'] ?? '';
+    $page = (int)($_GET['page'] ?? 1);
+    $limit = 10;
+    $offset = ($page - 1) * $limit;
 
-    $query = "SELECT s.*, c.name as cust_name, u.full_name as cashier_name 
-              FROM sales s 
-              LEFT JOIN customers c ON s.customer_id = c.id 
-              JOIN users u ON s.user_id = u.id 
-              WHERE s.payment_method IN ('cheque', 'credit') ";
+    $where = " s.payment_method IN ('cheque', 'credit') ";
     $params = [];
 
     if ($search) {
-        $query .= " AND (s.id LIKE ? OR c.name LIKE ? OR c.contact LIKE ?) ";
+        $where .= " AND (s.id LIKE ? OR c.name LIKE ? OR c.contact LIKE ?) ";
         $params[] = "%$search%";
         $params[] = "%$search%";
         $params[] = "%$search%";
     }
 
     if ($method !== 'all') {
-        $query .= " AND s.payment_method = ? ";
+        $where .= " AND s.payment_method = ? ";
         $params[] = $method;
     }
 
     if ($status !== 'all') {
-        $query .= " AND s.payment_status = ? ";
+        $where .= " AND s.payment_status = ? ";
         $params[] = $status;
     }
 
     if ($date) {
-        $query .= " AND DATE(s.created_at) = ? ";
+        $where .= " AND DATE(s.created_at) = ? ";
         $params[] = $date;
     } elseif ($month) {
-        $query .= " AND DATE_FORMAT(s.created_at, '%Y-%m') = ? ";
+        $where .= " AND DATE_FORMAT(s.created_at, '%Y-%m') = ? ";
         $params[] = $month;
     } elseif ($year) {
-        $query .= " AND YEAR(s.created_at) = ? ";
+        $where .= " AND YEAR(s.created_at) = ? ";
         $params[] = $year;
     }
 
-    $query .= " ORDER BY s.created_at DESC LIMIT 100";
+    // Get Total Count
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM sales s LEFT JOIN customers c ON s.customer_id = c.id WHERE $where");
+    $countStmt->execute($params);
+    $total_records = $countStmt->fetchColumn();
+    $total_pages = ceil($total_records / $limit);
+
+    $query = "SELECT s.*, c.name as cust_name, u.full_name as cashier_name 
+              FROM sales s 
+              LEFT JOIN customers c ON s.customer_id = c.id 
+              JOIN users u ON s.user_id = u.id 
+              WHERE $where 
+              ORDER BY s.created_at DESC 
+              LIMIT $limit OFFSET $offset";
+    
     $stmt = $pdo->prepare($query);
     $stmt->execute($params);
-    echo json_encode(['success' => true, 'sales' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    echo json_encode([
+        'success' => true, 
+        'sales' => $stmt->fetchAll(PDO::FETCH_ASSOC),
+        'total_pages' => $total_pages,
+        'current_page' => $page,
+        'total_records' => $total_records
+    ]);
     exit;
 }

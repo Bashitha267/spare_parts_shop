@@ -191,8 +191,42 @@ check_auth('cashier');
         </div>
     </nav>
     <div class="pt-32 px-3 md:px-6 max-w-7xl mx-auto animate-fade relative z-10 pb-8">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+            <!-- Cash -->
+            <div class="glass-card p-6 border-l-4 border-emerald-500 shadow-xl shadow-emerald-500/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-emerald-500 transition-colors">Cash</p>
+                <h3 id="card_cash" class="text-xl font-black text-emerald-600 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Card -->
+            <div class="glass-card p-6 border-l-4 border-indigo-500 shadow-xl shadow-indigo-500/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-indigo-500 transition-colors">Card</p>
+                <h3 id="card_card" class="text-xl font-black text-indigo-600 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Approved Credit -->
+            <div class="glass-card p-6 border-l-4 border-blue-500 shadow-xl shadow-blue-500/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-blue-500 transition-colors">Apprv. Credit</p>
+                <h3 id="card_app_credit" class="text-xl font-black text-blue-600 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Approved Cheque -->
+            <div class="glass-card p-6 border-l-4 border-amber-500 shadow-xl shadow-amber-500/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-amber-500 transition-colors">Apprv. Cheque</p>
+                <h3 id="card_app_cheque" class="text-xl font-black text-amber-600 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Pending Credit -->
+            <div class="glass-card p-6 border-l-4 border-rose-400 shadow-xl shadow-rose-400/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-rose-500 transition-colors">Pend. Credit</p>
+                <h3 id="card_pend_credit" class="text-xl font-black text-rose-500 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Pending Cheque -->
+            <div class="glass-card p-6 border-l-4 border-orange-400 shadow-xl shadow-orange-400/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-orange-500 transition-colors">Pend. Cheque</p>
+                <h3 id="card_pend_cheque" class="text-xl font-black text-orange-500 tracking-tight">Rs. 0.00</h3>
+            </div>
+        </div>
+
         <!-- Filter Card -->
-        <div class="glass-card p-4 md:p-6 mb-8 mt-2">
+        <div class="glass-card p-4 md:p-6 mb-8 mt-2 relative z-20">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                 <div class="md:col-span-1 relative" id="searchWrapper">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Search</label>
@@ -230,7 +264,7 @@ check_auth('cashier');
         </div>
 
         <!-- Table Card -->
-        <div class="glass-card overflow-hidden">
+        <div class="glass-card overflow-hidden relative z-10">
             <div class="overflow-x-auto">
                 <table class="w-full text-left min-w-[700px] md:min-w-0">
                     <thead>
@@ -291,19 +325,25 @@ check_auth('cashier');
                     </h3>
                     <p id="modal_sale_id" class="text-xs text-white/60 font-bold mt-0.5"></p>
                 </div>
-                <button onclick="closeDetailModal()" class="p-2 text-white/60 hover:text-white hover:bg-white/20 rounded-xl transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="modalPrintBtn" class="p-2 text-white/90 hover:text-white hover:bg-white/20 rounded-xl transition-all flex items-center gap-2">
+                        <svg class="w-5 h-5 " fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" ></path></svg>
+                        <span class="text-[10px] font-black uppercase tracking-widest hidden bg-white sm:inline text-blue-600 py-3 px-2 ">Print Invoice</span>
+                    </button>
+                    <button onclick="closeDetailModal()" class="p-2 text-white/60 hover:text-white hover:bg-white/20 rounded-xl transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
             </div>
             <div class="p-8">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200">
-                            <th class="pb-3">Product</th>
-                            <th class="pb-3 text-center">Qty</th>
-                            <th class="pb-3 text-right">Price</th>
-                            <th class="pb-3 text-right">Discount</th>
-                            <th class="pb-3 text-right">Total</th>
+                            <th class="pb-3 px-0">Product</th>
+                            <th class="pb-3 text-center px-0">Qty</th>
+                            <th class="pb-3 text-right px-0">Price</th>
+                            <th class="pb-3 text-right px-0">Discount</th>
+                            <th class="pb-3 text-right px-0">Total</th>
                         </tr>
                     </thead>
                     <tbody id="detailItems" class="divide-y divide-slate-100"></tbody>
@@ -313,18 +353,82 @@ check_auth('cashier');
         </div>
     </div>
 
+    <!-- Receipt Print Area (HIDDEN) -->
+    <div id="printArea" class="hidden">
+        <div class="receipt-bill p-4 text-center">
+            <h2 class="font-black text-lg">VEHICLE SQUARE</h2>
+            <p class="text-[10px]">No 123, Main Street, Town Name</p>
+            <p class="text-[10px]">Tel: 07x-xxxxxxx</p>
+            <div class="border-b border-dashed border-black my-2"></div>
+            <div class="text-left text-[10px] space-y-1">
+                <p>Date: <span id="bill_date"></span></p>
+                <p>Time: <span id="bill_time"></span></p>
+                <p>Invoice #: <span id="bill_id"></span></p>
+                <p>Customer: <span id="bill_cust"></span></p>
+                <p>Contact: <span id="bill_phone"></span></p>
+                <p>Mode: <span id="bill_pay"></span></p>
+            </div>
+            <div class="border-b border-dashed border-black my-2"></div>
+            <table class="w-full text-left text-[10px]">
+                <thead>
+                    <tr class="font-bold border-b border-slate-200">
+                        <th class="py-1">ITEM</th>
+                        <th class="py-1 text-center">QTY</th>
+                        <th class="py-1 text-right">TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody id="bill_items"></tbody>
+            </table>
+            <div class="border-b border-dashed border-black my-2"></div>
+            <div class="text-[10px] space-y-1">
+                <div class="flex justify-between font-bold">
+                    <span>Total Bill:</span>
+                    <span id="bill_total">LKR 0.00</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Discount:</span>
+                    <span id="bill_discount">LKR 0.00</span>
+                </div>
+                <div class="flex justify-between text-lg font-black border-t border-black pt-1">
+                    <span>NET TOTAL:</span>
+                    <span id="bill_net">LKR 0.00</span>
+                </div>
+            </div>
+            <div class="border-b border-dashed border-black my-4"></div>
+            <p class="text-[10px] font-bold">THANK YOU! COME AGAIN</p>
+        </div>
+    </div>
+
     <script>
         async function updateTodayTotal() {
-            const res = await fetch(`sales_handler.php?action=get_today_total`);
+            const fromDate = document.getElementById('dateFrom').value || new Date().toISOString().split('T')[0];
+            const res = await fetch(`sales_handler.php?action=get_today_total&date=${fromDate}`);
             const data = await res.json();
+            
             document.getElementById('today_total').innerText = 'Rs. ' + data.total;
             document.getElementById('today_approved').innerText = 'Rs. ' + data.approved;
             document.getElementById('today_pending').innerText = 'Rs. ' + data.pending;
+            
+            // Populate summary cards
+            if(data.summaries) {
+                const s = data.summaries;
+                document.getElementById('card_cash').innerText = 'Rs. ' + numberFormat(s.cash);
+                document.getElementById('card_card').innerText = 'Rs. ' + numberFormat(s.card);
+                document.getElementById('card_app_credit').innerText = 'Rs. ' + numberFormat(s.approved_credit);
+                document.getElementById('card_app_cheque').innerText = 'Rs. ' + numberFormat(s.approved_cheque);
+                document.getElementById('card_pend_credit').innerText = 'Rs. ' + numberFormat(s.pending_credit);
+                document.getElementById('card_pend_cheque').innerText = 'Rs. ' + numberFormat(s.pending_cheque);
+            }
         }
-        updateTodayTotal();
 
         let currentPage = 1;
         document.addEventListener('DOMContentLoaded', () => {
+            // Set default dates to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateFrom').value = today;
+            document.getElementById('dateTo').value = today;
+
+            updateTodayTotal();
             loadSales(1);
 
             const searchInput = document.getElementById('searchInput');
@@ -333,11 +437,13 @@ check_auth('cashier');
             let activeIdx = -1;
 
             window.resetFilters = function() {
+                const today = new Date().toISOString().split('T')[0];
                 searchInput.value = '';
-                document.getElementById('dateFrom').value = '';
-                document.getElementById('dateTo').value = '';
+                document.getElementById('dateFrom').value = today;
+                document.getElementById('dateTo').value = today;
                 document.getElementById('paymentMethod').value = '';
                 suggestDropdown.style.display = 'none';
+                updateTodayTotal();
                 loadSales(1);
             };
 
@@ -421,6 +527,9 @@ check_auth('cashier');
             const from = document.getElementById('dateFrom').value;
             const to = document.getElementById('dateTo').value;
             const method = document.getElementById('paymentMethod').value;
+
+            // Update summaries whenever filters change (if date is involved)
+            updateTodayTotal();
 
             const res = await fetch(`sales_handler.php?action=fetch_sales&page=${page}&search=${encodeURIComponent(search)}&from=${from}&to=${to}&method=${method}`);
             const data = await res.json();
@@ -522,13 +631,13 @@ check_auth('cashier');
                 tbody.innerHTML += `
                     <tr class="text-sm">
                         <td class="py-3.5">
-                            <p class="font-bold text-slate-800">${item.name}</p>
-                            <p class="text-[10px] text-slate-400 font-semibold mt-0.5">${item.brand}</p>
+                            <p class="font-bold text-slate-800 uppercase tracking-tight">${item.name}</p>
+                            <p class="text-[10px] text-slate-400 font-bold mt-0.5">${item.brand}</p>
                         </td>
                         <td class="py-3.5 text-center">
                             <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg text-xs font-black">${item.qty}</span>
                         </td>
-                        <td class="py-3.5 text-right font-semibold text-slate-500">Rs. ${numberFormat(item.unit_price)}</td>
+                        <td class="py-3.5 text-right font-bold text-slate-500">Rs. ${numberFormat(item.unit_price)}</td>
                         <td class="py-3.5 text-right font-bold text-rose-500">-Rs. ${numberFormat(item.discount)}</td>
                         <td class="py-3.5 text-right font-black text-slate-800">Rs. ${numberFormat(item.total_price)}</td>
                     </tr>
@@ -545,7 +654,55 @@ check_auth('cashier');
                 </div>
             `;
 
+            // Update print button click handler
+            const printBtn = document.getElementById('modalPrintBtn');
+            printBtn.onclick = () => printInvoice(data);
+
             document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function printInvoice(data) {
+            const sale = data.sale;
+            const items = data.items;
+            const now = new Date(sale.created_at);
+            
+            document.getElementById('bill_date').innerText = now.toLocaleDateString();
+            document.getElementById('bill_time').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('bill_id').innerText = 'SALE-' + sale.id;
+            document.getElementById('bill_cust').innerText = sale.cust_name || 'Walk-in Customer';
+            document.getElementById('bill_phone').innerText = sale.cust_contact || 'N/A';
+            document.getElementById('bill_pay').innerText = sale.payment_method.toUpperCase();
+            
+            const list = document.getElementById('bill_items');
+            list.innerHTML = '';
+            let sub = 0; 
+            let totalDisc = parseFloat(sale.discount) || 0;
+            
+            items.forEach(item => {
+                sub += (parseFloat(item.qty) * parseFloat(item.unit_price));
+                list.innerHTML += `
+                    <tr>
+                        <td class="py-1 uppercase">${item.name}</td>
+                        <td class="py-1 text-center">${item.qty}</td>
+                        <td class="py-1 text-right">${numberFormat(item.total_price)}</td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('bill_total').innerText = 'LKR ' + numberFormat(sub);
+            document.getElementById('bill_discount').innerText = 'LKR ' + numberFormat(totalDisc);
+            document.getElementById('bill_net').innerText = 'LKR ' + numberFormat(sale.final_amount);
+
+            // Trigger window print on the hidden div content
+            const printContent = document.getElementById('printArea').innerHTML;
+            const printWindow = window.open('', '_blank', 'width=400,height=600');
+            printWindow.document.write(`<html><head><title>Print Receipt</title><script src="https://cdn.tailwindcss.com"><\/script></head><body>${printContent}</body></html>`);
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+                printWindow.close();
+            }, 500);
         }
 
         function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }

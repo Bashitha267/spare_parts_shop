@@ -1490,6 +1490,8 @@ check_auth('cashier');
             const urlParams = new URLSearchParams(window.location.search);
             if(urlParams.get('open_drafts') === '1') {
                 openDraftsModal();
+            } else if (urlParams.get('draft_id')) {
+                resumeDraft(urlParams.get('draft_id'));
             }
         });
     </script>

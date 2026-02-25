@@ -189,28 +189,61 @@ if ($action === 'discard_draft') {
 
 if ($action === 'get_today_total') {
     $user_id = $_SESSION['id'];
-    $today = date('Y-m-d');
+    $date = $_GET['date'] ?? date('Y-m-d');
     
-    // Total Today
-    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND status = 'completed'");
-    $stmt->execute([$user_id, $today]);
-    $total = $stmt->fetchColumn() ?: 0;
+    $summaries = [
+        'cash' => 0,
+        'card' => 0,
+        'approved_credit' => 0,
+        'approved_cheque' => 0,
+        'pending_credit' => 0,
+        'pending_cheque' => 0
+    ];
 
-    // Approved Today
-    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'approved' AND status = 'completed'");
-    $stmt->execute([$user_id, $today]);
-    $approved = $stmt->fetchColumn() ?: 0;
+    $query = "SELECT payment_method, payment_status, SUM(final_amount) as total 
+              FROM sales 
+              WHERE user_id = ? AND DATE(created_at) = ? AND status = 'completed'
+              GROUP BY payment_method, payment_status";
+    
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$user_id, $date]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Pending Today (Awaiting Approval)
-    $stmt = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'pending' AND status = 'completed'");
-    $stmt->execute([$user_id, $today]);
-    $pending = $stmt->fetchColumn() ?: 0;
+    foreach ($results as $row) {
+        $method = $row['payment_method'];
+        $status = $row['payment_status'];
+        $total = (float)$row['total'];
+
+        if ($method === 'cash') $summaries['cash'] += $total;
+        elseif ($method === 'card') $summaries['card'] += $total;
+        elseif ($method === 'credit') {
+            if ($status === 'approved') $summaries['approved_credit'] += $total;
+            elseif ($status === 'pending') $summaries['pending_credit'] += $total;
+        }
+        elseif ($method === 'cheque') {
+            if ($status === 'approved') $summaries['approved_cheque'] += $total;
+            elseif ($status === 'pending') $summaries['pending_cheque'] += $total;
+        }
+    }
+
+    $stmt_tot = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND status = 'completed'");
+    $stmt_tot->execute([$user_id, $date]);
+    $grand_total = $stmt_tot->fetchColumn() ?: 0;
+
+    $stmt_app = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'approved' AND status = 'completed'");
+    $stmt_app->execute([$user_id, $date]);
+    $total_approved = $stmt_app->fetchColumn() ?: 0;
+
+    $stmt_pend = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'pending' AND status = 'completed'");
+    $stmt_pend->execute([$user_id, $date]);
+    $total_pending = $stmt_pend->fetchColumn() ?: 0;
 
     echo json_encode([
         'success' => true, 
-        'total' => number_format($total, 2),
-        'approved' => number_format($approved, 2),
-        'pending' => number_format($pending, 2)
+        'summaries' => $summaries,
+        'total' => number_format($grand_total, 2),
+        'approved' => number_format($total_approved, 2),
+        'pending' => number_format($total_pending, 2)
     ]);
     exit;
 }
@@ -242,7 +275,7 @@ if ($action === 'fetch_sales') {
     $to = $_GET['to'] ?? '';
     $method = $_GET['method'] ?? '';
 
-    $where = ["s.user_id = ?"];
+    $where = ["s.user_id = ?", "s.status = 'completed'"];
     $params = [$user_id];
 
     if (!empty($search)) {
@@ -275,7 +308,7 @@ if ($action === 'fetch_sales') {
     $stmt = $pdo->prepare("SELECT s.*, c.name as cust_name, c.contact as cust_phone 
                            FROM sales s 
                            LEFT JOIN customers c ON s.customer_id = c.id 
-                           WHERE $where_sql AND s.status = 'completed'
+                           WHERE $where_sql
                            ORDER BY s.created_at DESC 
                            LIMIT $limit OFFSET $offset");
     $stmt->execute($params);

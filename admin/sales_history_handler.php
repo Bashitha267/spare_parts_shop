@@ -126,6 +126,48 @@ if ($action === 'fetch') {
     exit;
 }
 
+if ($action === 'fetch_summaries') {
+    $date = $_GET['date'] ?? date('Y-m-d');
+    
+    $summaries = [
+        'cash' => 0,
+        'card' => 0,
+        'approved_credit' => 0,
+        'approved_cheque' => 0,
+        'pending_credit' => 0,
+        'pending_cheque' => 0
+    ];
+
+    $query = "SELECT payment_method, payment_status, SUM(final_amount) as total 
+              FROM sales 
+              WHERE DATE(created_at) = ? AND status = 'completed'
+              GROUP BY payment_method, payment_status";
+    
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$date]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($results as $row) {
+        $method = $row['payment_method'];
+        $status = $row['payment_status'];
+        $total = (float)$row['total'];
+
+        if ($method === 'cash') $summaries['cash'] += $total;
+        elseif ($method === 'card') $summaries['card'] += $total;
+        elseif ($method === 'credit') {
+            if ($status === 'approved') $summaries['approved_credit'] += $total;
+            elseif ($status === 'pending') $summaries['pending_credit'] += $total;
+        }
+        elseif ($method === 'cheque') {
+            if ($status === 'approved') $summaries['approved_cheque'] += $total;
+            elseif ($status === 'pending') $summaries['pending_cheque'] += $total;
+        }
+    }
+
+    echo json_encode(['success' => true, 'summaries' => $summaries]);
+    exit;
+}
+
 if ($action === 'edit') {
     $sale_id = $_POST['sale_id'];
     $amount = $_POST['total_amount'];

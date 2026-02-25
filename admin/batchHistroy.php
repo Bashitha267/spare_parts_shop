@@ -124,10 +124,11 @@ check_auth(['admin', 'cashier']);
                 <table class="w-full text-left border-collapse min-w-[700px]">
                     <thead>
                         <tr>
-                            <th class="px-8 py-5">Timestamp</th>
-                            <th class="px-8 py-5">User</th>
-                            <th class="px-8 py-5">Action</th>
-                            <th class="px-8 py-5">Details</th>
+                            <th class="px-8 py-5 text-left">Timestamp</th>
+                            <th class="px-8 py-5 text-left">Product Name</th>
+                            <th class="px-8 py-5 text-left">User</th>
+                            <th class="px-8 py-5 text-left">Action</th>
+                            <th class="px-8 py-5 text-left">Details</th>
                         </tr>
                     </thead>
                     <tbody id="logsBody">
@@ -225,7 +226,7 @@ check_auth(['admin', 'cashier']);
             tbody.innerHTML = '';
             
             if(data.logs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-16 text-slate-400 font-black uppercase tracking-widest text-xs italic">No activity logs found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-16 text-slate-400 font-black uppercase tracking-widest text-xs italic">No activity logs found.</td></tr>';
                 return;
             }
 
@@ -256,11 +257,33 @@ check_auth(['admin', 'cashier']);
                     actionClass = 'bg-cyan-50 text-cyan-700 border-cyan-200';
                 }
 
+                const details = log.details || '';
+                let productName = '-';
+                
+                if (log.action === 'Update Registry') {
+                    productName = details.split(' | ')[0];
+                } else if (log.action === 'New Batch Added') {
+                    const match = details.match(/Batch added for (.*?):/);
+                    if (match) productName = match[1];
+                } else if (log.action === 'New Item Added') {
+                    const match = details.match(/Added new item: (.*?) \(/);
+                    if (match) productName = match[1];
+                } else if (log.action === 'Activate Batch' || log.action === 'Deactivate Batch') {
+                    const match = details.match(/for (.*?) set to/);
+                    if (match) productName = match[1];
+                } else if (log.action === 'Delete Item') {
+                    const match = details.match(/deleted product: (.*?) \(/) || details.match(/for (.*?)\./);
+                    if (match) productName = match[1];
+                }
+
                 const row = `
                     <tr class="hover:bg-slate-50 transition-all group border-b border-slate-50 last:border-0 text-sm">
                         <td class="px-8 py-6">
                             <p class="text-[11px] font-black text-slate-900 uppercase tracking-tight">${new Date(log.created_at).toLocaleDateString('en-GB')}</p>
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">${new Date(log.created_at).toLocaleTimeString()}</p>
+                        </td>
+                        <td class="px-8 py-6">
+                            <p class="font-black text-blue-600 text-xs uppercase tracking-tight">${productName}</p>
                         </td>
                         <td class="px-8 py-6">
                             <p class="font-black text-slate-900 text-sm tracking-tight">${log.user_name || 'System'}</p>

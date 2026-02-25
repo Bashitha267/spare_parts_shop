@@ -3,7 +3,7 @@ require_once '../includes/auth.php';
 require_once '../includes/config.php';
 check_auth('admin');
 
-// Fetch some quick counts for the header
+// Fetch counts for the approval tab
 $count_stmt = $pdo->query("SELECT 
     COUNT(*) as total,
     SUM(CASE WHEN payment_method = 'cheque' THEN 1 ELSE 0 END) as cheques,
@@ -17,7 +17,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Clearing - Vehicle Square</title>
+    <title>Payment Management - Vehicle Square</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -82,7 +82,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
             background-color: rgba(241, 245, 249, 0.5);
         }
         td {
-            padding: 1.25rem 1.5rem !important;
+            padding: 1rem 1.5rem !important;
             border-bottom: 1px solid rgba(226, 232, 240, 0.5);
             color: #0f172a;
         }
@@ -91,6 +91,36 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
             color: white !important;
             box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
         }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .ph-suggest-dropdown {
+            position: fixed;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.18);
+            z-index: 99999;
+            overflow: hidden;
+            animation: phDropIn 0.13s ease-out;
+        }
+        @keyframes phDropIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+        .ph-suggest-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ph-suggest-item:last-child { border-bottom: none; }
+        .ph-suggest-item:hover, .ph-suggest-item.active { background: #eff6ff; }
     </style>
 </head>
 <body class="bg-main min-h-screen relative pb-20">
@@ -103,22 +133,21 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
                 <div>
-                  <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Payment Clearing</h1>
-                  <p class="hidden sm:block text-[9px] text-slate-400 font-black uppercase tracking-[0.2em]">Transaction Approval Center</p>
+                  <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Payment Management</h1>
+                  <p class="hidden sm:block text-[9px] text-slate-400 font-black uppercase tracking-[0.2em]">Approve Transactions \u0026 View History</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-6">
-                <div class="hidden lg:flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                    <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest"><?php echo $counts['total']; ?> Pending Review</span>
-                </div>
+            <!-- Tab Switcher -->
+            <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                <button onclick="switchMainTab('approve')" id="main-tab-approve" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all tab-active">Approvals</button>
+                <button onclick="switchMainTab('history')" id="main-tab-history" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600">History</button>
             </div>
         </div>
     </nav>
 
-    <main class="p-4 md:p-8 max-w-7xl mx-auto space-y-10 relative z-10">
-        
+    <!-- SECTION: APPROVALS -->
+    <main id="section-approve" class="p-4 md:p-8 max-w-7xl mx-auto space-y-10 relative z-10">
         <!-- Summary Strip -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="blue-gradient-card p-6 rounded-[2.5rem] flex items-center gap-5">
@@ -150,156 +179,201 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
             </div>
         </div>
 
-        <!-- Filter \u0026 Actions Bar -->
+        <!-- Filter Bar Approvals -->
         <div class="glass-card p-6 rounded-[2.5rem] flex flex-col lg:flex-row gap-6 items-center">
             <div class="relative flex-grow w-full lg:w-auto">
                 <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
-                <input type="text" id="searchPayments" class="block w-full pl-14 pr-6 py-4 rounded-2xl outline-none transition-all placeholder:text-slate-400 text-sm font-bold bg-white border border-slate-200" placeholder="Search by Sale ID or Customer Name...">
+                <input type="text" id="searchPayments" class="block w-full pl-14 pr-6 py-4 rounded-2xl outline-none transition-all placeholder:text-slate-400 text-sm font-bold bg-white border border-slate-200" placeholder="Search by TRX or Customer...">
             </div>
-
             <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-                <div class="relative flex-grow lg:flex-none">
-                    <input type="date" id="dateFilter" class="w-full lg:w-auto px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none transition-all border-slate-200 bg-white">
+                <input type="date" id="dateFilterApprove" class="w-full lg:w-auto px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none border-slate-200 bg-white">
+                <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                    <button onclick="changeMethod('all')" id="tab-all" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all tab-active">All</button>
+                    <button onclick="changeMethod('cheque')" id="tab-cheque" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400">Cheques</button>
+                    <button onclick="changeMethod('credit')" id="tab-credit" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400">Credits</button>
                 </div>
-                
-                <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 flex-grow lg:flex-none">
-                    <button onclick="changeMethod('all')" id="tab-all" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all tab-active">All</button>
-                    <button onclick="changeMethod('cheque')" id="tab-cheque" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600">Cheques</button>
-                    <button onclick="changeMethod('credit')" id="tab-credit" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600">Credits</button>
-                </div>
-
                 <button onclick="loadPendingPayments()" class="p-4 bg-white border border-slate-200 rounded-2xl text-blue-600 hover:bg-slate-50 transition-all font-black">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
             </div>
         </div>
 
-        <!-- Data Table -->
         <div class="glass-card rounded-[2.5rem] overflow-hidden border-4 border-blue-500/20">
             <div class="overflow-x-auto">
                 <table class="w-full text-left min-w-[800px] border-collapse">
-                <thead>
-                    <tr>
+                    <thead>
+                        <tr>
                         <th class="px-8 py-6">Transaction ID</th>
                         <th class="px-8 py-6">Customer Profile</th>
                         <th class="px-8 py-6">Payment Mode</th>
                         <th class="px-8 py-6">Settlement</th>
+                        <th class="px-8 py-6 text-center text-rose-500">Pending Days</th>
                         <th class="px-8 py-6 text-center">Officer</th>
                         <th class="px-8 py-6 text-right">Operational Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="paymentBody" class="divide-y divide-slate-100">
-                    <!-- Loaded via AJAX -->
-                </tbody>
-            </table>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+            <!-- Pagination Approvals -->
+            <div id="paginationApprove" class="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-center gap-2"></div>
+        </div>
+    </main>
+
+    <!-- SECTION: HISTORY -->
+    <main id="section-history" class="hidden p-4 md:p-8 max-w-7xl mx-auto space-y-10 relative z-10">
+        <!-- Search \u0026 Filter Bar History -->
+        <div class="glass-card p-6 rounded-[2rem] flex flex-wrap lg:flex-nowrap items-center gap-4">
+            <div class="relative w-full lg:w-72 flex-shrink-0" id="searchWrapperHist">
+                <span class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </span>
+                <input type="text" id="searchHistory" autocomplete="off" placeholder="Search TRX, Name or Contact..." class="w-full pl-12 pr-4 py-3 rounded-xl text-xs font-bold placeholder:text-slate-400">
+            </div>
+            
+            <div class="flex flex-wrap lg:flex-nowrap items-center gap-3 w-full lg:flex-grow">
+                <input type="date" id="hist_date" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer">
+                <input type="month" id="hist_month" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer">
+                <select id="hist_year" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer">
+                    <option value="">Year</option>
+                    <?php for($y=date('Y'); $y>=2020; $y--): ?>
+                        <option value="<?php echo $y; ?>"><?php echo $y; ?></option>
+                    <?php endfor; ?>
+                </select>
+                <select id="hist_method" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer">
+                    <option value="all">Mode</option>
+                    <option value="cheque">Cheque</option>
+                    <option value="credit">Credit</option>
+                </select>
+                <select id="hist_status" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer">
+                    <option value="all">Status</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <button onclick="clearHistoryFilters()" class="flex items-center gap-2 p-3 bg-blue-600 border border-slate-200 rounded-xl text-white font-black hover:bg-blue-800 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-[2.5rem] overflow-hidden border-4 border-blue-500/20">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left min-w-[800px] border-collapse">
+                    <thead>
+                        <tr>
+                            <th>Record ID</th>
+                            <th>Customer Identity</th>
+                            <th>Strategy</th>
+                            <th>Fiscal Volume</th>
+                            <th class="text-center">Officer</th>
+                            <th class="text-center">State</th>
+                            <th class="text-right">Settled At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody" class="divide-y divide-white/10"></tbody>
+                </table>
+            </div>
+            <!-- Pagination History -->
+            <div id="paginationHistory" class="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-center gap-2"></div>
         </div>
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', loadPendingPayments);
-
         let currentMethod = 'all';
+        let mainTab = 'approve';
         let debounceTimer;
+        let currentApprovePage = 1;
+        let currentHistoryPage = 1;
 
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPendingPayments();
+            initHistoryAutosuggest();
+        });
+
+        function switchMainTab(tab) {
+            mainTab = tab;
+            document.getElementById('section-approve').classList.toggle('hidden', tab !== 'approve');
+            document.getElementById('section-history').classList.toggle('hidden', tab !== 'history');
+            
+            document.getElementById('main-tab-approve').classList.toggle('tab-active', tab === 'approve');
+            document.getElementById('main-tab-approve').classList.toggle('text-slate-400', tab !== 'approve');
+            document.getElementById('main-tab-history').classList.toggle('tab-active', tab === 'history');
+            document.getElementById('main-tab-history').classList.toggle('text-slate-400', tab !== 'history');
+
+            if(tab === 'history') loadHistory();
+            else loadPendingPayments();
+        }
+
+        // ---- APPROVAL LOGIC ----
         document.getElementById('searchPayments').addEventListener('input', () => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(loadPendingPayments, 300);
         });
-
-        document.getElementById('dateFilter').addEventListener('change', loadPendingPayments);
+        document.getElementById('dateFilterApprove').addEventListener('change', loadPendingPayments);
 
         async function changeMethod(method) {
             currentMethod = method;
-            document.querySelectorAll('button[id^="tab-"]').forEach(btn => {
-                btn.classList.remove('tab-active');
-                btn.classList.add('text-slate-400', 'hover:text-slate-600');
+            const tabs = ['all', 'cheque', 'credit'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                btn.classList.toggle('tab-active', t === method);
+                btn.classList.toggle('text-slate-400', t !== method);
             });
-            const activeBtn = document.getElementById(`tab-${method}`);
-            activeBtn.classList.remove('text-slate-400', 'hover:text-slate-600');
-            activeBtn.classList.add('tab-active');
             loadPendingPayments();
         }
 
-        async function loadPendingPayments() {
+        async function loadPendingPayments(page = 1) {
+            currentApprovePage = page;
             const search = document.getElementById('searchPayments').value;
-            const date = document.getElementById('dateFilter').value;
+            const date = document.getElementById('dateFilterApprove').value;
             const tbody = document.getElementById('paymentBody');
-            tbody.innerHTML = `<tr><td colspan="6" class="py-24 text-center"><div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div></td></tr>`;
+            tbody.innerHTML = '<tr><td colspan="7" class="py-24 text-center"><div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent inline-block"></div></td></tr>';
             
-            try {
-                const res = await fetch(`payment_handler.php?action=fetch_pending_payments&method=${currentMethod}&search=${search}&date=${date}`);
-                const data = await res.json();
-                tbody.innerHTML = '';
+            const res = await fetch(`payment_handler.php?action=fetch_pending_payments&method=${currentMethod}&search=${search}&date=${date}&page=${page}`);
+            const data = await res.json();
+            tbody.innerHTML = '';
 
-                if (data.sales.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="py-32 text-center">
-                                <div class="flex flex-col items-center gap-6 opacity-20">
-                                    <svg class="w-24 h-24 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <p class="text-lg font-black text-slate-400 uppercase tracking-[0.2em]">Clear Skies. No Pending Items.</p>
-                                </div>
-                            </td>
-                        </tr>`;
-                    return;
-                }
-
-                data.sales.forEach(sale => {
-                    const methodClass = sale.payment_method.toLowerCase() === 'cheque' ? 'bg-amber-100 text-amber-800 border-amber-200' : 
-                                      sale.payment_method.toLowerCase() === 'credit' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 
-                                      'bg-slate-100 text-slate-400 border-slate-200';
-                    
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition-all group">
-                            <td class="px-8 py-8">
-                                <span class="font-mono text-[10px] font-black text-blue-800 tracking-tighter uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">TRX-${sale.id}</span>
-                            </td>
-                            <td class="px-8 py-8">
-                                <p class="font-black text-slate-900 leading-tight text-sm">${sale.cust_name || 'Anonymous Guest'}</p>
-                                <p class="text-[9px] text-slate-400 font-black uppercase tracking-wider mt-1.5">${new Date(sale.created_at).toLocaleDateString()} @ ${new Date(sale.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-                            </td>
-                            <td class="px-8 py-8">
-                                <span class="px-4 py-1.5 border rounded-xl text-[9px] font-black uppercase tracking-widest ${methodClass}">${sale.payment_method}</span>
-                            </td>
-                            <td class="px-8 py-8">
-                                <p class="font-black text-slate-900 tracking-widest text-base">Rs. ${numberFormat(sale.final_amount)}</p>
-                            </td>
-                            <td class="px-8 py-8 text-center text-nowrap">
-                                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-2xl">
-                                    <div class="w-6 h-6 rounded-lg bg-blue-600 text-[10px] flex items-center justify-center font-black text-white shadow-lg shadow-blue-600/20">${sale.cashier_name.charAt(0)}</div>
-                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${sale.cashier_name}</span>
-                                </div>
-                            </td>
-                            <td class="px-8 py-8 text-right">
-                                <div class="flex flex-row flex-nowrap justify-end items-center gap-3">
-                                    <button onclick="updateStatus(${sale.id}, 'approved')" class="whitespace-nowrap px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-800 hover:shadow-lg text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">Approve</button>
-                                    <button onclick="updateStatus(${sale.id}, 'rejected')" class="whitespace-nowrap px-6 py-3 bg-white border border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">Reject</button>
-                                </div>
-                            </td>
-                        </tr>`;
-                });
-            } catch (e) {
-                console.error(e);
-                tbody.innerHTML = '<tr><td colspan="6" class="py-20 text-center text-red-400 font-black uppercase tracking-widest">Failed to connect to transmission engine.</td></tr>';
+            if (data.sales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="py-32 text-center opacity-20"><p class="text-lg font-black uppercase tracking-widest">No Pending Approvals</p></td></tr>';
+                document.getElementById('paginationApprove').innerHTML = '';
+                return;
             }
+
+            data.sales.forEach(sale => {
+                const methodClass = sale.payment_method.toLowerCase() === 'cheque' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                
+                // Calculate days pending
+                const saleDate = new Date(sale.created_at);
+                const today = new Date();
+                const diffTime = Math.abs(today - saleDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const dayLabel = diffDays === 1 ? '1 Day' : diffDays + ' Days';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-all group">
+                        <td class="px-8 py-8"><span class="font-mono text-[10px] font-black text-blue-800 tracking-tighter uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">TRX-${sale.id}</span></td>
+                        <td class="px-8 py-8"><p class="font-black text-slate-900 leading-tight text-sm">${sale.cust_name || 'Walk-in'}</p><p class="text-[9px] text-slate-400 font-black uppercase tracking-wider mt-1.5">${new Date(sale.created_at).toLocaleDateString()} @ ${new Date(sale.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p></td>
+                        <td class="px-8 py-8"><span class="px-4 py-1.5 border rounded-xl text-[9px] font-black uppercase tracking-widest ${methodClass}">${sale.payment_method}</span></td>
+                        <td class="px-8 py-8"><p class="font-black text-slate-900 tracking-widest text-base">Rs. ${numberFormat(sale.final_amount)}</p></td>
+                        <td class="px-8 py-8 text-center text-rose-500 font-bold "><span class="text-xs font-black text-rose-600 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-100 uppercase tracking-tighter">${dayLabel}</span></td>
+                        <td class="px-8 py-8 text-center text-nowrap"><div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-2xl"><div class="w-6 h-6 rounded-lg bg-blue-600 text-[10px] flex items-center justify-center font-black text-white">${sale.cashier_name.charAt(0)}</div><span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${sale.cashier_name}</span></div></td>
+                        <td class="px-8 py-8 text-right"><div class="flex justify-end gap-3"><button onclick="updateStatus(${sale.id}, 'approved')" class="px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-800 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-md">Approve</button><button onclick="updateStatus(${sale.id}, 'rejected')" class="px-6 py-3 bg-white border border-rose-200 text-rose-600 rounded-2xl text-[10px] font-black uppercase tracking-widest">Reject</button></div></td>
+                    </tr>`;
+            });
+            renderPagination(data.total_pages, data.current_page, 'paginationApprove', loadPendingPayments);
         }
 
         async function updateStatus(saleId, status) {
             const result = await Swal.fire({
                 title: 'Authorize Transaction?',
-                text: `Are you sure you want to mark this TRX-${saleId} as ${status}?`,
+                text: `Mark TRX-${saleId} as ${status}?`,
                 icon: status === 'approved' ? 'success' : 'warning',
                 showCancelButton: true,
                 confirmButtonColor: status === 'approved' ? '#10b981' : '#f43f5e',
-                confirmButtonText: status === 'approved' ? 'Yes, Authorize' : 'Yes, Reject',
-                cancelButtonText: 'Wait, Cancel',
-                customClass: {
-                    popup: 'rounded-[2.5rem] bg-white border border-slate-100 shadow-2xl text-slate-800',
-                    confirmButton: 'rounded-2xl font-black uppercase text-[10px] px-8 py-4 tracking-widest',
-                    cancelButton: 'rounded-2xl font-black uppercase text-[10px] px-8 py-4 tracking-widest bg-slate-50 text-slate-400 border border-slate-100'
-                }
+                confirmButtonText: 'Yes, Confirm',
+                customClass: { popup: 'rounded-[2.5rem]' }
             });
 
             if (result.isConfirmed) {
@@ -307,21 +381,121 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                 fd.append('sale_id', saleId);
                 fd.append('status', status);
                 fd.append('action', 'update_payment_status');
-
                 const res = await fetch('payment_handler.php', { method: 'POST', body: fd });
                 const data = await res.json();
                 if (data.success) {
-                    Swal.fire({
-                        title: 'Clearance Success',
-                        text: `The transaction has been successfully ${status}.`,
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false,
-                        customClass: { popup: 'rounded-[2rem] bg-white border border-slate-100 shadow-xl text-slate-800' }
-                    });
+                    Swal.fire({ title: 'Success', icon: 'success', timer: 1000, showConfirmButton: false });
                     loadPendingPayments();
                 }
             }
+        }
+
+        // ---- HISTORY LOGIC ----
+        function initHistoryAutosuggest() {
+            const searchInput = document.getElementById('searchHistory');
+            const suggestDropdown = document.createElement('div');
+            suggestDropdown.className = 'ph-suggest-dropdown';
+            suggestDropdown.style.display = 'none';
+            document.body.appendChild(suggestDropdown);
+
+            searchInput.addEventListener('input', function() {
+                const val = this.value.trim();
+                loadHistory();
+                if (val.length < 1) { suggestDropdown.style.display = 'none'; return; }
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(async () => {
+                    const res = await fetch(`payment_handler.php?action=suggest&q=${encodeURIComponent(val)}`);
+                    const data = await res.json();
+                    renderSuggest(data.suggestions, suggestDropdown, searchInput);
+                }, 180);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!document.getElementById('searchWrapperHist').contains(e.target) && !suggestDropdown.contains(e.target))
+                    suggestDropdown.style.display = 'none';
+            });
+        }
+
+        function renderSuggest(items, dropdown, input) {
+            dropdown.innerHTML = '';
+            if (!items.length) { dropdown.style.display = 'none'; return; }
+            items.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'ph-suggest-item';
+                div.innerHTML = `<p class="font-black text-sm uppercase">${s.label}</p>`;
+                div.onmousedown = () => { input.value = s.value; dropdown.style.display = 'none'; loadHistory(); };
+                dropdown.appendChild(div);
+            });
+            const r = input.getBoundingClientRect();
+            dropdown.style.left = r.left + 'px';
+            dropdown.style.top = (r.bottom + 4) + 'px';
+            dropdown.style.width = r.width + 'px';
+            dropdown.style.display = 'block';
+        }
+
+        async function loadHistory(page = 1) {
+            currentHistoryPage = page;
+            const tbody = document.getElementById('historyBody');
+            const search = document.getElementById('searchHistory').value;
+            const date = document.getElementById('hist_date').value;
+            const month = document.getElementById('hist_month').value;
+            const year = document.getElementById('hist_year').value;
+            const method = document.getElementById('hist_method').value;
+            const status = document.getElementById('hist_status').value;
+
+            const res = await fetch(`payment_handler.php?action=fetch_payment_history&search=${search}&date=${date}&month=${month}&year=${year}&method=${method}&status=${status}&page=${page}`);
+            const data = await res.json();
+            tbody.innerHTML = '';
+
+            if(data.sales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-8 py-20 text-center opacity-30 italic font-black">No Audit Records Found</td></tr>';
+                document.getElementById('paginationHistory').innerHTML = '';
+                return;
+            }
+
+            data.sales.forEach(sale => {
+                const statusClass = sale.payment_status === 'approved' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-rose-100 text-rose-800 border-rose-200';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-all">
+                        <td class="px-8 py-6"><span class="font-mono text-[10px] font-black text-blue-800 tracking-tighter uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">TRX-${sale.id}</span></td>
+                        <td class="px-8 py-6"><p class="font-black text-slate-900 leading-tight text-sm">${sale.cust_name || 'Walk-in'}</p></td>
+                        <td class="px-8 py-6"><span class="text-[10px] font-black uppercase text-blue-600 tracking-widest">${sale.payment_method}</span></td>
+                        <td class="px-8 py-6 font-black text-slate-900 text-sm">Rs. ${parseFloat(sale.final_amount).toLocaleString()}</td>
+                        <td class="px-8 py-6 text-center font-black text-slate-500 uppercase text-[10px]">${sale.cashier_name}</td>
+                        <td class="px-8 py-6 text-center"><span class="status-badge ${statusClass}">${sale.payment_status}</span></td>
+                        <td class="px-8 py-6 text-right"><p class="font-bold text-slate-900 text-[11px]">${new Date(sale.created_at).toLocaleDateString()}</p><p class="text-[9px] text-slate-400 font-black">${new Date(sale.created_at).toLocaleTimeString()}</p></td>
+                    </tr>`;
+            });
+            renderPagination(data.total_pages, data.current_page, 'paginationHistory', loadHistory);
+        }
+
+        function renderPagination(totalPages, currentPage, elementId, callback) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const maxVisible = 5;
+            let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let end = Math.min(totalPages, start + maxVisible - 1);
+            if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
+
+            if (currentPage > 1) {
+                container.innerHTML += `<button onclick="${callback.name}(${currentPage - 1})" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase text-slate-500 hover:bg-slate-50 transition-all">Prev</button>`;
+            }
+
+            for (let i = start; i <= end; i++) {
+                container.innerHTML += `<button onclick="${callback.name}(${i})" class="w-10 h-10 flex items-center justify-center rounded-xl text-[10px] font-black border transition-all ${i === currentPage ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/30' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}">${i}</button>`;
+            }
+
+            if (currentPage < totalPages) {
+                container.innerHTML += `<button onclick="${callback.name}(${currentPage + 1})" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase text-slate-500 hover:bg-slate-50 transition-all">Next</button>`;
+            }
+        }
+
+        function clearHistoryFilters() {
+            ['searchHistory', 'hist_date', 'hist_month', 'hist_year'].forEach(id => document.getElementById(id).value = '');
+            ['hist_method', 'hist_status'].forEach(id => document.getElementById(id).value = 'all');
+            loadHistory();
         }
 
         function numberFormat(val) { return parseFloat(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }

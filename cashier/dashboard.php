@@ -128,7 +128,7 @@ $draft_count = $draft_stmt->fetchColumn() ?: 0;
             </a>
 
             <!-- Pending Drafts Card -->
-            <a href="pos.php?open_drafts=1" class="p-10 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden text-center">
+            <a href="pending.php" class="p-10 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden text-center">
                 <?php if($draft_count > 0): ?>
                 <span class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-rose-500 text-white text-[11px] font-black rounded-full shadow-lg border-2 border-white animate-pulse"><?php echo $draft_count; ?></span>
                 <?php endif; ?>

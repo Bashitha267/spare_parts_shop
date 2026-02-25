@@ -131,6 +131,40 @@ check_auth('admin');
 
     <main class="p-8 mx-auto space-y-10 relative z-10">
         
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+            <!-- Cash -->
+            <div class="glass-card p-8 border-l-4 border-emerald-500 shadow-xl shadow-emerald-500/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-emerald-500 transition-colors">Cash Sales</p>
+                <h3 id="card_cash" class="text-2xl font-black text-emerald-600 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Card -->
+            <div class="glass-card p-8 border-l-4 border-indigo-500 shadow-xl shadow-indigo-500/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-indigo-500 transition-colors">Card Sales</p>
+                <h3 id="card_card" class="text-2xl font-black text-indigo-600 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Approved Credit -->
+            <div class="glass-card p-8 border-l-4 border-blue-500 shadow-xl shadow-blue-500/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-blue-500 transition-colors">Approved Credit</p>
+                <h3 id="card_app_credit" class="text-2xl font-black text-blue-600 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Approved Cheque -->
+            <div class="glass-card p-8 border-l-4 border-amber-500 shadow-xl shadow-amber-500/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-amber-500 transition-colors">Approved Cheque</p>
+                <h3 id="card_app_cheque" class="text-2xl font-black text-amber-600 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Pending Credit -->
+            <div class="glass-card p-8 border-l-4 border-rose-400 shadow-xl shadow-rose-400/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-rose-500 transition-colors">Pending Credit</p>
+                <h3 id="card_pend_credit" class="text-2xl font-black text-rose-500 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Pending Cheque -->
+            <div class="glass-card p-8 border-l-4 border-orange-400 shadow-xl shadow-orange-400/10 hover:scale-105 transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-orange-500 transition-colors">Pending Cheque</p>
+                <h3 id="card_pend_cheque" class="text-2xl font-black text-orange-500 tracking-tight">Rs. 0.00</h3>
+            </div>
+        </div>
+
         <!-- Search & Filter Bar -->
         <div class="glass-card p-6 rounded-[2.5rem] flex flex-col md:flex-row gap-6 items-center">
             <div class="relative w-full md:flex-grow" id="searchWrapper">
@@ -253,11 +287,17 @@ check_auth('admin');
     <script>
         let currentPage = 1;
 
-        document.addEventListener('DOMContentLoaded', () => loadHistory(1));
+        document.addEventListener('DOMContentLoaded', () => {
+             // Set default date to today
+             const today = new Date().toISOString().split('T')[0];
+             document.getElementById('date_filter').value = today;
+             
+             loadHistory(1);
+        });
         
         function resetFilters() {
             document.getElementById('search').value = '';
-            document.getElementById('date_filter').value = '';
+            document.getElementById('date_filter').value = new Date().toISOString().split('T')[0];
             document.getElementById('method_filter').value = 'all';
             document.getElementById('status_filter').value = 'all';
             document.getElementById('order_status_filter').value = 'all';
@@ -355,6 +395,10 @@ check_auth('admin');
             currentPage = page;
             const search = document.getElementById('search').value;
             const date = document.getElementById('date_filter').value;
+            
+            // Load summaries whenever date changes (or on refresh)
+            loadSummaries(date);
+
             const method = document.getElementById('method_filter').value;
             const status = document.getElementById('status_filter').value;
             const order_status = document.getElementById('order_status_filter').value;
@@ -432,6 +476,20 @@ check_auth('admin');
             });
 
             renderPagination(data.pagination);
+        }
+
+        async function loadSummaries(date) {
+            const res = await fetch(`sales_history_handler.php?action=fetch_summaries&date=${date}`);
+            const data = await res.json();
+            if(!data.success) return;
+
+            const s = data.summaries;
+            document.getElementById('card_cash').innerText = 'Rs. ' + s.cash.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_card').innerText = 'Rs. ' + s.card.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_app_credit').innerText = 'Rs. ' + s.approved_credit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_app_cheque').innerText = 'Rs. ' + s.approved_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_pend_credit').innerText = 'Rs. ' + s.pending_credit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_pend_cheque').innerText = 'Rs. ' + s.pending_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
         }
 
         function renderPagination(pg) {
