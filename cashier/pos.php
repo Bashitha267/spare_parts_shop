@@ -226,10 +226,13 @@ check_auth('cashier');
 
             <!-- Section  section 3: Sale Items Table -->
             <div id="pos_main_area" class="glass-panel overflow-hidden transition-all duration-300 flex-1 flex flex-col min-h-0 relative bg-white/80 backdrop-blur-sm">
-                <div class="hidden lg:grid grid-cols-12 blue-gradient-header text-[11px] font-black uppercase tracking-[0.2em] px-6 py-4 border-b border-white/10">
-                    <div class="col-span-3">Product Profile</div>
-                    <div class="col-span-2 text-center">Category / Type</div>
-                    <div class="col-span-2 text-right">Net Unit Price</div>
+                <div class="hidden lg:grid grid-cols-12 blue-gradient-header text-[10px] xl:text-[11px] font-black uppercase tracking-[0.1em] px-4 xl:px-6 py-4 border-b border-white/10 gap-x-2">
+                    <div class="col-span-2">Product Profile</div>
+                    <div class="col-span-1 text-center">Cat / Type</div>
+                    <div class="col-span-1 text-right">Buying P.</div>
+                    <div class="col-span-1 text-right">Labeled P.</div>
+                    <div class="col-span-1 text-right">Est. Sale</div>
+                    <div class="col-span-1 text-right">Discount</div>
                     <div class="col-span-2 text-center">Quantity</div>
                     <div class="col-span-2 text-right">Total Payable</div>
                     <div class="col-span-1 text-center">Action</div>
@@ -257,19 +260,36 @@ check_auth('cashier');
                         </div>
                         
                         <div class="w-full lg:w-auto flex flex-col md:flex-row items-center gap-4 md:gap-8 lg:gap-10">
-                            <div class="flex items-center justify-center md:justify-end gap-6 md:gap-10 w-full md:w-auto">
-                                <div class="text-right">
-                                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Subtotal</p>
-                                    <p id="subtotal" class="text-xs md:text-sm font-black text-slate-700 tracking-tight">Rs. 0.00</p>
+                            <div class="flex items-center justify-center md:justify-end gap-5 lg:gap-8 w-full md:w-auto">
+                                <!-- Gross Subtotal & Item Discount -->
+                                <div class="hidden sm:flex items-center gap-6 border-r border-slate-200/50 pr-6">
+                                    <div class="text-right">
+                                        <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Gross Subtotal</p>
+                                        <p id="subtotal" class="text-sm font-black text-slate-700 tracking-tight">Rs. 0.00</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[8px] font-black text-red-400 uppercase tracking-widest mb-0.5">Item Discount</p>
+                                        <p id="total_discount" class="text-sm font-black text-red-500 tracking-tight">Rs. 0.00</p>
+                                    </div>
                                 </div>
+                                <!-- Bill Discount -->
                                 <div class="text-right">
-                                    <p class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-0.5">Discounts</p>
-                                    <p id="total_discount" class="text-xs md:text-sm font-black text-red-500 tracking-tight">Rs. 0.00</p>
+                                    <div class="flex items-center justify-end gap-1.5 mb-1.5">
+                                        <p class="text-[8px] font-black text-red-500 uppercase tracking-widest">Bill Dis.</p>
+                                        <div class="flex gap-1">
+                                            <button onclick="applyPercentageDiscount(5)" class="px-1.5 py-0.5 bg-white border border-slate-200 hover:border-red-500 hover:text-red-600 text-[8px] font-black text-slate-600 rounded transition-colors shadow-sm focus:outline-none">5%</button>
+                                            <button onclick="applyPercentageDiscount(10)" class="px-1.5 py-0.5 bg-white border border-slate-200 hover:border-red-500 hover:text-red-600 text-[8px] font-black text-slate-600 rounded transition-colors shadow-sm focus:outline-none">10%</button>
+                                            <button onclick="applyPercentageDiscount(20)" class="px-1.5 py-0.5 bg-white border border-slate-200 hover:border-red-500 hover:text-red-600 text-[8px] font-black text-slate-600 rounded transition-colors shadow-sm focus:outline-none">20%</button>
+                                        </div>
+                                    </div>
+                                    <div class="relative w-28 ml-auto">
+                                        <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-red-400 pointer-events-none">Rs.</span>
+                                        <input type="number" id="wholesale_discount" value="0.00" step="0.01" oninput="updatePaymentTotal()" class="w-full pl-7 pr-2 py-1 bg-white border-2 border-red-100 focus:border-red-500 rounded-md font-black text-[13px] text-right text-red-600 outline-none transition-all shadow-inner">
+                                    </div>
                                 </div>
-                                <div class="h-8 w-px bg-slate-200/50 hidden md:block"></div>
-                                <div class="text-right">
-                                    <p class="text-[10px] font-black text-blue-600 uppercase tracking-tight mb-0.5 opacity-80">Net Payable</p>
-                                    <p id="final_payable" class="text-2xl md:text-3xl font-black text-blue-700 tracking-tighter leading-none">Rs. 0.00</p>
+                                <div class="text-right min-w-[100px] pl-4 border-l border-slate-200/50 hidden md:block">
+                                    <p class="text-[9px] font-black text-blue-600 uppercase tracking-tight mb-0.5 opacity-80">Net Payable</p>
+                                    <p id="final_payable" class="text-2xl font-black text-blue-700 tracking-tighter leading-none">Rs. 0.00</p>
                                 </div>
                             </div>
                             
@@ -304,33 +324,6 @@ check_auth('cashier');
             </div>
 
             <div class="p-6 space-y-5">
-                <!-- Totals Section -->
-                <div class="space-y-2">
-                    <div class="bg-slate-50/50 rounded-2xl p-3 flex justify-between items-center border border-slate-100/50">
-                        <span class="text-slate-400 font-black text-[10px] uppercase tracking-widest">Gross total</span>
-                        <span id="pay_modal_total" class="text-xl font-black text-slate-900 tracking-tight">Rs. 0.00</span>
-                    </div>
-
-                    <div class="bg-red-50/30 rounded-2xl p-3 flex justify-between items-center border border-red-100/30">
-                        <span class="text-red-400 font-black text-[10px] uppercase tracking-widest">Savings / items disc</span>
-                        <span id="pay_modal_item_disc" class="text-base font-black text-red-500 tracking-tight">Rs. 0.00</span>
-                    </div>
-
-                    <div class="px-1 pt-1">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Wholesale discount</label>
-                        <div class="relative mb-3">
-                            <span class="absolute left-5 inset-y-0 flex items-center text-slate-300 font-black text-base">Rs.</span>
-                            <input type="number" id="wholesale_discount" value="0" step="0.01" oninput="updatePaymentTotal()" class="w-full pl-12 pr-6 py-3 bg-white border-2 border-slate-100 rounded-xl font-black text-xl text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all shadow-sm text-center">
-                        </div>
-                        <div class="grid grid-cols-4 gap-2">
-                            <button onclick="applyPercentageDiscount(5)" class="py-2 bg-white border border-slate-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-[11px] font-black transition-all shadow-sm">5%</button>
-                            <button onclick="applyPercentageDiscount(10)" class="py-2 bg-white border border-slate-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-[11px] font-black transition-all shadow-sm">10%</button>
-                            <button onclick="applyPercentageDiscount(20)" class="py-2 bg-white border border-slate-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-[11px] font-black transition-all shadow-sm">20%</button>
-                            <button onclick="applyPercentageDiscount(25)" class="py-2 bg-white border border-slate-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-[11px] font-black transition-all shadow-sm">25%</button>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Payable Box -->
                 <div class="bg-blue-600 rounded-[1.75rem] p-4 flex justify-between items-center shadow-xl shadow-blue-600/30 border border-blue-400/20">
                     <div>
@@ -402,68 +395,7 @@ check_auth('cashier');
         </div>
     </div>
 
-    <!-- Modal: Sale Entry Details -->
-    <div id="entryModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
-        <div class="bg-white/80 backdrop-blur-xl w-full max-w-[400px] rounded-3xl shadow-2xl p-6 anim-pop relative border border-white/50">
-            <button onclick="closeEntryModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            
-            <div class="flex items-center gap-3 mb-5">
-                <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                </div>
-                <h3 class="text-lg font-black text-slate-900 uppercase tracking-tighter">Configure Sale</h3>
-            </div>
-
-            <div class="space-y-3">
-                <div>
-                   <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Quantity to Sell</label>
-                   <div class="flex items-center gap-2">
-                       <input type="number" id="entry_qty" step="1" value="1" oninput="updateEntryTotal()" class="flex-1 px-4 py-2.5 bg-white/80 border border-slate-200 rounded-xl font-bold text-center text-lg text-blue-600 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm">
-                       <span id="entry_unit" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-3 py-2 rounded-lg border border-slate-200 min-w-[60px] text-center">Units</span>
-                   </div>
-                   <p id="entry_max" class="text-[9px] text-red-500 font-bold mt-1.5 uppercase tracking-tight ml-1"></p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 ml-1">Buying Price</label>
-                        <input type="number" id="entry_buying_price" readonly class="w-full px-2 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-400 outline-none text-[10px]">
-                    </div>
-                    <div>
-                        <label class="block text-[8px] font-black text-slate-600 uppercase tracking-widest mb-1 ml-1">Labeled Price</label>
-                        <input type="number" id="entry_labeled_price" readonly class="w-full px-2 py-2 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-600 outline-none text-[10px]">
-                    </div>
-                </div>
-                <!-- Hidden base price for discount calculations -->
-                <input type="hidden" id="entry_base_price">
-                
-                <div class="grid grid-cols-2 gap-3 pt-0.5">
-                    <div>
-                        <label class="block text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-1.5 ml-1">Estimated Selling Price</label>
-                        <input type="number" id="entry_price" step="0.01" oninput="syncFromPrice()" class="w-full px-3 py-2.5 bg-white border-2 border-blue-100 rounded-xl font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-red-500 uppercase tracking-widest mb-1.5 ml-1">Manual Discount</label>
-                        <input type="number" id="entry_discount" value="0" step="0.01" oninput="syncFromDiscount()" class="w-full px-3 py-2.5 bg-white border-2 border-red-50 rounded-xl font-bold text-red-500 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all shadow-sm">
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-slate-100 mt-1">
-                    <div class="flex justify-between items-center mb-1">
-                        <div>
-                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-0.5">Total Payable</p>
-                            <p id="entry_total" class="text-2xl font-black text-slate-950 tracking-tighter">Rs. 0.00</p>
-                        </div>
-                        <button onclick="addToCart()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all shadow-md shadow-blue-600/20">
-                            Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Modal: Sale Entry Details Removed -->
 
     <!-- Modal: New Customer -->
     <div id="newCustModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
@@ -608,7 +540,15 @@ check_auth('cashier');
                     custDropdown.appendChild(row);
                 });
             } else {
-                custDropdown.innerHTML = '<div class="px-4 py-3 text-xs text-slate-400 italic font-bold">No customer found. Try registering?</div>';
+                custDropdown.innerHTML = `
+                    <div class="px-4 py-4 text-center">
+                        <p class="text-[11px] text-slate-500 font-bold mb-3 uppercase tracking-widest">No customer found</p>
+                        <button type="button" onclick="custDropdown.style.display='none'; openNewCustomerModal(true);" class="btn-blue px-4 py-2 text-[10px] w-full flex items-center justify-center gap-2">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                            Add New Customer
+                        </button>
+                    </div>
+                `;
             }
             positionCustDropdown();
             custDropdown.style.display = 'block';
@@ -635,13 +575,12 @@ check_auth('cashier');
             document.getElementById('selectedCustPhone').innerText = c.contact;
             custDropdown.style.display = 'none';
             
-            setTimeout(() => {
                 if(isCheckingOut) {
-                    checkout();
+                    // Slight delay to ensure UI updates before showing popup again
+                    setTimeout(() => { checkout(); }, 100);
                 } else {
                     document.getElementById('prodSearch').focus();
                 }
-            }, 300);
         }
 
         function clearCustomer() {
@@ -652,7 +591,21 @@ check_auth('cashier');
             document.getElementById('custSearch').value = '';
         }
 
-        function openNewCustomerModal() { document.getElementById('newCustModal').classList.remove('hidden'); }
+        function openNewCustomerModal(useSearchValue = false) { 
+            const form = document.getElementById('newCustForm');
+            form.reset();
+            if (useSearchValue === true) {
+                const searchVal = document.getElementById('custSearch').value.trim();
+                if (searchVal) {
+                    if (/^[\d+\-\s()]+$/.test(searchVal)) {
+                        form.elements['contact'].value = searchVal;
+                    } else {
+                        form.elements['name'].value = searchVal;
+                    }
+                }
+            }
+            document.getElementById('newCustModal').classList.remove('hidden'); 
+        }
         function closeNewCustomerModal() { document.getElementById('newCustModal').classList.add('hidden'); }
 
         document.getElementById('newCustForm').onsubmit = async (e) => {
@@ -726,7 +679,7 @@ check_auth('cashier');
                             selectedProduct = p;
                             prodDropdown.style.display = 'none';
                             prodSearchInput.value = '';
-                            openEntryModal(b);
+                            addDirectlyToCart(p, b);
                         };
                         prodDropdown.appendChild(div);
                     });
@@ -809,8 +762,8 @@ check_auth('cashier');
                             <thead class="blue-gradient-header">
                                 <tr class="text-[10px] uppercase tracking-[0.1em]">
                                     <th class="px-5 py-4">Batch Details</th>
-                                    <th class="px-5 py-4 text-center">Retail Price</th>
-                                    <th class="px-5 py-4 text-center">Est. Sale</th>
+                                    <th class="px-5 py-4 text-center text-red-500">Retail Price</th>
+                                    <th class="px-5 py-4 text-center text-blue-600">Est. Sale</th>
                                     <th class="px-5 py-4 text-right">Available</th>
                                 </tr>
                             </thead>
@@ -849,7 +802,7 @@ check_auth('cashier');
                     `;
                     // Update the batch object with the locally adjusted qty for validation in openEntryModal
                     const bAdjusted = { ...b, current_qty: actualQty };
-                    tr.onclick = () => openEntryModal(bAdjusted);
+                    tr.onclick = () => addDirectlyToCart(selectedProduct, bAdjusted);
                     tbody.appendChild(tr);
                 });
                 
@@ -863,84 +816,82 @@ check_auth('cashier');
         }
 
         function closeBatchModal() { document.getElementById('batchModal').classList.add('hidden'); }
-        function closeEntryModal() { document.getElementById('entryModal').classList.add('hidden'); }
 
-        function openEntryModal(b) {
-            selectedBatch = b;
-            document.getElementById('entry_qty').value = 1;
-            document.getElementById('entry_buying_price').value = b.buying_price;
-            document.getElementById('entry_labeled_price').value = b.selling_price;
-            document.getElementById('entry_base_price').value = b.estimated_selling_price;
-            document.getElementById('entry_price').value = b.estimated_selling_price;
-            document.getElementById('entry_discount').value = "0.00";
-            document.getElementById('entry_unit').innerText = selectedProduct.oil_type === 'loose' ? 'Liters' : (selectedProduct.oil_type === 'can' ? 'Cans' : 'Units');
-            document.getElementById('entry_max').innerText = `Max available: ${b.current_qty}`;
-            updateEntryTotal();
-            document.getElementById('entryModal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('entry_qty').focus(), 100);
-        }
-
-        function syncFromPrice() {
-            const base = parseFloat(document.getElementById('entry_base_price').value) || 0;
-            const selling = parseFloat(document.getElementById('entry_price').value) || 0;
-            document.getElementById('entry_discount').value = (base - selling).toFixed(2);
-            updateEntryTotal();
-        }
-
-        function syncFromDiscount() {
-            const base = parseFloat(document.getElementById('entry_base_price').value) || 0;
-            const discount = parseFloat(document.getElementById('entry_discount').value) || 0;
-            document.getElementById('entry_price').value = (base - discount).toFixed(2);
-            updateEntryTotal();
-        }
-
-        function updateEntryTotal() {
-            const qty = parseFloat(document.getElementById('entry_qty').value) || 0;
-            const price = parseFloat(document.getElementById('entry_price').value) || 0;
-            const total = qty * price;
-            document.getElementById('entry_total').innerText = 'Rs. ' + numberFormat(total);
-        }
-
-        function addToCart() {
-            if(!selectedCustomer) { Swal.fire('Required', 'Please select a customer first.', 'warning'); document.getElementById('entryModal').classList.add('hidden'); return; }
-            
-            const qty = parseFloat(document.getElementById('entry_qty').value);
-            if(qty > selectedBatch.current_qty) { Swal.fire('Over Stock', 'Quantity exceeds available stock.', 'error'); return; }
-            if(qty <= 0) return;
-
-            const base_price = parseFloat(document.getElementById('entry_base_price').value);
-            const actual_price = parseFloat(document.getElementById('entry_price').value);
-            const per_item_discount = parseFloat(document.getElementById('entry_discount').value) || 0;
-            
-            const total_price = qty * actual_price;
-            const total_discount = qty * per_item_discount;
-
-            const existingIndex = cart.findIndex(item => item.batch_id === selectedBatch.id);
-            if(existingIndex > -1) {
-                cart[existingIndex].qty += qty;
-                cart[existingIndex].total_discount = cart[existingIndex].qty * cart[existingIndex].per_item_discount;
-                cart[existingIndex].total_price = (cart[existingIndex].qty * cart[existingIndex].unit_price) - cart[existingIndex].total_discount;
-            } else {
-                cart.push({
-                    product_id: selectedProduct.id,
-                    batch_id: selectedBatch.id,
-                    name: selectedProduct.name,
-                    brand: selectedProduct.brand,
-                    category: selectedProduct.type === 'oil' ? 'Oil' : 'Spare parts',
-                    oil_type: selectedProduct.type === 'oil' ? selectedProduct.oil_type : 'Unit',
-                    qty,
-                    unit_price: base_price, 
-                    per_item_discount: per_item_discount,
-                    total_discount: total_discount,
-                    total_price: total_price
-                });
+        function addDirectlyToCart(p, b) {
+            if(!selectedCustomer) { 
+                Swal.fire('Required', 'Please select a customer first.', 'warning'); 
+                return; 
             }
+            
+            const existingIndex = cart.findIndex(item => item.batch_id === b.id);
+            if(existingIndex > -1) {
+                if(cart[existingIndex].qty + 1 > b.current_qty) {
+                    Swal.fire('Over Stock', 'Quantity exceeds available stock.', 'error');
+                    return;
+                }
+                updateQty(existingIndex, 1);
+            } else {
+                if(1 > b.current_qty) {
+                    Swal.fire('Out of Stock', 'This batch is out of stock.', 'error');
+                    return;
+                }
 
-            renderCart();
-            document.getElementById('entryModal').classList.add('hidden');
+                const default_discount = b.selling_price - b.estimated_selling_price;
+                
+                cart.push({
+                    product_id: p.id,
+                    batch_id: b.id,
+                    max_qty: b.current_qty,
+                    name: p.name,
+                    brand: p.brand,
+                    category: p.type === 'oil' ? 'Oil' : 'Spare parts',
+                    oil_type: p.type === 'oil' ? p.oil_type : 'Unit',
+                    qty: 1,
+                    buying_price: b.buying_price,
+                    labeled_price: b.selling_price,
+                    est_selling_price: b.estimated_selling_price,
+                    unit_price: b.selling_price, /* Base price for math mapping to labeled_price */
+                    per_item_discount: default_discount,
+                    total_discount: default_discount * 1,
+                    total_price: (b.selling_price - default_discount) * 1
+                });
+                renderCart();
+            }
             document.getElementById('batchModal').classList.add('hidden');
-            document.getElementById('prodSearch').value = '';
-            prodDropdown.style.display = 'none';
+        }
+
+        function updateRowDiscount(index, newDiscount) {
+            const item = cart[index];
+            let parsed = parseFloat(newDiscount) || 0;
+            if (parsed < 0) parsed = 0;
+            item.per_item_discount = parsed;
+            item.total_discount = item.qty * item.per_item_discount;
+            item.total_price = (item.qty * item.unit_price) - item.total_discount;
+            renderCart();
+        }
+
+        function setQty(index, newQty) {
+            const item = cart[index];
+            let parsed = parseInt(newQty) || 1;
+            
+            if(parsed > item.max_qty) {
+                Swal.fire({
+                    title: 'Stock Limit Reached',
+                    text: `Only ${item.max_qty} available in this batch.`,
+                    icon: 'warning',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+                parsed = item.max_qty;
+            }
+            if(parsed < 1) parsed = 1;
+            
+            item.qty = parsed;
+            item.total_discount = item.qty * item.per_item_discount;
+            item.total_price = (item.qty * item.unit_price) - item.total_discount;
+            renderCart();
         }
 
         function renderCart() {
@@ -973,14 +924,14 @@ check_auth('cashier');
                 if(item.oil_type === 'can') typeIcon = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>`;
 
                 const div = document.createElement('div');
-                div.className = 'grid grid-cols-1 lg:grid-cols-12 items-center px-5 lg:px-6 py-5 lg:py-3.5 hover:bg-blue-50/20 transition-all gap-5 lg:gap-2 group border-b border-slate-100/50 animate-fade-in';
+                div.className = 'grid grid-cols-1 lg:grid-cols-12 items-center px-4 xl:px-6 py-5 lg:py-3 hover:bg-blue-50/20 transition-all gap-5 lg:gap-x-2 group border-b border-slate-100/50 animate-fade-in';
                 div.innerHTML = `
                     <!-- Product Info -->
-                    <div class="col-span-1 lg:col-span-3">
+                    <div class="col-span-1 lg:col-span-2 min-w-0">
                         <div class="flex flex-col">
-                            <p class="font-black text-slate-900 text-[15px] lg:text-[14px] leading-tight mb-1.5 uppercase tracking-tight">${item.name}</p>
-                            <div class="flex items-center gap-3">
-                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] opacity-80">${item.brand}</span>
+                            <p class="font-black text-slate-900 text-[13px] leading-tight mb-1 uppercase tracking-tight truncate" title="${item.name}">${item.name}</p>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest opacity-80">${item.brand}</span>
                                 <span class="lg:hidden flex items-center gap-1.5 text-[8px] font-black px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-500 uppercase">
                                     ${item.category}
                                 </span>
@@ -988,46 +939,64 @@ check_auth('cashier');
                         </div>
                     </div>
 
-                    <!-- Category / Type (Hidden on Mobile) -->
-                    <div class="hidden lg:flex col-span-2 items-center justify-center gap-3">
-                        <span class="flex items-center gap-1.5 text-[10px] font-black px-3 py-1.5 rounded-xl border ${item.category === 'Oil' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'} uppercase">
+                    <!-- Category / Type -->
+                    <div class="hidden lg:flex flex-col col-span-1 items-center justify-center gap-1.5">
+                        <span class="flex items-center gap-1 text-[9px] font-black px-2 py-0.5 rounded-md border ${item.category === 'Oil' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'} uppercase">
                             ${catIcon} ${item.category}
                         </span>
-                        <span class="font-black text-slate-400 text-[10px] uppercase tracking-widest">${typeLabel}</span>
+                        <span class="font-black text-slate-500 text-[10px] uppercase tracking-widest text-center">${typeLabel}</span>
                     </div>
 
-                    <!-- Net Price -->
-                    <div class="col-span-1 lg:col-span-2 text-left lg:text-right flex items-center justify-between lg:justify-end">
-                        <span class="lg:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Unit Price</span>
-                        <p class="text-[15px] lg:text-[16px] font-black text-slate-900 tracking-tighter">Rs. ${numberFormat(netPrice)}</p>
+                    <!-- Prices -->
+                    <div class="hidden lg:block col-span-1 text-right">
+                        <p class="text-[12px] font-mono font-bold text-slate-400 mt-0.5">${numberFormat(item.buying_price)}</p>
+                    </div>
+                    <div class="hidden lg:block col-span-1 text-right">
+                        <p class="text-[12px] font-mono font-bold text-slate-500 line-through decoration-red-400/50">${numberFormat(item.labeled_price)}</p>
+                    </div>
+                    <div class="hidden lg:block col-span-1 text-right">
+                        <p class="text-[13px] font-black text-slate-800">${numberFormat(item.est_selling_price)}</p>
                     </div>
 
-                    <!-- Quantity (Large Touch Target) -->
-                    <div class="col-span-1 lg:col-span-2 flex justify-center">
-                        <div class="flex items-center justify-center gap-4 lg:gap-3 bg-slate-50/50 p-1.5 lg:p-0 rounded-2xl lg:bg-transparent">
-                            <button onclick="updateQty(${index}, -1)" class="w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm active:scale-90">
-                                <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
-                            </button>
-                            <span class="font-black text-slate-900 w-10 lg:w-9 text-2xl lg:text-lg text-center tabular-nums">${item.qty}</span>
-                            <button onclick="updateQty(${index}, 1)" class="w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm active:scale-90">
-                                <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
-                            </button>
+                    <!-- Discount Input -->
+                    <div class="col-span-1 flex lg:justify-end">
+                        <div class="w-full lg:w-[68px] flex items-center lg:block">
+                            <span class="lg:hidden text-[10px] font-bold text-slate-500 uppercase w-20">Discount:</span>
+                            <div class="relative w-full">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-red-500 pointer-events-none pr-1">Rs.</span>
+                                <input type="number" step="0.01" value="${item.per_item_discount.toFixed(2)}" onchange="updateRowDiscount(${index}, this.value)" class="w-full text-right px-1.5 py-1.5 pl-[24px] bg-white border border-slate-300 rounded lg:rounded-md text-[13px] font-black outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 text-red-600 shadow-sm transition-all placeholder-red-300">
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="col-span-1 lg:col-span-2 flex justify-start lg:justify-center items-center">
+                        <span class="lg:hidden text-[10px] font-bold text-slate-500 uppercase w-20">Quantity:</span>
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="flex items-center justify-center gap-1 p-1 bg-slate-50 rounded-lg shadow-inner border border-slate-200">
+                                <button onclick="updateQty(${index}, -1)" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-md hover:bg-slate-200 hover:text-slate-800 transition-all shadow-sm active:scale-90" tabindex="-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
+                                </button>
+                                <input type="number" value="${item.qty}" min="1" max="${item.max_qty}" onchange="setQty(${index}, this.value)" class="font-black text-blue-700 w-12 text-center tabular-nums bg-transparent border-none outline-none text-[15px] m-0 p-0 focus:ring-0">
+                                <button onclick="updateQty(${index}, 1)" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-md hover:bg-slate-200 hover:text-slate-800 transition-all shadow-sm active:scale-90" tabindex="-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                                </button>
+                            </div>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest hidden lg:block">Max: ${item.max_qty} ${typeLabel}</span>
+                        </div>
+                        <span class="text-[9px] text-slate-400 font-bold ml-2 uppercase min-w-[30px] lg:hidden">${typeLabel}</span>
                     </div>
 
                     <!-- Line Total -->
-                    <div class="col-span-1 lg:col-span-2 text-left lg:text-right flex items-center justify-between lg:justify-end">
-                        <div class="lg:hidden flex flex-col">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Saved Info</span>
-                            <p class="text-[11px] font-black text-red-500 uppercase tracking-tighter italic">Off Rs.${numberFormat(item.total_discount)}</p>
-                        </div>
-                        <p class="text-[20px] lg:text-[19px] font-black text-blue-800 tracking-tighter leading-none">Rs. ${numberFormat(item.total_price)}</p>
+                    <div class="col-span-1 lg:col-span-2 text-right flex flex-col justify-center">
+                        <span class="lg:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 text-left">Total:</span>
+                        <p class="text-[16px] xl:text-[18px] font-black text-blue-700 tracking-tighter leading-none">${numberFormat(item.total_price)}</p>
                     </div>
 
                     <!-- Remove Action -->
-                    <div class="col-span-1 lg:col-span-1 flex justify-end lg:justify-center">
-                        <button onclick="removeFromCart(${index})" class="w-12 h-12 lg:w-10 lg:h-10 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500 rounded-2xl transition-all shadow-sm border border-slate-100 lg:border-transparent hover:shadow-red-500/20 active:scale-90">
-                             <svg class="w-6 h-6 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <div class="col-span-1 text-center flex justify-end lg:justify-center">
+                        <button onclick="removeFromCart(${index})" class="w-9 h-9 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500 rounded-lg transition-all shadow-sm border border-slate-100 bg-white hover:border-red-500">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
                 `;
@@ -1042,6 +1011,19 @@ check_auth('cashier');
             const item = cart[index];
             const newQty = parseFloat(item.qty) + delta;
             
+            if(newQty > item.max_qty) {
+                Swal.fire({
+                    title: 'Stock Limit Reached',
+                    text: `Only ${item.max_qty} available in this batch.`,
+                    icon: 'warning',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+                return;
+            }
+
             if(newQty <= 0) {
                 removeFromCart(index);
                 return;
@@ -1054,10 +1036,9 @@ check_auth('cashier');
         }
 
         function updateSummary(sub, disc) {
-            const final = sub - disc;
             document.getElementById('subtotal').innerText = 'Rs. ' + numberFormat(sub);
             document.getElementById('total_discount').innerText = 'Rs. ' + numberFormat(disc);
-            document.getElementById('final_payable').innerText = 'Rs. ' + numberFormat(final);
+            updatePaymentTotal();
         }
 
         function removeFromCart(index) {
@@ -1104,12 +1085,6 @@ check_auth('cashier');
             }
 
             isCheckingOut = false;
-            const sub = cart.reduce((a, b) => a + (b.qty * b.unit_price), 0);
-            const itemDisc = cart.reduce((a, b) => a + b.total_discount, 0); 
-
-            document.getElementById('pay_modal_total').innerText = 'Rs. ' + numberFormat(sub);
-            document.getElementById('pay_modal_item_disc').innerText = 'Rs. ' + numberFormat(itemDisc);
-            document.getElementById('wholesale_discount').value = 0;
             updatePaymentTotal();
             document.getElementById('paymentModal').classList.remove('hidden');
         }
@@ -1119,7 +1094,12 @@ check_auth('cashier');
             const itemDiscount = cart.reduce((a, b) => a + b.total_discount, 0);
             const wDiscount = parseFloat(document.getElementById('wholesale_discount').value) || 0;
             const final = (subTotal - itemDiscount) - wDiscount;
-            document.getElementById('final_pay_modal_total').innerText = 'Rs. ' + numberFormat(final);
+            
+            const finalEl = document.getElementById('final_payable');
+            if (finalEl) finalEl.innerText = 'Rs. ' + numberFormat(final);
+            
+            const pModalEl = document.getElementById('final_pay_modal_total');
+            if (pModalEl) pModalEl.innerText = 'Rs. ' + numberFormat(final);
         }
 
         function applyPercentageDiscount(pct) {
@@ -1132,55 +1112,66 @@ check_auth('cashier');
         }
 
         async function processPayment(payMethod) {
-            const sub = cart.reduce((a, b) => a + (b.qty * b.unit_price), 0);
-            const itemDiscount = cart.reduce((a, b) => a + b.total_discount, 0);
-            const wDiscount = parseFloat(document.getElementById('wholesale_discount').value) || 0;
-            const final = (sub - itemDiscount) - wDiscount;
+            Swal.fire({
+                title: 'Confirm Payment',
+                text: `Are you sure you want to complete this sale via ${payMethod.toUpperCase()}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#475569',
+                confirmButtonText: 'Yes, Complete Sale'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const sub = cart.reduce((a, b) => a + (b.qty * b.unit_price), 0);
+                    const itemDiscount = cart.reduce((a, b) => a + b.total_discount, 0);
+                    const wDiscount = parseFloat(document.getElementById('wholesale_discount').value) || 0;
+                    const final = (sub - itemDiscount) - wDiscount;
 
-            const fd = new FormData();
-            fd.append('customer_id', selectedCustomer.id);
-            fd.append('total_amount', sub);
-            fd.append('discount', itemDiscount + wDiscount); // Total discount = Item-wise + Wholesale
-            fd.append('final_amount', final);
-            fd.append('payment_method', payMethod);
-            fd.append('items', JSON.stringify(cart.map(i => ({
-                product_id: i.product_id,
-                batch_id: i.batch_id,
-                qty: i.qty,
-                unit_price: i.unit_price,
-                discount: i.total_discount,
-                total_price: i.total_price
-            }))));
+                    const fd = new FormData();
+                    fd.append('customer_id', selectedCustomer.id);
+                    fd.append('total_amount', sub);
+                    fd.append('discount', itemDiscount + wDiscount); // Total discount = Item-wise + Wholesale
+                    fd.append('final_amount', final);
+                    fd.append('payment_method', payMethod);
+                    fd.append('items', JSON.stringify(cart.map(i => ({
+                        product_id: i.product_id,
+                        batch_id: i.batch_id,
+                        qty: i.qty,
+                        unit_price: i.unit_price,
+                        discount: i.total_discount,
+                        total_price: i.total_price
+                    }))));
 
-            const data = await postAPI('submit_sale', fd);
-            if(data.success) {
-                const wDiscountForPrint = wDiscount; // Store for print
-                closePaymentModal();
-                printReceipt(data.sale_id, payMethod, wDiscountForPrint);
-                
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true
-                });
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Sale recorded successfully!'
-                });
+                    const data = await postAPI('submit_sale', fd);
+                    if(data.success) {
+                        const wDiscountForPrint = wDiscount; // Store for print
+                        closePaymentModal();
+                        document.getElementById('wholesale_discount').value = "0.00";
+                        printReceipt(data.sale_id, payMethod, wDiscountForPrint);
+                        
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            timerProgressBar: true
+                        });
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Sale recorded successfully!'
+                        });
 
-                clearCart();
-                clearCustomer();
-                updateTodayTotal();
-                
-                // Clear search inputs and results after sale
-                document.getElementById('prodSearch').value = '';
-                document.getElementById('prodList').innerHTML = '';
-                document.getElementById('prodList').classList.add('hidden');
-            } else {
-                Swal.fire('Error', data.message, 'error');
-            }
+                        clearCart();
+                        clearCustomer();
+                        updateTodayTotal();
+                        
+                        // Clear search inputs and results after sale
+                        document.getElementById('prodSearch').value = '';
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                }
+            });
         }
 
         function printReceipt(saleId, payMethod, wDiscount = 0) {

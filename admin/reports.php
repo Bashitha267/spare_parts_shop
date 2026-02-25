@@ -309,8 +309,8 @@ foreach($payment_summary_data as $row) {
             <!-- Total Sales -->
             <div class="blue-gradient-card p-10 rounded-[3rem] relative overflow-hidden flex flex-col justify-between min-h-[200px] text-white shadow-2xl group hover:scale-[1.02] transition-all">
                 <div class="relative z-10">
-                    <p class="text-[12px] font-black uppercase tracking-[0.5em] mb-4 opacity-70">Total Revenue</p>
-                    <h2 class="text-5xl font-black leading-tight tracking-widest">Rs. <?php echo number_format($total_approved_sales, 2); ?></h2>
+                    <p class="text-[9px] font-black uppercase tracking-[0.5em] mb-4 opacity-70">Total Revenue</p>
+                    <h2 class="text-2xl font-black leading-tight tracking-widest">Rs. <?php echo number_format($total_approved_sales, 2); ?></h2>
                 </div>
                 <div class="relative z-10 flex items-center gap-3">
                      <span class="text-[11px] font-black bg-white/15 px-5 py-2.5 rounded-2xl border border-white/20 uppercase tracking-widest backdrop-blur-md"><?php echo $total_approved_count; ?> Sales Approved</span>
@@ -322,7 +322,7 @@ foreach($payment_summary_data as $row) {
             <div class="bg-amber-600/90 p-10 rounded-[3rem] relative overflow-hidden flex flex-col justify-between min-h-[200px] text-white shadow-2xl group hover:scale-[1.02] transition-all border border-white/10 backdrop-blur-xl">
                 <div class="relative z-10">
                     <p class="text-[12px] font-black uppercase tracking-[0.5em] mb-4 opacity-70">Pending Cheques</p>
-                    <h2 class="text-4xl font-black leading-tight tracking-widest">Rs. <?php echo number_format($total_pending_cheque, 2); ?></h2>
+                    <h2 class="text-2xl font-black leading-tight tracking-widest">Rs. <?php echo number_format($total_pending_cheque, 2); ?></h2>
                 </div>
                 <div class="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center absolute bottom-8 right-8 border border-white/10 shadow-inner"><svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
             </div>
@@ -331,7 +331,7 @@ foreach($payment_summary_data as $row) {
             <div class="bg-rose-700/90 p-10 rounded-[3rem] relative overflow-hidden flex flex-col justify-between min-h-[200px] text-white shadow-2xl group hover:scale-[1.02] transition-all border border-white/10 backdrop-blur-xl">
                 <div class="relative z-10">
                     <p class="text-[12px] font-black uppercase tracking-[0.5em] mb-4 opacity-70">Pending Credits</p>
-                    <h2 class="text-4xl font-black leading-tight tracking-widest">Rs. <?php echo number_format($total_pending_credit, 2); ?></h2>
+                    <h2 class="text-2xl font-black leading-tight tracking-widest">Rs. <?php echo number_format($total_pending_credit, 2); ?></h2>
                 </div>
                 <div class="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center absolute bottom-8 right-8 border border-white/10 shadow-inner"><svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
             </div>
@@ -339,7 +339,7 @@ foreach($payment_summary_data as $row) {
             <div class="bg-slate-800 p-10 rounded-[3rem] relative overflow-hidden flex flex-col justify-between min-h-[200px] text-white shadow-2xl group hover:scale-[1.02] transition-all border border-white/10 backdrop-blur-xl">
                 <div class="relative z-10">
                     <p class="text-[12px] font-black uppercase tracking-[0.5em] mb-4 opacity-70">Cancelled Payments</p>
-                    <h2 class="text-4xl font-black leading-tight tracking-widest text-rose-400">Rs. <?php echo number_format($total_cancelled, 2); ?></h2>
+                    <h2 class="text-2xl font-black leading-tight tracking-widest text-rose-400">Rs. <?php echo number_format($total_cancelled, 2); ?></h2>
                 </div>
                 <div class="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center absolute bottom-8 right-8 border border-white/10 shadow-inner"><svg class="w-8 h-8 text-rose-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
             </div>
