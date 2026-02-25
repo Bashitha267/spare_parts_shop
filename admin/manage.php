@@ -146,23 +146,23 @@ $is_admin = ($_SESSION['role'] === 'admin');
                     <input type="text" id="searchInventory" autocomplete="off" class="block w-full pl-14 pr-6 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 text-sm font-bold" placeholder="Find product by name or barcode...">
                 </div>
 
-                <div class="flex items-center gap-4 w-full lg:w-auto">
-                    <select id="oilTypeFilter" class="flex-grow lg:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200">
+                <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+                    <select id="oilTypeFilter" class="flex-grow lg:flex-none px-4 md:px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200">
                         <option value="all">All Types</option>
                         <option value="can">Can</option>
                         <option value="loose">Loose</option>
                     </select>
-                    <select id="statusFilter" class="flex-grow lg:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200">
+                    <select id="statusFilter" class="flex-grow lg:flex-none px-4 md:px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200">
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
                         <option value="out_of_stock">Out of Stock</option>
                     </select>
-                    <select id="sortFilter" class="flex-grow lg:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200">
+                    <select id="sortFilter" class="flex-grow lg:flex-none px-4 md:px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200">
                         <option value="high_value">Value: High to Low</option>
                         <option value="low_value">Value: Low to High</option>
                         <option value="name_asc">Alphabetical (A-Z)</option>
                     </select>
-                    <button onclick="resetFilters()" title="Reset Filters" class="shrink-0 flex items-center gap-2 px-5 py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
+                    <button onclick="resetFilters()" title="Reset Filters" class="flex-grow lg:flex-none shrink-0 flex items-center justify-center gap-2 px-5 py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                         Reset
                     </button>
@@ -431,21 +431,52 @@ $is_admin = ($_SESSION['role'] === 'admin');
                 const data = await res.json();
                 oilDropdown.innerHTML = '';
                 oilActiveIdx = -1;
-                if (!data.suggestions.length) { oilDropdown.style.display = 'none'; return; }
-                data.suggestions.forEach(s => {
+                
+                if (data.suggestions.length > 0) {
+                    data.suggestions.forEach(s => {
+                        const el = document.createElement('div');
+                        el.className = 'suggest-item';
+                        el.innerHTML = `<div class="s-name">${s.name}</div><div class="s-meta">${s.barcode}${s.brand ? ' &nbsp;·&nbsp; ' + s.brand : ''}</div>`;
+                        el.onclick = () => {
+                            oilSearchInput.value = s.name;
+                            oilDropdown.style.display = 'none';
+                            loadInventory(1, s.name, currentStatus);
+                        };
+                        oilDropdown.appendChild(el);
+                    });
+                } else {
+                    // Show "Register New" button if nothing found
                     const el = document.createElement('div');
-                    el.className = 'suggest-item';
-                    el.innerHTML = `<div class="s-name">${s.name}</div><div class="s-meta">${s.barcode}${s.brand ? ' &nbsp;·&nbsp; ' + s.brand : ''}</div>`;
-                    el.onclick = () => {
-                        oilSearchInput.value = s.name;
-                        oilDropdown.style.display = 'none';
-                        loadInventory(1, s.name, currentStatus);
-                    };
+                    el.className = 'suggest-item no-res p-4';
+                    el.innerHTML = `
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 text-center">Found Nothing</p>
+                        <button onclick="openNewProductWithValue('${q.replace(/'/g, "\\'")}')" class="w-full py-3 bg-blue-50 text-blue-600 border-2 border-blue-200 rounded-xl text-[10px] font-black uppercase hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all flex items-center justify-center gap-2">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                            Register New Product
+                        </button>
+                    `;
                     oilDropdown.appendChild(el);
-                });
+                }
+                
                 positionOilDropdown();
                 oilDropdown.style.display = 'block';
             }
+
+            window.openNewProductWithValue = function(val) {
+                oilDropdown.style.display = 'none';
+                openModal('newProductModal');
+                const form = document.getElementById('newProductForm');
+                form.reset();
+                
+                // If value is all numeric and >= 8 chars, assume it's a barcode
+                if (/^\d+$/.test(val) && val.length >= 8) {
+                    document.getElementById('np_barcode').value = val;
+                    form.querySelector('[name="name"]').focus();
+                } else {
+                    form.querySelector('[name="name"]').value = val;
+                    document.getElementById('np_barcode').focus();
+                }
+            };
 
             document.getElementById('statusFilter').addEventListener('change', function() {
                 currentStatus = this.value;
@@ -535,7 +566,22 @@ $is_admin = ($_SESSION['role'] === 'admin');
             document.getElementById('grand_inventory_value').innerText = 'Rs. ' + parseFloat(data.grand_total_value || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
             if(data.products.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400">No products found.</td></tr>';
+                const searchQ = document.getElementById('searchInventory').value;
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-20 bg-slate-50/30">
+                            <div class="max-w-xs mx-auto">
+                                <p class="text-slate-400 font-bold text-sm mb-6 uppercase tracking-widest">No matching products found</p>
+                                ${searchQ ? `
+                                <button onclick="openNewProductWithValue('${searchQ.replace(/'/g, "\\'")}')" class="w-full py-5 bg-white text-blue-600 border-4 border-blue-50 border-dashed rounded-3xl font-black hover:border-blue-500 hover:text-blue-800 transition-all uppercase text-xs tracking-[0.2em] shadow-sm hover:shadow-xl flex items-center justify-center gap-3">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                                    Register This Product
+                                </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
 

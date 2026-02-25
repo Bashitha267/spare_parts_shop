@@ -105,31 +105,31 @@ check_auth('admin');
         
         <!-- Filters -->
         <div class="glass-card p-6 border-2 border-white flex flex-col md:flex-row gap-6 items-center">
-            <div class="flex flex-wrap items-center gap-4 w-full">
-                <div class="flex-grow md:flex-none">
+            <div class="flex flex-wrap items-end gap-4 w-full">
+                <div class="flex-grow sm:flex-none w-full sm:w-48">
                     <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Product Type</label>
-                    <select id="typeFilter" onchange="loadSales()" class="w-full md:w-48 px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
+                    <select id="typeFilter" onchange="loadSales()" class="w-full px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
                         <option value="all">All Products</option>
                         <option value="oil">Oil Only</option>
                         <option value="spare_part">Spare Parts Only</option>
                     </select>
                 </div>
 
-                <div class="flex-grow md:flex-none">
+                <div class="flex-grow sm:flex-none w-full sm:w-48">
                     <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Date</label>
-                    <input type="date" id="dateFilter" onchange="loadSales()" class="w-full md:w-48 px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
+                    <input type="date" id="dateFilter" onchange="loadSales()" class="w-full px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
                 </div>
 
-                <div class="flex-grow md:flex-none">
+                <div class="flex-grow sm:flex-none w-full sm:w-48">
                     <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Sort By</label>
-                    <select id="sortFilter" onchange="loadSales()" class="w-full md:w-48 px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
+                    <select id="sortFilter" onchange="loadSales()" class="w-full px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
                         <option value="most_sold">Most Sold Items</option>
                         <option value="least_sold">Least Sold Items</option>
                         <option value="highest_earning">Highest Earning</option>
                     </select>
                 </div>
 
-                <div class="flex-grow">
+                <div class="flex-grow w-full md:w-auto">
                     <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Quick Search</label>
                     <div class="relative" id="itemSearchWrapper">
                         <input type="text" id="searchInput" autocomplete="off" oninput="onItemSearchInput()" class="w-full px-6 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all pl-12" placeholder="Search by name or barcode...">
@@ -138,8 +138,8 @@ check_auth('admin');
                     </div>
                 </div>
 
-                <div class="flex-shrink-0 pt-6">
-                    <button onclick="resetFilters()" title="Reset Filters" class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
+                <div class="flex-shrink-0 w-full sm:w-auto">
+                    <button onclick="resetFilters()" title="Reset Filters" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                         Reset
                     </button>
@@ -159,6 +159,7 @@ check_auth('admin');
                             <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-center">Total Sold Qty</th>
                             <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-center">Current Inventory</th>
                             <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Total Earned (Rs.)</th>
+                            <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Total Profit (Rs.)</th>
                         </tr>
                     </thead>
                     <tbody id="salesTableBody" class="divide-y divide-slate-100">
@@ -234,7 +235,7 @@ check_auth('admin');
             const search = document.getElementById('searchInput').value;
 
             const tableBody = document.getElementById('salesTableBody');
-            tableBody.innerHTML = '<tr><td colspan="6" class="px-8 py-10 text-center text-slate-400 font-bold uppercase tracking-widest animate-pulse italic">Analyzing sale data...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="7" class="px-8 py-10 text-center text-slate-400 font-bold uppercase tracking-widest animate-pulse italic">Analyzing sale data...</td></tr>';
 
             try {
                 const response = await fetch(`item_sales_handler.php?action=fetch_item_sales&type=${type}&date=${date}&sort=${sort}&search=${encodeURIComponent(search)}`);
@@ -243,7 +244,7 @@ check_auth('admin');
                 if (result.success) {
                     tableBody.innerHTML = '';
                     if (result.data.length === 0) {
-                        tableBody.innerHTML = '<tr><td colspan="6" class="px-8 py-20 text-center text-slate-400 font-black uppercase tracking-[0.3em]">No sales recorded for this period</td></tr>';
+                        tableBody.innerHTML = '<tr><td colspan="7" class="px-8 py-20 text-center text-slate-400 font-black uppercase tracking-[0.3em]">No sales recorded for this period</td></tr>';
                         return;
                     }
 
@@ -287,7 +288,10 @@ check_auth('admin');
                                     </span>
                                 </td>
                                 <td class="px-8 py-3 text-right">
-                                    <p class="text-lg font-black text-blue-800 tracking-tighter">Rs. ${parseFloat(item.total_revenue).toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                                    <p class="text-sm font-black text-blue-800 tracking-tighter">Rs. ${parseFloat(item.total_revenue).toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                                </td>
+                                <td class="px-8 py-3 text-right">
+                                    <p class="text-lg font-black text-emerald-600 tracking-tighter">Rs. ${parseFloat(item.total_profit).toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
                                 </td>
                             </tr>
                         `;

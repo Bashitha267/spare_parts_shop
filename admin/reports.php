@@ -15,7 +15,48 @@ if(isset($_GET['export']) && $_GET['export'] === 'csv') {
     header('Content-Disposition: attachment; filename="'.$filename.'"');
     
     $output = fopen('php://output', 'w');
-    fputcsv($output, ['Sale ID', 'Customer', 'Date/Time', 'Method', 'Total', 'Status']);
+
+    // Fetch Summary Stats for the selected month
+    $stmt_stats = $pdo->prepare("
+        SELECT 
+            SUM(CASE WHEN LOWER(payment_method) = 'cash' AND LOWER(payment_status) = 'approved' THEN final_amount ELSE 0 END) as total_cash,
+            SUM(CASE WHEN LOWER(payment_method) = 'cheque' AND LOWER(payment_status) = 'approved' THEN final_amount ELSE 0 END) as total_cheque,
+            SUM(CASE WHEN LOWER(payment_method) = 'credit' AND LOWER(payment_status) = 'approved' THEN final_amount ELSE 0 END) as total_credit,
+            SUM(CASE WHEN LOWER(payment_status) = 'pending' THEN final_amount ELSE 0 END) as total_pending,
+            SUM(CASE WHEN LOWER(payment_status) = 'rejected' THEN final_amount ELSE 0 END) as total_cancelled,
+            SUM(CASE WHEN LOWER(payment_status) = 'approved' THEN final_amount ELSE 0 END) as total_sales
+        FROM sales 
+        WHERE DATE_FORMAT(created_at, '%Y-%m') = ?
+    ");
+    $stmt_stats->execute([$month]);
+    $stats = $stmt_stats->fetch(PDO::FETCH_ASSOC);
+
+    // Calculate monthly cost for profit
+    $stmt_profit = $pdo->prepare("
+        SELECT SUM(si.qty * b.buying_price) as cost 
+        FROM sale_items si 
+        JOIN sales s ON si.sale_id = s.id 
+        JOIN batches b ON si.batch_id = b.id 
+        WHERE DATE_FORMAT(s.created_at, '%Y-%m') = ? AND LOWER(s.payment_status) = 'approved'
+    ");
+    $stmt_profit->execute([$month]);
+    $total_monthly_cost = $stmt_profit->fetchColumn() ?: 0;
+    $total_monthly_profit = ($stats['total_sales'] ?? 0) - $total_monthly_cost;
+
+    // Write Summary Section
+    fputcsv($output, ["MONTHLY SALES REPORT - " . date('F Y', strtotime($month.'-01'))]);
+    fputcsv($output, []);
+    fputcsv($output, ["SUMMARY STATISTICS"]);
+    fputcsv($output, ["Total Sales (Approved)", number_format($stats['total_sales'] ?? 0, 2)]);
+    fputcsv($output, ["Total Estimated Profit", number_format($total_monthly_profit, 2)]);
+    fputcsv($output, ["Total Cash Collected", number_format($stats['total_cash'] ?? 0, 2)]);
+    fputcsv($output, ["Total Cheque (Approved)", number_format($stats['total_cheque'] ?? 0, 2)]);
+    fputcsv($output, ["Total Credit (Approved)", number_format($stats['total_credit'] ?? 0, 2)]);
+    fputcsv($output, ["Total Pending Amount", number_format($stats['total_pending'] ?? 0, 2)]);
+    fputcsv($output, ["Total Cancelled/Rejected", number_format($stats['total_cancelled'] ?? 0, 2)]);
+    fputcsv($output, []);
+    fputcsv($output, ["DETAILED TRANSACTIONS"]);
+    fputcsv($output, ['Sale ID', 'Customer', 'Date/Time', 'Method', 'Total (LKR)', 'Status']);
     
     $stmt = $pdo->prepare("SELECT s.*, c.name as cust_name FROM sales s LEFT JOIN customers c ON s.customer_id = c.id WHERE DATE_FORMAT(s.created_at, '%Y-%m') = ? ORDER BY s.created_at ASC");
     $stmt->execute([$month]);
@@ -336,35 +377,29 @@ foreach($payment_summary_data as $row) {
                 <div class="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center absolute bottom-8 right-8 border border-white/10 shadow-inner"><svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
             </div>
             <!-- Cancelled Payments -->
-            <div class="bg-slate-800 p-10 rounded-[3rem] relative overflow-hidden flex flex-col justify-between min-h-[200px] text-white shadow-2xl group hover:scale-[1.02] transition-all border border-white/10 backdrop-blur-xl">
-                <div class="relative z-10">
-                    <p class="text-[12px] font-black uppercase tracking-[0.5em] mb-4 opacity-70">Cancelled Payments</p>
-                    <h2 class="text-2xl font-black leading-tight tracking-widest text-rose-400">Rs. <?php echo number_format($total_cancelled, 2); ?></h2>
-                </div>
-                <div class="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center absolute bottom-8 right-8 border border-white/10 shadow-inner"><svg class="w-8 h-8 text-rose-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
-            </div>
+           
         </div>
 
         <!-- MIDDLE SECTION: FILTERING CONTROLS -->
-        <div class="glass-card p-8 flex flex-wrap gap-8 items-center border-b-4 border-blue-500/20 rounded-[2.5rem]">
-            <form class="flex flex-wrap gap-8 items-end w-full" id="filterForm">
-                <div class="space-y-3">
+        <div class="glass-card p-6 md:p-8 flex flex-wrap gap-8 items-center border-b-4 border-blue-500/20 rounded-[2.5rem]">
+            <form class="flex flex-wrap gap-6 md:gap-8 items-end w-full" id="filterForm">
+                <div class="space-y-3 flex-grow sm:flex-none w-full sm:w-auto">
                     <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Analysis Period Start</label>
-                    <input type="date" name="start_date" value="<?php echo $start_date; ?>" onchange="this.form.submit()" class="px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest border border-slate-200 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                    <input type="date" name="start_date" value="<?php echo $start_date; ?>" onchange="this.form.submit()" class="w-full px-6 md:px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest border border-slate-200 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
                 </div>
-                <div class="space-y-3">
+                <div class="space-y-3 flex-grow sm:flex-none w-full sm:w-auto">
                     <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Analysis Period End</label>
-                    <input type="date" name="end_date" value="<?php echo $end_date; ?>" onchange="this.form.submit()" class="px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest border border-slate-200 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                    <input type="date" name="end_date" value="<?php echo $end_date; ?>" onchange="this.form.submit()" class="w-full px-6 md:px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest border border-slate-200 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
                 </div>
-                <div class="flex-shrink-0 pt-6">
-                    <button type="submit" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.25em] transition-all shadow-lg shadow-blue-500/20 active:scale-95">Apply</button>
+                <div class="flex-shrink-0 w-full sm:w-auto">
+                    <button type="submit" class="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.25em] transition-all shadow-lg shadow-blue-500/20 active:scale-95">Apply</button>
                 </div>
                 <div class="h-12 w-px bg-slate-200 mx-2 hidden lg:block"></div>
-                <div class="flex gap-3">
-                    <button type="button" onclick="setRange('today')" class="px-6 py-3 bg-slate-100 hover:bg-blue-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all">Today</button>
-                    <button type="button" onclick="setRange('week')" class="px-6 py-3 bg-slate-100 hover:bg-blue-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all">This Week</button>
-                    <button type="button" onclick="setRange('month')" class="px-6 py-3 bg-slate-100 hover:bg-blue-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all">This Month</button>
-                    <button type="button" onclick="setRange('month'); document.getElementById('filterForm').submit();" class="px-6 py-3 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2">
+                <div class="flex flex-wrap gap-3 w-full lg:w-auto">
+                    <button type="button" onclick="setRange('today')" class="flex-grow sm:flex-none px-6 py-3 bg-slate-100 hover:bg-blue-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all">Today</button>
+                    <button type="button" onclick="setRange('week')" class="flex-grow sm:flex-none px-6 py-3 bg-slate-100 hover:bg-blue-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all">This Week</button>
+                    <button type="button" onclick="setRange('month')" class="flex-grow sm:flex-none px-6 py-3 bg-slate-100 hover:bg-blue-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all">This Month</button>
+                    <button type="button" onclick="setRange('month'); document.getElementById('filterForm').submit();" class="flex-grow sm:flex-none px-6 py-3 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                         Reset
                     </button>

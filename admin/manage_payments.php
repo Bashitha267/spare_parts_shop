@@ -127,21 +127,21 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
     <div class="colorful-overlay"></div>
     
     <nav class="glass-nav sticky top-0 z-50">
-        <div class="px-4 md:px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4">
+        <div class="px-4 md:px-6 py-4 flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto gap-4">
+            <div class="flex items-center gap-4 w-full sm:w-auto">
                 <a href="dashboard.php" class="p-2 hover:bg-slate-100 rounded-xl transition-all text-blue-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
                 <div>
                   <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Payment Management</h1>
-                  <p class="hidden sm:block text-[9px] text-slate-400 font-black uppercase tracking-[0.2em]">Approve Transactions \u0026 View History</p>
+                  <p class="hidden sm:block text-[9px] text-slate-800 font-black uppercase tracking-[0.2em]">Approve Transactions & View History</p>
                 </div>
             </div>
             
             <!-- Tab Switcher -->
-            <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
-                <button onclick="switchMainTab('approve')" id="main-tab-approve" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all tab-active">Approvals</button>
-                <button onclick="switchMainTab('history')" id="main-tab-history" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600">History</button>
+            <div class="flex w-full sm:w-auto bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                <button onclick="switchMainTab('approve')" id="main-tab-approve" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all tab-active text-black">Approvals</button>
+                <button onclick="switchMainTab('history')" id="main-tab-history" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-black hover:text-slate-600">History</button>
             </div>
         </div>
     </nav>
@@ -188,13 +188,13 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                 <input type="text" id="searchPayments" class="block w-full pl-14 pr-6 py-4 rounded-2xl outline-none transition-all placeholder:text-slate-400 text-sm font-bold bg-white border border-slate-200" placeholder="Search by TRX or Customer...">
             </div>
             <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-                <input type="date" id="dateFilterApprove" class="w-full lg:w-auto px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none border-slate-200 bg-white">
-                <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
-                    <button onclick="changeMethod('all')" id="tab-all" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all tab-active">All</button>
-                    <button onclick="changeMethod('cheque')" id="tab-cheque" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400">Cheques</button>
-                    <button onclick="changeMethod('credit')" id="tab-credit" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400">Credits</button>
+                <input type="date" id="dateFilterApprove" class="flex-grow lg:flex-none px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none border-slate-200 bg-white">
+                <div class="flex flex-grow sm:flex-none bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                    <button onclick="changeMethod('all')" id="tab-all" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all tab-active">All</button>
+                    <button onclick="changeMethod('cheque')" id="tab-cheque" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400">Cheques</button>
+                    <button onclick="changeMethod('credit')" id="tab-credit" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400">Credits</button>
                 </div>
-                <button onclick="loadPendingPayments()" class="p-4 bg-white border border-slate-200 rounded-2xl text-blue-600 hover:bg-slate-50 transition-all font-black">
+                <button onclick="loadPendingPayments()" class="flex-grow sm:flex-none p-4 bg-white border border-slate-200 rounded-2xl text-blue-600 hover:bg-slate-50 transition-all font-black flex justify-center items-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
             </div>

@@ -7,8 +7,11 @@ check_auth('admin');
 $inv_stmt = $pdo->query("SELECT SUM(current_qty * buying_price) FROM batches");
 $total_inventory = $inv_stmt->fetchColumn() ?: 0;
 
-$sales_stmt = $pdo->query("SELECT SUM(final_amount) FROM sales WHERE DATE(created_at) = CURDATE()");
+$sales_stmt = $pdo->query("SELECT SUM(final_amount) FROM sales WHERE DATE(created_at) = CURDATE() AND payment_status = 'approved'");
 $today_sales = $sales_stmt->fetchColumn() ?: 0;
+
+$pending_stmt = $pdo->query("SELECT SUM(final_amount) FROM sales WHERE DATE(created_at) = CURDATE() AND payment_status = 'pending'");
+$today_pending = $pending_stmt->fetchColumn() ?: 0;
 ?>
 
 <!DOCTYPE html>
@@ -72,6 +75,8 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-main min-h-screen relative">
@@ -82,25 +87,29 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
         <div class="px-4 md:px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
             <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Dashboard</h1>
             
-            <div class="flex items-center gap-4 md:gap-8">
+            <div class="flex items-center gap-3 overflow-x-auto no-scrollbar scroll-smooth">
                 <!-- Metrics Badges (Aligned Right) -->
-                <div class="hidden lg:flex items-center gap-4">
-                    <div class="px-5 py-2.5 bg-indigo-50 border-2 border-indigo-200 rounded-2xl flex flex-col items-end shadow-sm">
-                        <span class="text-[8px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1.5">Total Inventory</span>
-                        <span class="text-sm font-black text-indigo-800 leading-none">Rs. <?php echo number_format($total_inventory, 2); ?></span>
+                <div class="flex items-center gap-2 md:gap-4 flex-nowrap">
+                    <div class="px-3 md:px-5 py-2 md:py-2.5 bg-indigo-50 border-2 border-indigo-200 rounded-xl md:rounded-2xl flex flex-col items-end shadow-sm flex-shrink-0">
+                        <span class="text-[7px] md:text-[8px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1 md:mb-1.5 whitespace-nowrap">Inventory</span>
+                        <span class="text-xs md:text-sm font-black text-indigo-800 leading-none whitespace-nowrap">Rs. <?php echo number_format($total_inventory, 0); ?></span>
                     </div>
-                    <div class="px-5 py-2.5 bg-emerald-50 border-2 border-emerald-200 rounded-2xl flex flex-col items-end shadow-sm">
-                        <span class="text-[8px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1.5">Today's Sales</span>
-                        <span class="text-sm font-black text-emerald-800 leading-none">Rs. <?php echo number_format($today_sales, 2); ?></span>
+                    <div class="px-3 md:px-5 py-2 md:py-2.5 bg-emerald-50 border-2 border-emerald-200 rounded-xl md:rounded-2xl flex flex-col items-end shadow-sm flex-shrink-0">
+                        <span class="text-[7px] md:text-[8px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1 md:mb-1.5 whitespace-nowrap">Approved</span>
+                        <span class="text-xs md:text-sm font-black text-emerald-800 leading-none whitespace-nowrap">Rs. <?php echo number_format($today_sales, 0); ?></span>
+                    </div>
+                    <div class="px-3 md:px-5 py-2 md:py-2.5 bg-amber-50 border-2 border-amber-200 rounded-xl md:rounded-2xl flex flex-col items-end shadow-sm flex-shrink-0">
+                        <span class="text-[7px] md:text-[8px] font-black text-amber-400 uppercase tracking-widest leading-none mb-1 md:mb-1.5 whitespace-nowrap">Pending</span>
+                        <span class="text-xs md:text-sm font-black text-amber-800 leading-none whitespace-nowrap">Rs. <?php echo number_format($today_pending, 2); ?></span>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4 border-l border-slate-200 pl-8">
+                <div class="flex items-center gap-3 md:gap-4 border-l border-slate-200 pl-3 md:pl-8 flex-shrink-0">
                     <div class="hidden sm:block text-right">
-                        <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none mb-1">Administrator</p>
-                        <p class="text-xs font-bold text-slate-900"><?php echo $_SESSION['full_name']; ?></p>
+                        <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none mb-1">Admin</p>
+                        <p class="text-xs font-bold text-slate-900"><?php echo explode(' ', $_SESSION['full_name'])[0]; ?></p>
                     </div>
-                    <a href="../logout.php" class="text-xs font-black text-white bg-red-600 border-2 border-white px-5 py-2.5 rounded-xl hover:bg-red-700 hover:shadow-lg transition-all uppercase tracking-wider">Logout</a>
+                    <a href="../logout.php" class="text-[10px] font-black text-white bg-red-600 border-2 border-white px-3 md:px-5 py-2.5 rounded-xl hover:bg-red-700 hover:shadow-lg transition-all uppercase tracking-wider">Logout</a>
                 </div>
             </div>
         </div>
@@ -111,8 +120,7 @@ $today_sales = $sales_stmt->fetchColumn() ?: 0;
 
         <!-- Quick Actions -->
         <div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
 
 
                 <!-- Manage Oil Inventory -->

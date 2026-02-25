@@ -90,24 +90,24 @@ $draft_count = $draft_stmt->fetchColumn() ?: 0;
             </div>
             
             <div class="flex items-center gap-4 md:gap-8">
-                <!-- Metrics Badges (Aligned Right) -->
-                <div class="hidden lg:flex items-center gap-4">
-                    <div class="px-5 py-2 bg-indigo-50 border-2 border-indigo-200 rounded-2xl flex flex-col items-end shadow-sm">
-                        <span class="text-[8px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1">Total Inventory</span>
-                        <span class="text-xs font-black text-indigo-800 leading-none">Rs. <?php echo number_format($total_inventory, 2); ?></span>
+                <!-- Metrics Badges (Enabled on tablets) -->
+                <div class="hidden sm:flex items-center gap-3">
+                    <div class="px-3 sm:px-5 py-2 bg-indigo-50 border-2 border-indigo-200 rounded-2xl flex flex-col items-end shadow-sm">
+                        <span class="text-[7px] sm:text-[8px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1">Stock Value</span>
+                        <span class="text-[10px] sm:text-xs font-black text-indigo-800 leading-none">Rs. <?php echo number_format($total_inventory, 0); ?></span>
                     </div>
-                    <div class="px-5 py-2 bg-emerald-50 border-2 border-emerald-200 rounded-2xl flex flex-col items-end shadow-sm">
-                        <span class="text-[8px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1">Today's Sales</span>
-                        <span class="text-xs font-black text-emerald-800 leading-none">Rs. <?php echo number_format($today_sales, 2); ?></span>
+                    <div class="px-3 sm:px-5 py-2 bg-emerald-50 border-2 border-emerald-200 rounded-2xl flex flex-col items-end shadow-sm">
+                        <span class="text-[7px] sm:text-[8px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1">Today</span>
+                        <span class="text-[10px] sm:text-xs font-black text-emerald-800 leading-none">Rs. <?php echo number_format($today_sales, 0); ?></span>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4 border-l border-slate-200 pl-8">
-                    <div class="hidden sm:block text-right">
-                        <p class="text-[10px] text-slate-500 uppercase font-black text-white tracking-widest leading-none mb-1">Operator</p>
+                <div class="flex items-center gap-4 border-l border-slate-200 pl-4 sm:pl-8">
+                    <div class="hidden md:block text-right">
+                        <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none mb-1">Operator</p>
                         <p class="text-xs font-bold text-slate-900"><?php echo $_SESSION['full_name']; ?></p>
                     </div>
-                    <a href="../logout.php" class="text-xs font-black text-white bg-red-600 border-2 border-white px-5 py-2.5 rounded-xl hover:bg-red-700 hover:shadow-lg transition-all uppercase tracking-wider">Logout</a>
+                    <a href="../logout.php" class="text-[10px] font-black text-white bg-red-600 border-2 border-white px-4 sm:px-5 py-2.5 rounded-xl hover:bg-red-700 hover:shadow-lg transition-all uppercase tracking-wider">Logout</a>
                 </div>
             </div>
         </div>
@@ -118,56 +118,56 @@ $draft_count = $draft_stmt->fetchColumn() ?: 0;
             <h2 class="text-4xl font-white text-white tracking-tighter mb-2 font-bold">Good Day, <?php echo explode(' ', $_SESSION['full_name'])[0]; ?>!</h2>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8">
             <!-- POS Card -->
-            <a href="pos.php" class="p-10 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden text-center">
-                <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
-                    <svg class="w-14 h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            <a href="pos.php" class="p-6 sm:p-10 blue-gradient-card rounded-[2rem] sm:rounded-[2.5rem] group relative overflow-hidden text-center">
+                <div class="mb-4 sm:mb-5 group-hover:rotate-12 transition-transform relative z-10">
+                    <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 </div>
-                <h3 class="text-sm font-black text-white uppercase tracking-[0.2em] relative z-10">Point of Sale</h3>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">POS Terminal</h3>
             </a>
 
             <!-- Pending Drafts Card -->
-            <a href="pending.php" class="p-10 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden text-center">
+            <a href="pending.php" class="p-6 sm:p-10 blue-gradient-card rounded-[2rem] sm:rounded-[2.5rem] group relative overflow-hidden text-center">
                 <?php if($draft_count > 0): ?>
-                <span class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-rose-500 text-white text-[11px] font-black rounded-full shadow-lg border-2 border-white animate-pulse"><?php echo $draft_count; ?></span>
+                <span class="absolute top-3 right-3 sm:top-4 sm:right-4 w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center bg-rose-500 text-white text-[9px] sm:text-[11px] font-black rounded-full shadow-lg border-2 border-white animate-pulse"><?php echo $draft_count; ?></span>
                 <?php endif; ?>
-                <div class="mb-5 group-hover:-rotate-12 transition-transform relative z-10">
-                    <svg class="w-14 h-14 icon-svg border-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <div class="mb-4 sm:mb-5 group-hover:-rotate-12 transition-transform relative z-10">
+                    <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg border-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h3 class="text-sm font-black text-white uppercase tracking-[0.2em] relative z-10">Pending Drafts</h3>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Saved Drafts</h3>
             </a>
 
             <!-- History Card -->
-            <a href="history.php" class="p-10 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden text-center">
-                <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
-                    <svg class="w-14 h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <a href="history.php" class="p-6 sm:p-10 blue-gradient-card rounded-[2rem] sm:rounded-[2.5rem] group relative overflow-hidden text-center">
+                <div class="mb-4 sm:mb-5 group-hover:rotate-12 transition-transform relative z-10">
+                    <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
-                <h3 class="text-sm font-black text-white uppercase tracking-[0.2em] relative z-10">Sales History</h3>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Sales History</h3>
             </a>
 
             <!-- Oil Registry Card -->
-            <a href="../admin/manage.php" class="p-10 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden text-center">
-                <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
-                    <svg class="w-14 h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.675.337a4 4 0 01-2.574.345l-3.113-.623a4 4 0 01-2.574-.345l-.675-.337a6 6 0 00-3.86-.517l-2.387.477a2 2 0 00-1.022.547V21a1 1 0 001 1h12a1 1 0 001-1v-5.572zM12 11V5.05a.5.5 0 01.09-.3l3.29-4.41a.5.5 0 01.82 0l3.29 4.41c.06.08.09.18.09.3V11h-7.5z"/></svg>
+            <a href="../admin/manage.php" class="p-6 sm:p-10 blue-gradient-card rounded-[2rem] sm:rounded-[2.5rem] group relative overflow-hidden text-center">
+                <div class="mb-4 sm:mb-5 group-hover:rotate-12 transition-transform relative z-10">
+                    <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.675.337a4 4 0 01-2.574.345l-3.113-.623a4 4 0 01-2.574-.345l-.675-.337a6 6 0 00-3.86-.517l-2.387.477a2 2 0 00-1.022.547V21a1 1 0 001 1h12a1 1 0 001-1v-5.572zM12 11V5.05a.5.5 0 01.09-.3l3.29-4.41a.5.5 0 01.82 0l3.29 4.41c.06.08.09.18.09.3V11h-7.5z"/></svg>
                 </div>
-                <h3 class="text-sm font-black text-white uppercase tracking-[0.2em] relative z-10">Oil Registry</h3>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Registry</h3>
             </a>
 
             <!-- Spare Parts Card -->
-            <a href="../admin/manage_spare.php" class="p-10 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden text-center">
-                <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
-                    <svg class="w-14 h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <a href="../admin/manage_spare.php" class="p-6 sm:p-10 blue-gradient-card rounded-[2rem] sm:rounded-[2.5rem] group relative overflow-hidden text-center">
+                <div class="mb-4 sm:mb-5 group-hover:rotate-12 transition-transform relative z-10">
+                    <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </div>
-                <h3 class="text-sm font-black text-white uppercase tracking-[0.2em] relative z-10">Spare Parts</h3>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Spare Parts</h3>
             </a>
 
             <!-- Arrival History Card -->
-            <a href="../admin/batchHistroy.php" class="p-10 blue-gradient-card rounded-[2.5rem] group relative overflow-hidden text-center">
-                <div class="mb-5 group-hover:rotate-12 transition-transform relative z-10">
-                    <svg class="w-14 h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            <a href="../admin/batchHistroy.php" class="p-6 sm:p-10 blue-gradient-card rounded-[2rem] sm:rounded-[2.5rem] group relative overflow-hidden text-center">
+                <div class="mb-4 sm:mb-5 group-hover:rotate-12 transition-transform relative z-10">
+                    <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 </div>
-                <h3 class="text-sm font-black text-white uppercase tracking-[0.2em] relative z-10">Arrival History</h3>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Arrivals</h3>
             </a>
         </div>
     </main>

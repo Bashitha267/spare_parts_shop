@@ -70,8 +70,8 @@ check_auth('admin');
     <div class="colorful-overlay"></div>
     
     <nav class="glass-nav sticky top-0 z-30">
-        <div class="px-4 md:px-8 py-4 flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-6">
+        <div class="px-4 md:px-8 py-4 flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto gap-6 mt-4 sm:mt-0">
+            <div class="flex items-center gap-6 w-full sm:w-auto">
                 <a href="dashboard.php" class="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
@@ -80,9 +80,9 @@ check_auth('admin');
                    <p class="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] mt-0.5">Control Security Clearances</p>
                 </div>
             </div>
-            <div class="flex gap-3">
-                <button onclick="openCashierModal('admin')" class="bg-slate-900 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black hover:bg-slate-800 transition-all shadow-xl shadow-slate-500/20 uppercase tracking-widest ring-4 ring-slate-900/10">+ New Admin Access</button>
-                <button onclick="openCashierModal('cashier')" class="bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">+ New Cashier Access</button>
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <button onclick="openCashierModal('admin')" class="w-full sm:w-auto bg-slate-900 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black hover:bg-slate-800 transition-all shadow-xl shadow-slate-500/20 uppercase tracking-widest ring-4 ring-slate-900/10">+ New Admin Access</button>
+                <button onclick="openCashierModal('cashier')" class="w-full sm:w-auto bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">+ New Cashier Access</button>
             </div>
         </div>
     </nav>

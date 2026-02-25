@@ -47,11 +47,13 @@ if ($action === 'fetch_item_sales') {
                 p.oil_type,
                 p.brand,
                 SUM(si.qty) as total_qty,
-                SUM(si.qty * si.unit_price) as total_revenue,
-                COALESCE((SELECT SUM(b.current_qty) FROM batches b WHERE b.product_id = p.id), 0) as current_stock
+                SUM(si.total_price) as total_revenue,
+                SUM(si.total_price - (si.qty * b.buying_price)) as total_profit,
+                COALESCE((SELECT SUM(bat.current_qty) FROM batches bat WHERE bat.product_id = p.id AND bat.is_active = 1), 0) as current_stock
             FROM sale_items si
             JOIN sales s ON si.sale_id = s.id
             JOIN products p ON si.product_id = p.id
+            JOIN batches b ON si.batch_id = b.id
             $whereSql
             GROUP BY p.id
             ORDER BY $orderBy";
@@ -90,11 +92,13 @@ if ($action === 'export_excel') {
     $sql = "SELECT 
                 p.name, p.barcode, p.type, p.oil_type, p.brand,
                 SUM(si.qty) as total_qty,
-                SUM(si.qty * si.unit_price) as total_revenue,
-                (SELECT SUM(b.current_qty) FROM batches b WHERE b.product_id = p.id) as current_stock
+                SUM(si.total_price) as total_revenue,
+                SUM(si.total_price - (si.qty * b.buying_price)) as total_profit,
+                (SELECT SUM(bat.current_qty) FROM batches bat WHERE bat.product_id = p.id AND bat.is_active = 1) as current_stock
             FROM sale_items si
             JOIN sales s ON si.sale_id = s.id
             JOIN products p ON si.product_id = p.id
+            JOIN batches b ON si.batch_id = b.id
             $whereSql
             GROUP BY p.id
             ORDER BY total_qty DESC";
@@ -107,7 +111,7 @@ if ($action === 'export_excel') {
     header('Content-Disposition: attachment; filename="Item_Sales_Report_' . date('Y-m-d') . '.csv"');
     
     $output = fopen('php://output', 'w');
-    fputcsv($output, ['Product Name', 'Barcode', 'Type', 'Category', 'Brand', 'Sold Qty', 'Total Earned', 'Current Stock']);
+    fputcsv($output, ['Product Name', 'Barcode', 'Type', 'Category', 'Brand', 'Sold Qty', 'Total Revenue', 'Total Profit', 'Current Stock']);
     
     foreach ($data as $row) {
         fputcsv($output, [
@@ -118,6 +122,7 @@ if ($action === 'export_excel') {
             $row['brand'],
             $row['total_qty'],
             number_format($row['total_revenue'], 2, '.', ''),
+            number_format($row['total_profit'], 2, '.', ''),
             $row['current_stock'] ?: 0
         ]);
     }

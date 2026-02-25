@@ -174,9 +174,9 @@ check_auth('admin');
                 <input type="text" id="search" autocomplete="off" placeholder="Locate by ID, Name or Contact..." class="w-full pl-16 pr-6 py-4 rounded-2xl text-sm font-bold placeholder:text-slate-300">
             </div>
             <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
-                <input type="date" id="date_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none">
+                <input type="date" id="date_filter" class="flex-grow md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none">
                 
-                <select id="method_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
+                <select id="method_filter" class="flex-grow md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
                     <option value="all">All Methods</option>
                     <option value="cash">Cash</option>
                     <option value="card">Card</option>
@@ -184,24 +184,26 @@ check_auth('admin');
                     <option value="credit">Credit</option>
                 </select>
 
-                <select id="status_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
+                <select id="status_filter" class="flex-grow md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
                     <option value="all">Pay Status</option>
                     <option value="approved">Approved</option>
                     <option value="pending">Pending</option>
                     <option value="rejected">Rejected</option>
                 </select>
 
-                <select id="order_status_filter" class="flex-1 md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
+                <select id="order_status_filter" class="flex-grow md:flex-none px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-slate-200">
                     <option value="all">Order Status</option>
                     <option value="completed">Completed</option>
                     <option value="pending">Drafted/Pending</option>
                 </select>
 
-                <button onclick="resetFilters()" class="px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex flex-row gap-2 border border-slate-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                    Reset
-                </button>
-                <button onclick="loadHistory()" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:shadow-lg transition-all active:scale-95 flex flex-row gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Refresh</button>
+                <div class="flex w-full md:w-auto gap-3">
+                    <button onclick="resetFilters()" class="flex-1 md:flex-none px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Reset
+                    </button>
+                    <button onclick="loadHistory()" class="flex-1 md:flex-none px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Refresh</button>
+                </div>
             </div>
         </div>
 

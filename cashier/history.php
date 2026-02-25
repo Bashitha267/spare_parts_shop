@@ -143,48 +143,47 @@ check_auth('cashier');
 <body class="bg-main min-h-screen relative">
     <div class=""></div>
 
-    <!-- Nav -->
-    <nav class="glass-nav fixed w-full z-30 top-0">
-        <div class="px-4 md:px-6 py-3 flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-3">
+    <nav class="glass-nav sticky top-0 z-30">
+        <div class="px-4 md:px-6 py-3 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto gap-4">
+            <div class="flex items-center gap-3 w-full md:w-auto">
                 <a href="dashboard.php" class="p-2 hover:bg-blue-50 rounded-xl transition-all text-blue-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
                 <div>
-                    <h1 class="text-sm font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    <h1 class="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                         Sales History
                     </h1>
-                    <p class="text-[9px] text-slate-600 font-bold uppercase tracking-widest">All your past sales</p>
+                    <p class="text-[8px] sm:text-[9px] text-slate-600 font-bold uppercase tracking-widest">All past sales</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 md:gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
                 <!-- Total Today -->
-                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-2 rounded-xl flex items-center gap-2.5 shadow-lg shadow-blue-500/20">
-                    <div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 sm:gap-2.5 shadow-lg shadow-blue-500/20 shrink-0">
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/10 flex items-center justify-center">
+                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <div>
-                        <p class="text-[8px] font-black text-white/70 uppercase tracking-widest leading-none">Today</p>
-                        <p id="today_total" class="text-xs md:text-sm font-black text-white leading-none mt-0.5">Rs. 0.00</p>
+                        <p class="text-[7px] font-black text-white/70 uppercase tracking-widest leading-none">Today</p>
+                        <p id="today_total" class="text-[10px] sm:text-xs md:text-sm font-black text-white leading-none mt-0.5 whitespace-nowrap">Rs. 0.00</p>
                     </div>
                 </div>
 
                 <!-- Approved -->
-                <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl flex items-center gap-2.5">
-                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 sm:gap-2.5 shrink-0">
+                    <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                     <div>
-                        <p class="text-[8px] font-black opacity-60 uppercase tracking-widest leading-none">Approved</p>
-                        <p id="today_approved" class="text-xs md:text-sm font-black leading-none mt-0.5">Rs. 0.00</p>
+                        <p class="text-[7px] font-black opacity-60 uppercase tracking-widest leading-none">Apprv.</p>
+                        <p id="today_approved" class="text-[10px] sm:text-xs md:text-sm font-black leading-none mt-0.5 whitespace-nowrap">Rs. 0.00</p>
                     </div>
                 </div>
 
                 <!-- Pending -->
-                <div class="bg-rose-50 text-rose-700 border border-rose-200 px-4 py-2 rounded-xl flex items-center gap-2.5">
-                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="bg-rose-50 text-rose-700 border border-rose-200 px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 sm:gap-2.5 shrink-0">
+                    <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <div>
-                        <p class="text-[8px] font-black opacity-60 uppercase tracking-widest leading-none">Pending</p>
-                        <p id="today_pending" class="text-xs md:text-sm font-black leading-none mt-0.5">Rs. 0.00</p>
+                        <p class="text-[7px] font-black opacity-60 uppercase tracking-widest leading-none">Pend.</p>
+                        <p id="today_pending" class="text-[10px] sm:text-xs md:text-sm font-black leading-none mt-0.5 whitespace-nowrap">Rs. 0.00</p>
                     </div>
                 </div>
             </div>
@@ -192,58 +191,58 @@ check_auth('cashier');
     </nav>
     <div class="pt-32 px-3 md:px-6 max-w-7xl mx-auto animate-fade relative z-10 pb-8">
         <!-- Summary Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-8">
             <!-- Cash -->
-            <div class="glass-card p-6 border-l-4 border-emerald-500 shadow-xl shadow-emerald-500/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-emerald-500 transition-colors">Cash</p>
-                <h3 id="card_cash" class="text-xl font-black text-emerald-600 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-4 sm:p-6 border-l-4 border-emerald-500 shadow-xl shadow-emerald-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-emerald-500 transition-colors">Cash</p>
+                <h3 id="card_cash" class="text-base sm:text-xl font-black text-emerald-600 tracking-tighter">Rs. 0.00</h3>
             </div>
             <!-- Card -->
-            <div class="glass-card p-6 border-l-4 border-indigo-500 shadow-xl shadow-indigo-500/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-indigo-500 transition-colors">Card</p>
-                <h3 id="card_card" class="text-xl font-black text-indigo-600 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-4 sm:p-6 border-l-4 border-indigo-500 shadow-xl shadow-indigo-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-indigo-500 transition-colors">Card</p>
+                <h3 id="card_card" class="text-base sm:text-xl font-black text-indigo-600 tracking-tighter">Rs. 0.00</h3>
             </div>
             <!-- Approved Credit -->
-            <div class="glass-card p-6 border-l-4 border-blue-500 shadow-xl shadow-blue-500/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-blue-500 transition-colors">Apprv. Credit</p>
-                <h3 id="card_app_credit" class="text-xl font-black text-blue-600 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-4 sm:p-6 border-l-4 border-blue-500 shadow-xl shadow-blue-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-blue-500 transition-colors">App. Credit</p>
+                <h3 id="card_app_credit" class="text-base sm:text-xl font-black text-blue-600 tracking-tighter">Rs. 0.00</h3>
             </div>
             <!-- Approved Cheque -->
-            <div class="glass-card p-6 border-l-4 border-amber-500 shadow-xl shadow-amber-500/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-amber-500 transition-colors">Apprv. Cheque</p>
-                <h3 id="card_app_cheque" class="text-xl font-black text-amber-600 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-4 sm:p-6 border-l-4 border-amber-500 shadow-xl shadow-amber-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-amber-500 transition-colors">App. Cheque</p>
+                <h3 id="card_app_cheque" class="text-base sm:text-xl font-black text-amber-600 tracking-tighter">Rs. 0.00</h3>
             </div>
             <!-- Pending Credit -->
-            <div class="glass-card p-6 border-l-4 border-rose-400 shadow-xl shadow-rose-400/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-rose-500 transition-colors">Pend. Credit</p>
-                <h3 id="card_pend_credit" class="text-xl font-black text-rose-500 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-4 sm:p-6 border-l-4 border-rose-400 shadow-xl shadow-rose-400/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-rose-500 transition-colors">Pend. Credit</p>
+                <h3 id="card_pend_credit" class="text-base sm:text-xl font-black text-rose-500 tracking-tighter">Rs. 0.00</h3>
             </div>
             <!-- Pending Cheque -->
-            <div class="glass-card p-6 border-l-4 border-orange-400 shadow-xl shadow-orange-400/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-orange-500 transition-colors">Pend. Cheque</p>
-                <h3 id="card_pend_cheque" class="text-xl font-black text-orange-500 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-4 sm:p-6 border-l-4 border-orange-400 shadow-xl shadow-orange-400/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-orange-500 transition-colors">Pend. Cheque</p>
+                <h3 id="card_pend_cheque" class="text-base sm:text-xl font-black text-orange-500 tracking-tighter">Rs. 0.00</h3>
             </div>
         </div>
 
         <!-- Filter Card -->
         <div class="glass-card p-4 md:p-6 mb-8 mt-2 relative z-20">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                <div class="md:col-span-1 relative" id="searchWrapper">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Search</label>
-                    <input type="text" id="searchInput" autocomplete="off" placeholder="Cust. Name or Phone" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
+                <div class="sm:col-span-2 md:col-span-1 relative" id="searchWrapper">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Search Records</label>
+                    <input type="text" id="searchInput" autocomplete="off" placeholder="Name or Contact..." class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block p-3 outline-none transition-all font-bold placeholder:text-slate-300">
                     <div id="suggestDropdown" class="suggest-dropdown" style="display:none"></div>
                 </div>
                 <div class="md:col-span-1">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">From Date</label>
-                    <input type="date" id="dateFrom" onchange="loadSales(1)" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">From Date</label>
+                    <input type="date" id="dateFrom" onchange="loadSales(1)" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block p-3 outline-none transition-all font-bold">
                 </div>
                 <div class="md:col-span-1">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">To Date</label>
-                    <input type="date" id="dateTo" onchange="loadSales(1)" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">To Date</label>
+                    <input type="date" id="dateTo" onchange="loadSales(1)" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block p-3 outline-none transition-all font-bold">
                 </div>
                 <div class="md:col-span-1">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Payment Method</label>
-                    <select id="paymentMethod" onchange="loadSales(1)" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Payment Mode</label>
+                    <select id="paymentMethod" onchange="loadSales(1)" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block p-3 outline-none transition-all font-bold">
                         <option value="">All Methods</option>
                         <option value="cash">Cash</option>
                         <option value="card">Card</option>
@@ -252,11 +251,11 @@ check_auth('cashier');
                     </select>
                 </div>
                 <div class="md:col-span-1 flex gap-2">
-                    <button onclick="resetFilters()" title="Reset" class="flex-1 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black hover:bg-slate-200 transition-all uppercase tracking-widest border border-slate-200 flex items-center justify-center gap-2 py-3">
+                    <button onclick="resetFilters()" title="Reset" class="flex-grow bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black hover:bg-slate-200 transition-all uppercase tracking-widest border border-slate-200 flex items-center justify-center gap-2 py-3.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        Reset
+                        <span class="md:hidden lg:inline">Reset</span>
                     </button>
-                    <button onclick="loadSales(1)" class="flex-1 bg-blue-600 text-white rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest py-3 ring-4 ring-blue-600/10">
+                    <button onclick="loadSales(1)" class="flex-grow bg-blue-600 text-white rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest py-3.5 ring-4 ring-blue-600/10">
                         Refresh
                     </button>
                 </div>

@@ -119,46 +119,46 @@ check_auth('cashier');
     <!-- Main Content -->
     <main class="h-screen max-h-screen flex flex-col relative z-20 overflow-hidden">
         <!-- Top Navigation Bar -->
-        <header class="blue-gradient-header px-4 md:px-6 py-2 flex flex-col sm:flex-row items-center justify-between shadow-lg z-20 gap-3 sm:gap-0 border-b border-white/10">
-            <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-8 text-sm font-medium text-white/70">
-                <div class="flex items-center gap-4">
-                    <a href="dashboard.php" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white" title="Dashboard">
+        <header class="blue-gradient-header px-4 md:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between shadow-lg z-20 gap-3 sm:gap-0 border-b border-white/10">
+            <div class="flex items-center justify-between w-full sm:w-auto gap-3 md:gap-8 text-sm font-medium text-white/70">
+                <div class="flex items-center gap-3">
+                    <a href="dashboard.php" class="p-2 hover:bg-white/10 rounded-xl transition-colors text-white/80 hover:text-white" title="Dashboard">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </a>
-                    <button onclick="openDraftsModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors border border-blue-400 shadow-sm" title="Saved Drafts">
+                    <button onclick="openDraftsModal()" class="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-400 transition-colors border border-blue-400 shadow-sm" title="Saved Drafts">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="hidden sm:inline text-[9px] font-black uppercase tracking-widest text-white">Drafts</span>
+                        <span class="hidden xs:inline text-[10px] font-black uppercase tracking-widest text-white">Drafts</span>
                     </button>
-                    <div class="flex items-center gap-2 px-2 py-1 bg-white/10 rounded-md">
+                    <div class="flex items-center gap-2 px-2.5 py-1.5 bg-white/10 rounded-lg">
                         <span id="draft_saving_indicator" class="w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50"></span>
                         <span id="draft_status_text" class="font-bold uppercase tracking-widest text-[9px] text-white/90">Online</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md">
                         <svg class="w-3.5 h-3.5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span id="header_date" class="text-[10px] font-bold text-white"></span>
+                        <span id="header_date" class="text-[10px] font-bold text-white uppercase"></span>
                     </div>
-                    <div class="flex items-center gap-1.5">
+                    <div class="hidden xs:flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md">
                         <svg class="w-3.5 h-3.5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span id="header_time" class="text-[10px] font-bold text-white"></span>
                     </div>
                 </div>
             </div>
             
-            <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-8">
-                <div class="text-right hidden sm:block">
+            <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-8 border-t border-white/10 sm:border-t-0 pt-2 sm:pt-0">
+                <div class="text-right hidden md:block">
                     <p class="text-[8px] text-white/60 font-bold uppercase tracking-widest leading-none mb-1">Operator</p>
                     <p class="text-[11px] font-bold text-white uppercase truncate max-w-[120px]"><?php echo $_SESSION['full_name']; ?></p>
                 </div>
-                <div class="h-8 w-px bg-white/20 hidden sm:block"></div>
-                <div class="flex items-center gap-3 px-3 py-1.5 backdrop-blur-md border border-white/20 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div class="hidden sm:block h-8 w-px bg-white/20"></div>
+                <div class="flex-grow sm:flex-none flex items-center gap-3 px-4 py-2 backdrop-blur-md border border-white/20 rounded-xl shadow-sm hover:shadow-md transition-shadow bg-white/5">
                     <div class="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-blue-600 shadow-lg shadow-white/20">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <div class="text-right">
+                    <div class="text-right flex-grow">
                         <p class="text-[8px] font-black text-white/70 uppercase tracking-widest leading-none mb-1">Today's Sales</p>
-                        <p id="today_total" class="text-xs font-black text-white leading-none tracking-tight">LKR 0.00</p>
+                        <p id="today_total" class="text-[13px] font-black text-white leading-none tracking-tight">LKR 0.00</p>
                     </div>
                 </div>
             </div>

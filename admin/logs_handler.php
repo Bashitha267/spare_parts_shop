@@ -21,6 +21,19 @@ if ($action === 'fetch_logs') {
             $params[] = "%$search%";
         }
 
+        $from_date = $_GET['from_date'] ?? '';
+        $to_date = $_GET['to_date'] ?? '';
+
+        if (!empty($from_date)) {
+            $whereClause .= " AND DATE(sl.created_at) >= ? ";
+            $params[] = $from_date;
+        }
+
+        if (!empty($to_date)) {
+            $whereClause .= " AND DATE(sl.created_at) <= ? ";
+            $params[] = $to_date;
+        }
+
         $type = $_GET['type'] ?? '';
         if ($type === 'inventory') {
             $whereClause .= " AND sl.action IN ('Activate Batch', 'Deactivate Batch', 'Update Registry', 'Delete Item', 'New Item Added', 'New Batch Added')";

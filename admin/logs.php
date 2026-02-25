@@ -103,18 +103,32 @@ check_auth('admin');
                 </div>
             </div>
             
-            <div class="flex items-center gap-4">
-                <div class="relative" id="logSearchWrapper">
-                    <input type="text" id="logSearch" autocomplete="off" class="pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none w-64" placeholder="Search logs...">
+        <div class="px-4 md:px-8 py-4 flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto gap-4">
+            <div class="flex items-center gap-6 w-full sm:w-auto">
+                <a href="dashboard.php" class="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </a>
+                <div>
+                   <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">System Logs</h1>
+                   <p class="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] mt-0.5">Audit Activity Trail</p>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                <div class="relative flex-grow sm:flex-none" id="logSearchWrapper">
+                    <input type="text" id="logSearch" autocomplete="off" class="w-full sm:w-64 pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Search logs...">
                     <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     <div id="logSuggestDropdown" class="suggest-dropdown" style="display:none"></div>
                 </div>
-                <button onclick="resetLogFilters()" title="Reset" class="flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black hover:bg-slate-200 transition-all uppercase tracking-widest border border-slate-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                    Reset
-                </button>
-                <button onclick="loadLogs(1)" class="bg-blue-600 text-white px-8 py-2.5 rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">Refresh</button>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="resetLogFilters()" title="Reset" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black hover:bg-slate-200 transition-all uppercase tracking-widest border border-slate-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Reset
+                    </button>
+                    <button onclick="loadLogs(1)" class="flex-1 sm:flex-none bg-blue-600 text-white px-8 py-2.5 rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest ring-4 ring-blue-600/10">Refresh</button>
+                </div>
             </div>
+        </div>
         </div>
     </nav>
 
