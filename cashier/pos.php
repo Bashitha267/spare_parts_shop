@@ -274,17 +274,17 @@ check_auth('cashier');
                                 </div>
                                 <!-- Bill Discount -->
                                 <div class="text-right">
-                                    <div class="flex items-center justify-end gap-1.5 mb-1.5">
-                                        <p class="text-[8px] font-black text-red-500 uppercase tracking-widest">Bill Dis.</p>
+                                    <div class="flex items-center justify-end gap-2 mb-2">
+                                        <p class="text-[10px] font-black text-red-500 uppercase tracking-widest">Bill Dis.</p>
                                         <div class="flex gap-1">
-                                            <button onclick="applyPercentageDiscount(5)" class="px-1.5 py-0.5 bg-white border border-slate-200 hover:border-red-500 hover:text-red-600 text-[8px] font-black text-slate-600 rounded transition-colors shadow-sm focus:outline-none">5%</button>
-                                            <button onclick="applyPercentageDiscount(10)" class="px-1.5 py-0.5 bg-white border border-slate-200 hover:border-red-500 hover:text-red-600 text-[8px] font-black text-slate-600 rounded transition-colors shadow-sm focus:outline-none">10%</button>
-                                            <button onclick="applyPercentageDiscount(20)" class="px-1.5 py-0.5 bg-white border border-slate-200 hover:border-red-500 hover:text-red-600 text-[8px] font-black text-slate-600 rounded transition-colors shadow-sm focus:outline-none">20%</button>
+                                            <button onclick="applyPercentageDiscount(5)" class="px-2 py-1 bg-white border border-slate-200 hover:border-red-500 hover:text-red-600 text-[10px] font-black text-slate-600 rounded transition-colors shadow-sm focus:outline-none">5%</button>
+                                            <button onclick="applyPercentageDiscount(10)" class="px-2 py-1 bg-white border border-slate-200 hover:border-red-500 hover:text-red-600 text-[10px] font-black text-slate-600 rounded transition-colors shadow-sm focus:outline-none">10%</button>
+                                            <button onclick="applyPercentageDiscount(20)" class="px-2 py-1 bg-white border border-slate-200 hover:border-red-500 hover:text-red-600 text-[10px] font-black text-slate-600 rounded transition-colors shadow-sm focus:outline-none">20%</button>
                                         </div>
                                     </div>
-                                    <div class="relative w-28 ml-auto">
-                                        <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-red-400 pointer-events-none">Rs.</span>
-                                        <input type="number" id="wholesale_discount" value="0.00" step="0.01" oninput="updatePaymentTotal()" class="w-full pl-7 pr-2 py-1 bg-white border-2 border-red-100 focus:border-red-500 rounded-md font-black text-[13px] text-right text-red-600 outline-none transition-all shadow-inner">
+                                    <div class="relative w-36 ml-auto">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-bold text-red-400 pointer-events-none">Rs.</span>
+                                        <input type="number" id="wholesale_discount" value="0.00" step="0.01" oninput="updatePaymentTotal()" class="w-full pl-10 pr-3 py-1.5 bg-white border-2 border-red-100 focus:border-red-500 rounded-lg font-black text-[20px] text-right text-red-600 outline-none transition-all shadow-inner leading-none">
                                     </div>
                                 </div>
                                 <div class="text-right min-w-[100px] pl-4 border-l border-slate-200/50 hidden md:block">
@@ -960,7 +960,7 @@ check_auth('cashier');
 
                     <!-- Discount Input -->
                     <div class="col-span-1 flex lg:justify-end">
-                        <div class="w-full lg:w-[68px] flex items-center lg:block">
+                        <div class="w-full lg:w-[90px] flex items-center lg:block">
                             <span class="lg:hidden text-[10px] font-bold text-slate-500 uppercase w-20">Discount:</span>
                             <div class="relative w-full">
                                 <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-red-500 pointer-events-none pr-1">Rs.</span>
