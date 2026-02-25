@@ -54,7 +54,8 @@ if ($action === 'fetch_items') {
 
 if ($action === 'fetch') {
     $search = $_GET['search'] ?? '';
-    $date = $_GET['date'] ?? '';
+    $from = $_GET['from'] ?? '';
+    $to = $_GET['to'] ?? '';
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $limit = 10;
     $offset = ($page - 1) * $limit;
@@ -70,9 +71,16 @@ if ($action === 'fetch') {
         $params[] = "%$search%";
     }
     
-    if ($date) {
-        $whereClause .= " AND DATE(s.created_at) = ? ";
-        $params[] = $date;
+    if ($from && $to) {
+        $whereClause .= " AND DATE(s.created_at) BETWEEN ? AND ? ";
+        $params[] = $from;
+        $params[] = $to;
+    } elseif ($from) {
+        $whereClause .= " AND DATE(s.created_at) >= ? ";
+        $params[] = $from;
+    } elseif ($to) {
+        $whereClause .= " AND DATE(s.created_at) <= ? ";
+        $params[] = $to;
     }
 
     $method = $_GET['method'] ?? 'all';
@@ -127,7 +135,8 @@ if ($action === 'fetch') {
 }
 
 if ($action === 'fetch_summaries') {
-    $date = $_GET['date'] ?? date('Y-m-d');
+    $from = $_GET['from'] ?? date('Y-m-d');
+    $to = $_GET['to'] ?? date('Y-m-d');
     
     $summaries = [
         'cash' => 0,
@@ -140,11 +149,11 @@ if ($action === 'fetch_summaries') {
 
     $query = "SELECT payment_method, payment_status, SUM(final_amount) as total 
               FROM sales 
-              WHERE DATE(created_at) = ? AND status = 'completed'
+              WHERE DATE(created_at) BETWEEN ? AND ? AND status = 'completed'
               GROUP BY payment_method, payment_status";
     
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$date]);
+    $stmt->execute([$from, $to]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($results as $row) {
