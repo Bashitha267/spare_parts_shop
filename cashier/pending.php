@@ -85,7 +85,6 @@ function numberFormat($val) {
                 </a>
                 <div>
                     <h1 class="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                         Pending Drafts
                     </h1>
                     <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Orders waiting for completion</p>
@@ -112,12 +111,18 @@ function numberFormat($val) {
         <?php else: ?>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php foreach ($drafts as $d): ?>
-                    <a href="pos.php?draft_id=<?php echo $d['id']; ?>" class="glass-card p-6 border-2 border-white shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_40px_-10px_rgba(37,99,235,0.15)] transition-all duration-300 hover:-translate-y-1.5 group block relative overflow-hidden">
+                    <div id="draft-card-<?php echo $d['id']; ?>" class="glass-card p-6 border-2 border-white shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_40px_-10px_rgba(37,99,235,0.15)] transition-all duration-300 hover:-translate-y-1.5 group block relative overflow-hidden flex flex-col">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 rounded-bl-[4rem] -z-10 group-hover:from-blue-500/10 group-hover:scale-110 transition-all duration-500"></div>
                         
                         <div class="flex justify-between items-start mb-6">
-                            <div>
-                                <span class="text-[8px] font-black uppercase tracking-[0.2em] text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-lg mb-3 inline-block shadow-sm">Draft ID: <?php echo $d['id']; ?></span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <span class="text-[8px] font-black uppercase tracking-[0.2em] text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-lg shadow-sm">ID: <?php echo $d['id']; ?></span>
+                                    <button onclick="deleteDraft(<?php echo $d['id']; ?>)" class="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg border border-red-100 transition-all group/del" title="Delete Draft">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        <span class="text-[9px] font-black uppercase tracking-widest">Delete</span>
+                                    </button>
+                                </div>
                                 <h4 class="text-base font-black text-slate-800 uppercase tracking-tighter leading-tight group-hover:text-blue-600 transition-colors"><?php echo htmlspecialchars($d['cust_name'] ?: 'Walk-in Customer'); ?></h4>
                                 <?php if ($d['cust_name']): ?>
                                     <p class="text-[10px] text-slate-500 font-bold mt-1.5 tracking-wider uppercase"><?php echo htmlspecialchars($d['cust_contact']); ?></p>
@@ -130,17 +135,74 @@ function numberFormat($val) {
                                 <span class="text-[8px] font-black uppercase text-slate-400 tracking-widest block mb-1">Total Payable</span>
                                 <p class="text-xl font-black text-slate-900 leading-none tracking-tighter group-hover:text-blue-600 transition-colors">Rs. <?php echo numberFormat($d['final_amount']); ?></p>
                             </div>
-                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-lg group-hover:shadow-blue-600/30">
+                            <a href="pos.php?draft_id=<?php echo $d['id']; ?>" class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm hover:shadow-lg hover:shadow-blue-600/30">
                                 <svg class="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </div>
+                            </a>
                         </div>
                         <div class="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
                             <span><?php echo date('M d, Y', strtotime($d['created_at'])); ?></span>
                             <span><?php echo date('h:i A', strtotime($d['created_at'])); ?></span>
                         </div>
-                    </a>
+                    </div>
                 <?php endforeach; ?>
             </div>
+
+            <script>
+                async function deleteDraft(id) {
+                    const result = await Swal.fire({
+                        title: 'Delete Draft?',
+                        text: "This will permanently remove the draft and return all items to inventory stock.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Yes, Delete it!',
+                        cancelButtonText: 'Cancel',
+                        background: '#ffffff'
+                    });
+
+                    if (result.isConfirmed) {
+                        try {
+                            const formData = new FormData();
+                            formData.append('action', 'discard_draft');
+                            formData.append('draft_id', id);
+
+                            const response = await fetch('sales_handler.php', {
+                                method: 'POST',
+                                body: formData
+                            });
+                            
+                            const data = await response.json();
+                            
+                            if (data.success) {
+                                const card = document.getElementById(`draft-card-${id}`);
+                                card.style.opacity = '0';
+                                card.style.transform = 'scale(0.95)';
+                                setTimeout(() => {
+                                    card.remove();
+                                    if (document.querySelectorAll('[id^="draft-card-"]').length === 0) {
+                                        window.location.reload();
+                                    }
+                                }, 300);
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted',
+                                    text: 'Draft removed and stock restored.',
+                                    timer: 1500,
+                                    showConfirmButton: false,
+                                    toast: true,
+                                    position: 'top-end'
+                                });
+                            } else {
+                                Swal.fire('Error', data.message || 'Failed to delete draft', 'error');
+                            }
+                        } catch (error) {
+                            Swal.fire('Error', 'Connection failed', 'error');
+                        }
+                    }
+                }
+            </script>
         <?php endif; ?>
     </main>
 </body>

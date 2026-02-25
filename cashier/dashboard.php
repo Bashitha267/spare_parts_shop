@@ -138,7 +138,7 @@ $draft_count = $draft_stmt->fetchColumn() ?: 0;
                 <div class="mb-4 sm:mb-5 group-hover:-rotate-12 transition-transform relative z-10">
                     <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg border-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Saved Drafts</h3>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Pending Sales</h3>
             </a>
 
             <!-- History Card -->
@@ -154,7 +154,7 @@ $draft_count = $draft_stmt->fetchColumn() ?: 0;
                 <div class="mb-4 sm:mb-5 group-hover:rotate-12 transition-transform relative z-10">
                     <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.675.337a4 4 0 01-2.574.345l-3.113-.623a4 4 0 01-2.574-.345l-.675-.337a6 6 0 00-3.86-.517l-2.387.477a2 2 0 00-1.022.547V21a1 1 0 001 1h12a1 1 0 001-1v-5.572zM12 11V5.05a.5.5 0 01.09-.3l3.29-4.41a.5.5 0 01.82 0l3.29 4.41c.06.08.09.18.09.3V11h-7.5z"/></svg>
                 </div>
-                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Registry</h3>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Oil inventory</h3>
             </a>
 
             <!-- Spare Parts Card -->
@@ -162,7 +162,7 @@ $draft_count = $draft_stmt->fetchColumn() ?: 0;
                 <div class="mb-4 sm:mb-5 group-hover:rotate-12 transition-transform relative z-10">
                     <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </div>
-                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Spare Parts</h3>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Spare Parts inventory</h3>
             </a>
 
             <!-- Arrival History Card -->

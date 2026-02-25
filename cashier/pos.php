@@ -111,15 +111,26 @@ check_auth('cashier');
         .pos-name-item:hover, .pos-name-item.name-active { background: #eff6ff; }
         .pos-name-item .pname { font-size: 12px; font-weight: 900; color: #0f172a; text-transform: uppercase; letter-spacing: 0.02em; }
         .pos-name-item .pbar  { font-size: 9px; font-family: monospace; color: #94a3b8; font-weight: 600; }
+
+        @media (max-width: 640px) {
+            .pos-dropdown {
+                left: 10px !important;
+                right: 10px !important;
+                width: calc(100% - 20px) !important;
+            }
+            .glass-panel {
+                border-radius: 0.75rem;
+            }
+        }
     </style>
 </head>
-<body class="bg-main h-screen overflow-hidden flex flex-col relative ">
+<body class="bg-main h-[100dvh] overflow-hidden flex flex-col relative ">
     <div class="colorful-overlay"></div>
     
     <!-- Main Content -->
-    <main class="h-screen max-h-screen flex flex-col relative z-20 overflow-hidden">
+    <main class="h-[100dvh] max-h-[100dvh] flex flex-col relative z-20 overflow-hidden">
         <!-- Top Navigation Bar -->
-        <header class="blue-gradient-header px-4 md:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between shadow-lg z-20 gap-3 sm:gap-0 border-b border-white/10">
+        <header class="blue-gradient-header px-4 md:px-6 py-2.5 flex flex-row items-center justify-between shadow-lg z-20 gap-3 border-b border-white/10">
             <div class="flex items-center justify-between w-full sm:w-auto gap-3 md:gap-8 text-sm font-medium text-white/70">
                 <div class="flex items-center gap-3">
                     <a href="dashboard.php" class="p-2 hover:bg-white/10 rounded-xl transition-colors text-white/80 hover:text-white" title="Dashboard">
@@ -127,11 +138,11 @@ check_auth('cashier');
                     </a>
                     <button onclick="openDraftsModal()" class="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-400 transition-colors border border-blue-400 shadow-sm" title="Saved Drafts">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="hidden xs:inline text-[10px] font-black uppercase tracking-widest text-white">Drafts</span>
+                        <span class="hidden sm:inline text-[10px] font-black uppercase tracking-widest text-white">Drafts</span>
                     </button>
                     <button onclick="window.location.reload()" class="flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 transition-colors border border-emerald-500 shadow-sm" title="Start New Sale">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                        <span class="hidden xs:inline text-[10px] font-black uppercase tracking-widest text-white">New Sale</span>
+                        <span class="hidden sm:inline text-[10px] font-black uppercase tracking-widest text-white">New Sale</span>
                     </button>
                     <div class="flex items-center gap-2 px-2.5 py-1.5 bg-white/10 rounded-lg">
                         <span id="draft_saving_indicator" class="w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50"></span>
@@ -143,26 +154,26 @@ check_auth('cashier');
                         <svg class="w-3.5 h-3.5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         <span id="header_date" class="text-[10px] font-bold text-white uppercase"></span>
                     </div>
-                    <div class="hidden xs:flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md">
+                    <div class="hidden sm:flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md">
                         <svg class="w-3.5 h-3.5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span id="header_time" class="text-[10px] font-bold text-white"></span>
                     </div>
                 </div>
             </div>
             
-            <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-8 border-t border-white/10 sm:border-t-0 pt-2 sm:pt-0">
-                <div class="text-right hidden md:block">
+            <div class="flex items-center justify-end sm:justify-between w-full sm:w-auto gap-4 md:gap-8 border-t border-white/10 sm:border-t-0 pt-2 sm:pt-0">
+                <div class="text-right hidden sm:block">
                     <p class="text-[8px] text-white/60 font-bold uppercase tracking-widest leading-none mb-1">Operator</p>
                     <p class="text-[11px] font-bold text-white uppercase truncate max-w-[120px]"><?php echo $_SESSION['full_name']; ?></p>
                 </div>
-                <div class="hidden sm:block h-8 w-px bg-white/20"></div>
-                <div class="flex-grow sm:flex-none flex items-center gap-3 px-4 py-2 backdrop-blur-md border border-white/20 rounded-xl shadow-sm hover:shadow-md transition-shadow bg-white/5">
-                    <div class="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-blue-600 shadow-lg shadow-white/20">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="hidden md:block h-8 w-px bg-white/20"></div>
+                <div class="flex items-center gap-3 px-3 py-1.5 backdrop-blur-md border border-white/20 rounded-xl shadow-sm bg-white/5">
+                    <div class="w-6 h-6 rounded-lg bg-white flex items-center justify-center text-blue-600">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <div class="text-right flex-grow">
-                        <p class="text-[8px] font-black text-white/70 uppercase tracking-widest leading-none mb-1">Today's Sales</p>
-                        <p id="today_total" class="text-[13px] font-black text-white leading-none tracking-tight">LKR 0.00</p>
+                    <div class="text-right">
+                        <p class="text-[7px] font-black text-white/70 uppercase tracking-widest leading-none mb-0.5">Today Sales</p>
+                        <p id="today_total" class="text-[11px] font-black text-white leading-none tracking-tight">LKR 0</p>
                     </div>
                 </div>
             </div>
@@ -253,8 +264,8 @@ check_auth('cashier');
                 </div>
 
                 <!-- Summary Row (Fixed Bottom) -->
-                <div class="absolute bottom-0 left-0 right-0 px-4 md:px-8 py-3 md:py-4 bg-white/95 backdrop-blur-3xl border-t border-slate-200/80 z-30 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)]">
-                    <div class="flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-8">
+                <div class="absolute bottom-0 left-0 right-0 px-3 md:px-8 py-2 md:py-4 bg-white/95 backdrop-blur-3xl border-t border-slate-200/80 z-30 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)]">
+                    <div class="flex flex-col lg:flex-row justify-between items-center gap-2 lg:gap-8">
                         <div class="flex-1 hidden xl:flex items-center">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
@@ -267,17 +278,17 @@ check_auth('cashier');
                             </div>
                         </div>
                         
-                        <div class="w-full lg:w-auto flex flex-col md:flex-row items-center gap-4 md:gap-8 lg:gap-10">
-                            <div class="flex items-center justify-center md:justify-end gap-5 lg:gap-8 w-full md:w-auto">
+                        <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-2 sm:gap-6 lg:gap-10">
+                            <div class="flex items-center justify-center sm:justify-end gap-4 lg:gap-8 w-full sm:w-auto">
                                 <!-- Gross Subtotal & Item Discount -->
                                 <div class="hidden sm:flex items-center gap-6 border-r border-slate-200/50 pr-6">
                                     <div class="text-right">
-                                        <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Gross Subtotal</p>
-                                        <p id="subtotal" class="text-sm font-black text-slate-700 tracking-tight">Rs. 0.00</p>
+                                        <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Gross</p>
+                                        <p id="subtotal" class="text-[11px] font-black text-slate-700 tracking-tight">Rs. 0.00</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-[8px] font-black text-red-400 uppercase tracking-widest mb-0.5">Item Discount</p>
-                                        <p id="total_discount" class="text-sm font-black text-red-500 tracking-tight">Rs. 0.00</p>
+                                        <p class="text-[8px] font-black text-red-400 uppercase tracking-widest mb-0.5">Disc.</p>
+                                        <p id="total_discount" class="text-[11px] font-black text-red-500 tracking-tight">Rs. 0.00</p>
                                     </div>
                                 </div>
                                 <!-- Bill Discount -->
@@ -295,15 +306,15 @@ check_auth('cashier');
                                         <input type="number" id="wholesale_discount" value="0.00" step="0.01" oninput="updatePaymentTotal()" class="w-full pl-10 pr-3 py-1.5 bg-white border-2 border-red-100 focus:border-red-500 rounded-lg font-black text-[20px] text-right text-red-600 outline-none transition-all shadow-inner leading-none">
                                     </div>
                                 </div>
-                                <div class="text-right min-w-[100px] pl-4 border-l border-slate-200/50 hidden md:block">
+                                <div class="text-right min-w-[100px] pl-4 border-l border-slate-200/50 flex flex-col">
                                     <p class="text-[9px] font-black text-blue-600 uppercase tracking-tight mb-0.5 opacity-80">Net Payable</p>
-                                    <p id="final_payable" class="text-2xl font-black text-blue-700 tracking-tighter leading-none">Rs. 0.00</p>
+                                    <p id="final_payable" class="text-xl md:text-2xl font-black text-blue-700 tracking-tighter leading-none">Rs. 0.00</p>
                                 </div>
                             </div>
                             
-                            <div class="flex gap-3 w-full md:w-auto">
-                                <button onclick="discardCart()" class="flex-1 md:flex-none px-6 py-3 bg-slate-50 text-slate-400 rounded-xl font-black text-[10px] hover:bg-red-50 hover:text-red-500 border border-slate-100 transition-all uppercase tracking-widest shadow-sm">Discard</button>
-                                <button onclick="checkout()" class="flex-1 md:flex-none px-10 py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] hover:bg-blue-700 transition-all uppercase tracking-[0.2em] shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-[0.98] border border-blue-500/50">Complete Order</button>
+                            <div class="flex gap-2 w-full sm:w-auto">
+                                <button onclick="discardCart()" class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-slate-50 text-slate-400 rounded-xl font-black text-[10px] hover:bg-red-50 hover:text-red-500 border border-slate-100 transition-all uppercase tracking-widest shadow-sm">Discard</button>
+                                <button onclick="checkout()" class="flex-1 sm:flex-none px-6 sm:px-10 py-2.5 bg-blue-600 text-white rounded-xl font-black text-[10px] hover:bg-blue-700 transition-all uppercase tracking-[0.2em] shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-[0.98] border border-blue-500/50">Complete Order</button>
                             </div>
                         </div>
                     </div>
@@ -317,13 +328,13 @@ check_auth('cashier');
         <div class="bg-white backdrop-blur-2xl w-full max-w-[420px] rounded-[2rem] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.4)] overflow-hidden anim-pop border border-white/40">
             <!-- Header -->
             <div class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-slate-50">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Complete Sale</h3>
-                        <p class="text-[9px] text-slate-400 font-bold mt-1 uppercase tracking-[0.1em] opacity-60">Finalize transaction</p>
+                        <h3 class="text-base font-black text-slate-900 uppercase tracking-tighter leading-none">Complete Sale</h3>
+                        <p class="text-[8px] text-slate-400 font-bold mt-1 uppercase tracking-[0.1em] opacity-60">Finalize transaction</p>
                     </div>
                 </div>
                 <button onclick="closePaymentModal()" class="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-300 hover:text-slate-900 hover:rotate-90">
@@ -346,30 +357,30 @@ check_auth('cashier');
                 <!-- Payment Methods Selection -->
                 <div class="pt-1">
                     <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">Payment Method</h4>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="processPayment('cash')" class="group p-4 bg-slate-50 border-2 border-transparent hover:border-emerald-500 hover:bg-emerald-50 transition-all rounded-[1.5rem] text-center shadow-sm">
-                            <div class="w-10 h-10 rounded-xl bg-white text-emerald-600 flex items-center justify-center mx-auto mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-md">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <div class="grid grid-cols-2 gap-3 md:gap-4">
+                        <button onclick="processPayment('cash')" class="group p-3 md:p-4 bg-slate-50 border-2 border-transparent hover:border-emerald-500 hover:bg-emerald-50 transition-all rounded-2xl md:rounded-[1.5rem] text-center shadow-sm">
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white text-emerald-600 flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-md">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                             </div>
-                            <span class="text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-emerald-700">Cash Sale</span>
+                            <span class="text-[10px] md:text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-emerald-700">Cash</span>
                         </button>
-                        <button onclick="processPayment('card')" class="group p-4 bg-slate-50 border-2 border-transparent hover:border-blue-500 hover:bg-blue-50 transition-all rounded-[1.5rem] text-center shadow-sm">
-                            <div class="w-10 h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-md">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        <button onclick="processPayment('card')" class="group p-3 md:p-4 bg-slate-50 border-2 border-transparent hover:border-blue-500 hover:bg-blue-50 transition-all rounded-2xl md:rounded-[1.5rem] text-center shadow-sm">
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-md">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                             </div>
-                            <span class="text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-blue-700">Card Payment</span>
+                            <span class="text-[10px] md:text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-blue-700">Card</span>
                         </button>
-                        <button onclick="processPayment('cheque')" class="group p-4 bg-slate-50 border-2 border-transparent hover:border-slate-500 hover:bg-slate-100 transition-all rounded-[1.5rem] text-center shadow-sm">
-                            <div class="w-10 h-10 rounded-xl bg-white text-slate-600 flex items-center justify-center mx-auto mb-3 group-hover:bg-slate-600 group-hover:text-white transition-all shadow-md">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <button onclick="processPayment('cheque')" class="group p-3 md:p-4 bg-slate-50 border-2 border-transparent hover:border-slate-500 hover:bg-slate-100 transition-all rounded-2xl md:rounded-[1.5rem] text-center shadow-sm">
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white text-slate-600 flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:bg-slate-600 group-hover:text-white transition-all shadow-md">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             </div>
-                            <span class="text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-slate-700">Cheque</span>
+                            <span class="text-[10px] md:text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-slate-700">Cheque</span>
                         </button>
-                        <button onclick="processPayment('credit')" class="group p-4 bg-slate-50 border-2 border-transparent hover:border-orange-500 hover:bg-orange-50 transition-all rounded-[1.5rem] text-center shadow-sm">
-                            <div class="w-10 h-10 rounded-xl bg-white text-orange-600 flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-all shadow-md">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <button onclick="processPayment('credit')" class="group p-3 md:p-4 bg-slate-50 border-2 border-transparent hover:border-orange-500 hover:bg-orange-50 transition-all rounded-2xl md:rounded-[1.5rem] text-center shadow-sm">
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white text-orange-600 flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-all shadow-md">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
-                            <span class="text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-orange-700">Credit Sale</span>
+                            <span class="text-[10px] md:text-[11px] font-black text-slate-700 uppercase tracking-widest group-hover:text-orange-700">Credit</span>
                         </button>
                     </div>
                 </div>
@@ -680,13 +691,13 @@ check_auth('cashier');
                 const header = document.createElement('div');
                 header.className = 'px-4 py-3 blue-gradient-header border-b border-blue-700 flex items-center text-[9px] uppercase tracking-widest sticky top-0 z-10 rounded-t-xl';
                 header.innerHTML = `
-                    <div class="w-[22%]">Product Name</div>
-                    <div class="w-[15%]">Barcode</div>
-                    <div class="w-[10%] text-center">Type</div>
-                    <div class="w-[8%] text-center">Stock</div>
-                    <div class="w-[15%] text-right pr-2">Buying</div>
-                    <div class="w-[15%] text-right pr-2">Labeled</div>
-                    <div class="w-[15%] text-right pr-2">Est. Selling</div>
+                    <div class="w-[40%] lg:w-[22%]">Product Name</div>
+                    <div class="w-[30%] lg:w-[15%]">Barcode</div>
+                    <div class="hidden lg:block lg:w-[10%] text-center">Type</div>
+                    <div class="w-[10%] lg:w-[8%] text-center">Stock</div>
+                    <div class="hidden lg:block lg:w-[15%] text-right pr-2">Buying</div>
+                    <div class="hidden lg:block lg:w-[15%] text-right pr-2">Labeled</div>
+                    <div class="w-[20%] lg:w-[15%] text-right pr-2">Price</div>
                 `;
                 prodDropdown.appendChild(header);
 
@@ -704,13 +715,13 @@ check_auth('cashier');
                         }
                         div.className = 'flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 active:bg-blue-100 transition-all';
                         div.innerHTML = `
-                            <div class="w-[22%] min-w-0"><p class="text-[12px] font-black text-slate-900 leading-tight uppercase truncate">${p.name}</p></div>
-                            <div class="w-[15%]"><p class="text-[12px] font-mono text-blue-500 font-black tracking-tight">${p.barcode}</p></div>
-                            <div class="w-[10%] text-center">${typeBadge}</div>
-                            <div class="w-[8%] text-center"><span class="text-[12px] font-black text-slate-700">${b.current_qty}</span><span class="text-[8px] text-slate-400 font-bold uppercase">${isOil ? (p.oil_type === 'loose' ? 'L' : 'C') : 'P'}</span></div>
-                            <div class="w-[15%] text-right pr-2"><p class="text-[12px] font-mono font-bold text-slate-400 italic">${numberFormat(b.buying_price)}</p></div>
-                            <div class="w-[15%] text-right pr-2"><p class="text-[12px] font-mono font-bold text-slate-600">${numberFormat(b.selling_price)}</p></div>
-                            <div class="w-[15%] text-right pr-2"><p class="text-[12px] font-mono font-black text-blue-600">${numberFormat(b.estimated_selling_price)}</p></div>
+                            <div class="w-[40%] lg:w-[22%] min-w-0"><p class="text-[11px] lg:text-[12px] font-black text-slate-900 leading-tight uppercase truncate">${p.name}</p></div>
+                            <div class="w-[30%] lg:w-[15%]"><p class="text-[10px] lg:text-[12px] font-mono text-blue-500 font-black tracking-tight">${p.barcode}</p></div>
+                            <div class="hidden lg:block lg:w-[10%] text-center">${typeBadge}</div>
+                            <div class="w-[10%] lg:w-[8%] text-center"><span class="text-[11px] lg:text-[12px] font-black text-slate-700">${b.current_qty}</span><span class="text-[8px] text-slate-400 font-bold uppercase">${isOil ? (p.oil_type === 'loose' ? 'L' : 'C') : 'P'}</span></div>
+                            <div class="hidden lg:block lg:w-[15%] text-right pr-2"><p class="text-[12px] font-mono font-bold text-slate-400 italic">${numberFormat(b.buying_price)}</p></div>
+                            <div class="hidden lg:block lg:w-[15%] text-right pr-2"><p class="text-[12px] font-mono font-bold text-slate-600">${numberFormat(b.selling_price)}</p></div>
+                            <div class="w-[20%] lg:w-[15%] text-right pr-2"><p class="text-[11px] lg:text-[12px] font-mono font-black text-blue-600">${numberFormat(b.estimated_selling_price)}</p></div>
                         `;
                         div.onclick = () => {
                             selectedProduct = p;
@@ -793,58 +804,90 @@ check_auth('cashier');
                 </div>
             `;
             if(data.batches.length > 0) {
-                list.innerHTML = compHtml + `
-                    <div class="rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
-                        <table class="w-full text-left">
-                            <thead class="blue-gradient-header">
-                                <tr class="text-[10px] uppercase tracking-[0.1em]">
-                                    <th class="px-5 py-4">Batch Details</th>
-                                    <th class="px-5 py-4 text-center text-red-500">Retail Price</th>
-                                    <th class="px-5 py-4 text-center text-blue-600">Est. Sale</th>
-                                    <th class="px-5 py-4 text-right">Available</th>
-                                </tr>
-                            </thead>
-                            <tbody id="batchTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
-                        </table>
-                    </div>
-                `;
-                const tbody = document.getElementById('batchTableBody');
-                data.batches.forEach(b => {
-                    // Subtract quantity already in cart
-                    const inCart = cart.filter(item => item.batch_id === b.id).reduce((sum, item) => sum + item.qty, 0);
-                    const actualQty = b.current_qty - inCart;
-                    
-                    if(actualQty <= 0) return; // Skip batches already "sold out" in this session
-
-                    const unit = selectedProduct.oil_type === 'loose' ? 'Ltrs' : (selectedProduct.oil_type === 'can' ? 'Cans' : 'Units');
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-blue-50/50 cursor-pointer transition-all group active:bg-blue-100';
-                    tr.innerHTML = `
-                        <td class="px-5 py-4">
-                            <span class="bg-slate-100 group-hover:bg-blue-100 text-slate-600 group-hover:text-blue-700 px-2 py-0.5 rounded text-[10px] font-black uppercase transition-colors">Batch: ID-${b.id}</span>
-                            <p class="text-[10px] font-bold text-slate-400 mt-1.5 flex items-center gap-1.5 opacity-70">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Expiry: ${b.expire_date || 'N/A'}
-                            </p>
-                        </td>
-                        <td class="px-5 py-4 text-center">
-                            <p class="text-xs font-bold text-slate-400 line-through">${numberFormat(b.selling_price)}</p>
-                        </td>
-                        <td class="px-5 py-4 text-center">
-                            <p class="text-base font-black text-blue-600">${numberFormat(b.estimated_selling_price)}</p>
-                        </td>
-                        <td class="px-5 py-4 text-right">
-                            <p class="text-lg font-black text-slate-800 tabular-nums">${actualQty} <span class="text-[10px] text-slate-400 font-bold uppercase ml-1">${unit}</span></p>
-                        </td>
-                    `;
-                    // Update the batch object with the locally adjusted qty for validation in openEntryModal
-                    const bAdjusted = { ...b, current_qty: actualQty };
-                    tr.onclick = () => addDirectlyToCart(selectedProduct, bAdjusted);
-                    tbody.appendChild(tr);
-                });
+                const isMobile = window.innerWidth < 640;
+                list.innerHTML = compHtml;
                 
-                if(tbody.innerHTML === '') {
-                    tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-slate-400 italic">All available stock for this product is already in the cart</td></tr>';
+                if (isMobile) {
+                    data.batches.forEach(b => {
+                        const inCart = cart.filter(item => item.batch_id === b.id).reduce((sum, item) => sum + item.qty, 0);
+                        const actualQty = b.current_qty - inCart;
+                        if(actualQty <= 0) return;
+
+                        const unit = selectedProduct.oil_type === 'loose' ? 'Ltrs' : (selectedProduct.oil_type === 'can' ? 'Cans' : 'Units');
+                        const div = document.createElement('div');
+                        div.className = 'bg-white border border-slate-100 rounded-2xl p-4 mb-3 shadow-sm active:bg-blue-50 transition-all';
+                        div.innerHTML = `
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest">ID: ${b.id}</span>
+                                <p class="text-[10px] font-bold text-slate-400">Exp: ${b.expire_date || 'N/A'}</p>
+                            </div>
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Available</p>
+                                    <p class="text-xl font-black text-slate-800">${actualQty} <span class="text-[10px] opacity-40">${unit}</span></p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[8px] font-black text-blue-600 uppercase tracking-widest mb-1">Selling Price</p>
+                                    <p class="text-xl font-black text-blue-600">${numberFormat(b.estimated_selling_price)}</p>
+                                </div>
+                            </div>
+                        `;
+                        div.onclick = () => addDirectlyToCart(selectedProduct, { ...b, current_qty: actualQty });
+                        list.appendChild(div);
+                    });
+                } else {
+                    const tableWrapper = document.createElement('div');
+                    tableWrapper.className = 'rounded-2xl border border-slate-100 overflow-hidden shadow-sm';
+                    const table = document.createElement('table');
+                    table.className = 'w-full text-left';
+                    table.innerHTML = `
+                        <thead class="blue-gradient-header">
+                            <tr class="text-[10px] uppercase tracking-[0.1em]">
+                                <th class="px-5 py-4">Batch Details</th>
+                                <th class="px-5 py-4 text-center text-red-500">Retail Price</th>
+                                <th class="px-5 py-4 text-center text-blue-600">Est. Sale</th>
+                                <th class="px-5 py-4 text-right">Available</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batchTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+                    `;
+                    tableWrapper.appendChild(table);
+                    list.appendChild(tableWrapper);
+
+                    const tbody = table.querySelector('#batchTableBody');
+                    data.batches.forEach(b => {
+                        const inCart = cart.filter(item => item.batch_id === b.id).reduce((sum, item) => sum + item.qty, 0);
+                        const actualQty = b.current_qty - inCart;
+                        if(actualQty <= 0) return;
+
+                        const unit = selectedProduct.oil_type === 'loose' ? 'Ltrs' : (selectedProduct.oil_type === 'can' ? 'Cans' : 'Units');
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-blue-50/50 cursor-pointer transition-all group active:bg-blue-100';
+                        tr.innerHTML = `
+                            <td class="px-5 py-4">
+                                <span class="bg-slate-100 group-hover:bg-blue-100 text-slate-600 group-hover:text-blue-700 px-2 py-0.5 rounded text-[10px] font-black uppercase transition-colors">Batch: ID-${b.id}</span>
+                                <p class="text-[10px] font-bold text-slate-400 mt-1.5 flex items-center gap-1.5 opacity-70">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Expiry: ${b.expire_date || 'N/A'}
+                                </p>
+                            </td>
+                            <td class="px-5 py-4 text-center">
+                                <p class="text-xs font-bold text-slate-400 line-through">${numberFormat(b.selling_price)}</p>
+                            </td>
+                            <td class="px-5 py-4 text-center">
+                                <p class="text-base font-black text-blue-600">${numberFormat(b.estimated_selling_price)}</p>
+                            </td>
+                            <td class="px-5 py-4 text-right">
+                                <p class="text-lg font-black text-slate-800 tabular-nums">${actualQty} <span class="text-[10px] text-slate-400 font-bold uppercase ml-1">${unit}</span></p>
+                            </td>
+                        `;
+                        tr.onclick = () => addDirectlyToCart(selectedProduct, { ...b, current_qty: actualQty });
+                        tbody.appendChild(tr);
+                    });
+                }
+                
+                if(list.innerText.trim() === selectedProduct.vehicle_compatibility || list.innerText.trim() === 'Universal Application') {
+                    list.innerHTML += '<div class="py-10 text-center text-slate-400 italic">No available stock for this product</div>';
                 }
                 document.getElementById('batchModal').classList.remove('hidden');
             } else {
@@ -962,17 +1005,19 @@ check_auth('cashier');
                 if(item.oil_type === 'can') typeIcon = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>`;
 
                 const div = document.createElement('div');
-                div.className = 'grid grid-cols-1 lg:grid-cols-12 items-center px-4 xl:px-6 py-5 lg:py-3 hover:bg-blue-50/20 transition-all gap-5 lg:gap-x-2 group border-b border-slate-100/50 animate-fade-in';
+                div.className = 'grid grid-cols-1 lg:grid-cols-12 items-center px-4 xl:px-6 py-4 lg:py-3 hover:bg-blue-50/20 transition-all gap-3 lg:gap-x-2 group border-b border-slate-100/50 animate-fade-in';
                 div.innerHTML = `
                     <!-- Product Info -->
-                    <div class="col-span-1 lg:col-span-2 min-w-0">
-                        <div class="flex flex-col">
-                            <p class="font-black text-slate-900 text-[13px] leading-tight mb-1 uppercase tracking-tight truncate" title="${item.name}">${item.name}</p>
+                    <div class="col-span-1 lg:col-span-2 min-w-0 flex items-start gap-3">
+                        <div class="lg:hidden w-10 h-10 rounded-lg bg-blue-50 flex flex-col items-center justify-center shrink-0 border border-blue-100">
+                             ${catIcon}
+                             <span class="text-[7px] font-black uppercase mt-1 leading-none text-blue-600">${item.category === 'Oil' ? 'Oil' : 'Spare'}</span>
+                        </div>
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <p class="font-black text-slate-900 text-[12px] lg:text-[13px] leading-tight mb-0.5 uppercase tracking-tight truncate" title="${item.name}">${item.name}</p>
                             <div class="flex items-center gap-2">
                                 <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest opacity-80">${item.brand}</span>
-                                <span class="lg:hidden flex items-center gap-1.5 text-[8px] font-black px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-500 uppercase">
-                                    ${item.category}
-                                </span>
+                                <span class="lg:hidden text-[8px] font-black text-slate-400">/ ${typeLabel}</span>
                             </div>
                         </div>
                     </div>
@@ -996,44 +1041,35 @@ check_auth('cashier');
                         <p class="text-[13px] font-black text-slate-800">${numberFormat(item.est_selling_price)}</p>
                     </div>
 
-                    <!-- Discount Input -->
-                    <div class="col-span-1 flex lg:justify-end">
-                        <div class="w-full lg:w-[90px] flex items-center lg:block">
-                            <span class="lg:hidden text-[10px] font-bold text-slate-500 uppercase w-20">Discount:</span>
-                            <div class="relative w-full">
-                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-red-500 pointer-events-none pr-1">Rs.</span>
-                                <input type="number" step="0.01" value="${item.per_item_discount.toFixed(2)}" onchange="updateRowDiscount(${index}, this.value)" class="w-full text-right px-1.5 py-1.5 pl-[24px] bg-white border border-slate-300 rounded lg:rounded-md text-[13px] font-black outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 text-red-600 shadow-sm transition-all placeholder-red-300">
+                    <!-- Middle Controls (Discount & Qty) -->
+                    <div class="col-span-1 lg:col-span-4 flex items-center justify-between lg:justify-end gap-3 lg:gap-8">
+                        <!-- Discount Input -->
+                        <div class="flex-1 lg:flex-none">
+                            <div class="relative w-full lg:w-[100px]">
+                                <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-red-500 pointer-events-none">Rs.</span>
+                                <input type="number" step="0.01" value="${item.per_item_discount.toFixed(2)}" onchange="updateRowDiscount(${index}, this.value)" class="w-full text-right px-2 py-1.5 pl-7 bg-white border border-slate-200 rounded-lg text-[12px] font-black outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 text-red-600 transition-all">
+                                <span class="lg:hidden absolute -top-4 left-1 text-[8px] font-black text-slate-400 uppercase tracking-widest">Discount / Item</span>
                             </div>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="flex-1 lg:flex-none flex flex-col items-center">
+                            <div class="flex items-center bg-slate-100/50 rounded-lg p-0.5 border border-slate-200">
+                                <button onclick="updateQty(${index}, -1)" class="w-7 h-7 flex items-center justify-center bg-white text-slate-600 rounded-md shadow-sm border border-slate-200 hover:bg-slate-50 transition-all">-</button>
+                                <input type="number" value="${item.qty}" min="1" max="${item.max_qty}" onchange="setQty(${index}, this.value)" class="w-10 text-center font-black text-blue-600 bg-transparent border-none focus:ring-0 text-[14px]">
+                                <button onclick="updateQty(${index}, 1)" class="w-7 h-7 flex items-center justify-center bg-white text-slate-600 rounded-md shadow-sm border border-slate-200 hover:bg-slate-50 transition-all">+</button>
+                            </div>
+                            <span class="lg:hidden text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Qty (${typeLabel})</span>
                         </div>
                     </div>
 
-                    <!-- Quantity -->
-                    <div class="col-span-1 lg:col-span-2 flex justify-start lg:justify-center items-center">
-                        <span class="lg:hidden text-[10px] font-bold text-slate-500 uppercase w-20">Quantity:</span>
-                        <div class="flex flex-col items-center gap-1">
-                            <div class="flex items-center justify-center gap-1 p-1 bg-slate-50 rounded-lg shadow-inner border border-slate-200">
-                                <button onclick="updateQty(${index}, -1)" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-md hover:bg-slate-200 hover:text-slate-800 transition-all shadow-sm active:scale-90" tabindex="-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
-                                </button>
-                                <input type="number" value="${item.qty}" min="1" max="${item.max_qty}" onchange="setQty(${index}, this.value)" class="font-black text-blue-700 w-12 text-center tabular-nums bg-transparent border-none outline-none text-[15px] m-0 p-0 focus:ring-0">
-                                <button onclick="updateQty(${index}, 1)" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-md hover:bg-slate-200 hover:text-slate-800 transition-all shadow-sm active:scale-90" tabindex="-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
-                                </button>
-                            </div>
-                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest hidden lg:block">Max: ${item.max_qty} ${typeLabel}</span>
+                    <!-- Line Total & Delete -->
+                    <div class="col-span-1 lg:col-span-2 flex items-center justify-between lg:justify-end gap-4">
+                        <div class="text-right">
+                             <p class="text-[17px] font-black text-blue-700 tracking-tighter leading-none">${numberFormat(item.total_price)}</p>
+                             <p class="lg:hidden text-[8px] font-bold text-slate-400 uppercase text-right mt-1">Total Payable</p>
                         </div>
-                        <span class="text-[9px] text-slate-400 font-bold ml-2 uppercase min-w-[30px] lg:hidden">${typeLabel}</span>
-                    </div>
-
-                    <!-- Line Total -->
-                    <div class="col-span-1 lg:col-span-2 text-right flex flex-col justify-center">
-                        <span class="lg:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 text-left">Total:</span>
-                        <p class="text-[16px] xl:text-[18px] font-black text-blue-700 tracking-tighter leading-none">${numberFormat(item.total_price)}</p>
-                    </div>
-
-                    <!-- Remove Action -->
-                    <div class="col-span-1 text-center flex justify-end lg:justify-center">
-                        <button onclick="removeFromCart(${index})" class="w-9 h-9 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500 rounded-lg transition-all shadow-sm border border-slate-100 bg-white hover:border-red-500">
+                        <button onclick="removeFromCart(${index})" class="w-9 h-9 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500 rounded-xl transition-all border border-red-50 hover:border-red-500">
                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
