@@ -137,14 +137,14 @@ if ($action === 'fetch') {
 if ($action === 'fetch_summaries') {
     $from = $_GET['from'] ?? date('Y-m-d');
     $to = $_GET['to'] ?? date('Y-m-d');
+    $date_today = date('Y-m-d');
     
+    // --- Range Summaries (for cards) ---
     $summaries = [
-        'cash' => 0,
-        'card' => 0,
-        'approved_credit' => 0,
+        'cash' => 0, 'card' => 0,
         'approved_cheque' => 0,
-        'pending_credit' => 0,
-        'pending_cheque' => 0
+        'total_credit' => 0,
+        'pending_credit' => 0, 'pending_cheque' => 0
     ];
 
     $query = "SELECT payment_method, payment_status, SUM(final_amount) as total 
@@ -164,16 +164,37 @@ if ($action === 'fetch_summaries') {
         if ($method === 'cash') $summaries['cash'] += $total;
         elseif ($method === 'card') $summaries['card'] += $total;
         elseif ($method === 'credit') {
-            if ($status === 'approved') $summaries['approved_credit'] += $total;
-            elseif ($status === 'pending') $summaries['pending_credit'] += $total;
+            $summaries['total_credit'] += $total;
+            if ($status !== 'approved') $summaries['pending_credit'] += $total;
         }
         elseif ($method === 'cheque') {
             if ($status === 'approved') $summaries['approved_cheque'] += $total;
-            elseif ($status === 'pending') $summaries['pending_cheque'] += $total;
+            else $summaries['pending_cheque'] += $total;
         }
     }
 
-    echo json_encode(['success' => true, 'summaries' => $summaries]);
+    // --- Strictly Today's Stats (for navbar) ---
+    $stmt_tot = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE DATE(created_at) = ? AND status = 'completed'");
+    $stmt_tot->execute([$date_today]);
+    $grand_total = $stmt_tot->fetchColumn() ?: 0;
+
+    $stmt_app = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE DATE(created_at) = ? AND payment_status = 'approved' AND status = 'completed'");
+    $stmt_app->execute([$date_today]);
+    $total_approved = $stmt_app->fetchColumn() ?: 0;
+
+    $stmt_pend = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE DATE(created_at) = ? AND payment_status = 'pending' AND status = 'completed'");
+    $stmt_pend->execute([$date_today]);
+    $total_pending = $stmt_pend->fetchColumn() ?: 0;
+
+    echo json_encode([
+        'success' => true, 
+        'summaries' => $summaries,
+        'today' => [
+            'total' => (float)$grand_total,
+            'approved' => (float)$total_approved,
+            'pending' => (float)$total_pending
+        ]
+    ]);
     exit;
 }
 

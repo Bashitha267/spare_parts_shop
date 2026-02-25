@@ -132,7 +132,7 @@ check_auth('admin');
                         <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <div>
-                        <p class="text-[7px] font-black text-white/70 uppercase tracking-widest leading-none">Total</p>
+                        <p class="text-[7px] font-black text-white/70 uppercase tracking-widest leading-none">Today</p>
                         <p id="nav_total" class="text-[10px] sm:text-xs md:text-sm font-black text-white leading-none mt-0.5 whitespace-nowrap">Rs. 0.00</p>
                     </div>
                 </div>
@@ -163,34 +163,34 @@ check_auth('admin');
         <!-- Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
             <!-- Cash -->
-            <div class="glass-card p-8 border-l-4 border-emerald-500 shadow-xl shadow-emerald-500/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-emerald-500 transition-colors">Cash Sales</p>
+            <div class="glass-card p-8 border-l-4 border-emerald-500 shadow-xl shadow-emerald-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-emerald-500 transition-colors">Total Cash</p>
                 <h3 id="card_cash" class="text-2xl font-black text-emerald-600 tracking-tight">Rs. 0.00</h3>
             </div>
             <!-- Card -->
-            <div class="glass-card p-8 border-l-4 border-indigo-500 shadow-xl shadow-indigo-500/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-indigo-500 transition-colors">Card Sales</p>
+            <div class="glass-card p-8 border-l-4 border-indigo-500 shadow-xl shadow-indigo-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-indigo-500 transition-colors">Total Card</p>
                 <h3 id="card_card" class="text-2xl font-black text-indigo-600 tracking-tight">Rs. 0.00</h3>
             </div>
-            <!-- Approved Credit -->
-            <div class="glass-card p-8 border-l-4 border-blue-500 shadow-xl shadow-blue-500/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-blue-500 transition-colors">Approved Credit</p>
+            <!-- Approved Cheque -->
+            <div class="glass-card p-8 border-l-4 border-amber-500 shadow-xl shadow-amber-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-amber-500 transition-colors">Tot. App. Cheque</p>
+                <h3 id="card_app_cheque" class="text-2xl font-black text-amber-600 tracking-tight">Rs. 0.00</h3>
+            </div>
+            <!-- Total Credit -->
+            <div class="glass-card p-8 border-l-4 border-blue-500 shadow-xl shadow-blue-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-blue-500 transition-colors">Total Credit</p>
                 <h3 id="card_app_credit" class="text-2xl font-black text-blue-600 tracking-tight">Rs. 0.00</h3>
             </div>
-            <!-- Approved Cheque -->
-            <div class="glass-card p-6 border-l-4 border-amber-500 shadow-xl shadow-amber-500/10 hover:scale-[1.02] transition-all cursor-default group">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-amber-500 transition-colors">Approved Cheque</p>
-                <h3 id="card_app_cheque" class="text-xl font-black text-amber-600 tracking-tight">Rs. 0.00</h3>
-            </div>
             <!-- Pending Credit -->
-            <div class="glass-card p-6 border-l-4 border-rose-400 shadow-xl shadow-rose-400/10 hover:scale-[1.02] transition-all cursor-default group">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-rose-500 transition-colors">Pending Credit</p>
-                <h3 id="card_pend_credit" class="text-xl font-black text-rose-500 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-8 border-l-4 border-rose-400 shadow-xl shadow-rose-400/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-rose-500 transition-colors">Pending Credit</p>
+                <h3 id="card_pend_credit" class="text-2xl font-black text-rose-500 tracking-tight">Rs. 0.00</h3>
             </div>
             <!-- Pending Cheque -->
-            <div class="glass-card p-6 border-l-4 border-orange-400 shadow-xl shadow-orange-400/10 hover:scale-[1.02] transition-all cursor-default group">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-orange-500 transition-colors">Pending Cheque</p>
-                <h3 id="card_pend_cheque" class="text-xl font-black text-orange-500 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-8 border-l-4 border-orange-400 shadow-xl shadow-orange-400/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-orange-500 transition-colors">Pending Cheque</p>
+                <h3 id="card_pend_cheque" class="text-2xl font-black text-orange-500 tracking-tight">Rs. 0.00</h3>
             </div>
         </div>
 
@@ -331,16 +331,21 @@ check_auth('admin');
 
         document.addEventListener('DOMContentLoaded', () => {
              // Set default date range to today
-             const today = new Date().toISOString().split('T')[0];
+             const today = getTodayDate();
              document.getElementById('date_from').value = today;
              document.getElementById('date_to').value = today;
              
              loadHistory(1);
         });
         
+        function getTodayDate() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+        
         function resetFilters() {
             document.getElementById('search').value = '';
-            const today = new Date().toISOString().split('T')[0];
+            const today = getTodayDate();
             document.getElementById('date_from').value = today;
             document.getElementById('date_to').value = today;
             document.getElementById('method_filter').value = 'all';
@@ -463,6 +468,9 @@ check_auth('admin');
             }
 
             data.sales.forEach(sale => {
+                const isDraft = sale.status === 'pending';
+                const rowClass = isDraft ? 'bg-amber-100 hover:bg-amber-200' : 'hover:bg-blue-50/50';
+
                 const statusClass = sale.payment_status === 'approved' ? 'bg-emerald-500 shadow-emerald-500/20' : 
                                   sale.payment_status === 'pending' ? 'bg-amber-400 shadow-amber-500/20' : 'bg-rose-500 shadow-rose-500/20';
 
@@ -475,7 +483,7 @@ check_auth('admin');
                 const methodClass = methodClasses[sale.payment_method.toLowerCase()] || 'text-blue-300 border-white/10 bg-white/5';
                                   
                 tbody.innerHTML += `
-                    <tr class="hover:bg-blue-50/50 transition-all group">
+                    <tr class="${rowClass} transition-all group">
                         <td class="px-6 py-8">
                             <span class="font-mono text-[10px] font-black text-blue-600 tracking-tighter whitespace-nowrap uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">TRX-${sale.id}</span>
                         </td>
@@ -498,7 +506,7 @@ check_auth('admin');
                             <p class="font-bold text-[11px] tracking-widest">${new Date(sale.created_at).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                         </td>
                         <td class="px-2 py-8 text-left">
-                            <span class="px-3 py-1 border rounded-lg text-[9px] font-black uppercase tracking-widest ${methodClass}">${sale.payment_method}</span>
+                            ${isDraft ? '' : `<span class="px-3 py-1 border rounded-lg text-[9px] font-black uppercase tracking-widest ${methodClass}">${sale.payment_method}</span>`}
                         </td>
                         <td class="px-8 py-8 text-right font-black text-rose-600 tracking-widest text-sm hidden xl:table-cell">${parseFloat(sale.discount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                         <td class="px-8 py-8 text-right font-black text-blue-800 tracking-widest text-sm">${parseFloat(sale.final_amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
@@ -506,7 +514,7 @@ check_auth('admin');
                             <span class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-600 border border-slate-200 bg-white shadow-sm">${sale.status === 'pending' ? 'DRAFTED' : 'COMPLETED'}</span>
                         </td>
                         <td class="px-8 py-8 text-center text-nowrap">
-                            <span class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest text-white ${statusClass} shadow-lg">${sale.payment_status}</span>
+                            ${isDraft ? '' : `<span class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest text-white ${statusClass} shadow-lg">${sale.payment_status}</span>`}
                         </td>
                         <td class="px-8 py-8 text-right">
                             <div class="flex justify-end items-center gap-3">
@@ -533,23 +541,23 @@ check_auth('admin');
             const data = await res.json();
             if(!data.success) return;
 
-            const s = data.summaries;
-            const total = s.cash + s.card + s.approved_credit + s.approved_cheque + s.pending_credit + s.pending_cheque;
-            const approved = s.cash + s.card + s.approved_credit + s.approved_cheque;
-            const pending = s.pending_credit + s.pending_cheque;
+            // Update Nav Mini Cards (Strictly Today)
+            if(data.today) {
+                document.getElementById('nav_total').innerText = '' + data.today.total.toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById('nav_approved').innerText = '' + data.today.approved.toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById('nav_pending').innerText = '' + data.today.pending.toLocaleString(undefined, {minimumFractionDigits: 2});
+            }
 
-            // Update Nav Mini Cards
-            document.getElementById('nav_total').innerText = '' + total.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('nav_approved').innerText = '' + approved.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('nav_pending').innerText = '' + pending.toLocaleString(undefined, {minimumFractionDigits: 2});
-
-            // Update Big Cards
-            document.getElementById('card_cash').innerText = '' + s.cash.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_card').innerText = '' + s.card.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_app_credit').innerText = '' + s.approved_credit.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_app_cheque').innerText = '' + s.approved_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_pend_credit').innerText = '' + s.pending_credit.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_pend_cheque').innerText = '' + s.pending_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
+            // Update Big Cards (Range Based)
+            if(data.summaries) {
+                const s = data.summaries;
+                document.getElementById('card_cash').innerText = '' + s.cash.toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById('card_card').innerText = '' + s.card.toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById('card_app_credit').innerText = '' + (s.total_credit || 0).toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById('card_app_cheque').innerText = '' + s.approved_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById('card_pend_credit').innerText = '' + s.pending_credit.toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById('card_pend_cheque').innerText = '' + s.pending_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
+            }
         }
 
         function renderPagination(pg) {

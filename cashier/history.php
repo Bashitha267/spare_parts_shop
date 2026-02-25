@@ -559,8 +559,11 @@ check_auth('cashier');
                 };
                 const style = methodStyles[row.payment_method] || 'bg-slate-500 text-white';
                 
+                const isDraft = row.status === 'pending';
+                const rowClass = isDraft ? 'bg-amber-50/70 hover:bg-amber-100/70' : 'hover:bg-blue-50/20';
+
                 tbody.innerHTML += `
-                    <tr class="group animate-fade">
+                    <tr class="${rowClass} group animate-fade">
                         <td><span class="bg-gradient-to-r from-blue-400 to-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black tracking-widest shadow-md shadow-blue-500/20">#${row.id}</span></td>
                         <td>
                             <p class="text-sm font-bold text-slate-800">${formatDate(row.created_at)}</p>
@@ -578,9 +581,9 @@ check_auth('cashier');
                             </div>
                         </td>
                         <td>
-                            <span class="inline-flex items-center gap-1.5 text-[10px] font-black px-4 py-2 ${style} rounded-full uppercase tracking-widest shadow-lg">
+                            ${isDraft ? '' : `<span class="inline-flex items-center gap-1.5 text-[10px] font-black px-4 py-2 ${style} rounded-full uppercase tracking-widest shadow-lg">
                                 ${row.payment_method}
-                            </span>
+                            </span>`}
                         </td>
                         <td class="text-right">
                             <p class="text-lg font-black text-blue-800 tracking-tight">Rs. ${numberFormat(row.final_amount)}</p>

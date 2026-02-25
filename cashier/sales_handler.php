@@ -279,7 +279,7 @@ if ($action === 'fetch_sales') {
     $to = $_GET['to'] ?? '';
     $method = $_GET['method'] ?? '';
 
-    $where = ["s.user_id = ?", "s.status = 'completed'"];
+    $where = ["s.user_id = ?", "s.status IN ('completed', 'pending')"];
     $params = [$user_id];
 
     if (!empty($search)) {
