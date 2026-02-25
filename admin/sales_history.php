@@ -539,17 +539,17 @@ check_auth('admin');
             const pending = s.pending_credit + s.pending_cheque;
 
             // Update Nav Mini Cards
-            document.getElementById('nav_total').innerText = 'Rs. ' + total.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('nav_approved').innerText = 'Rs. ' + approved.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('nav_pending').innerText = 'Rs. ' + pending.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('nav_total').innerText = '' + total.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('nav_approved').innerText = '' + approved.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('nav_pending').innerText = '' + pending.toLocaleString(undefined, {minimumFractionDigits: 2});
 
             // Update Big Cards
-            document.getElementById('card_cash').innerText = 'Rs. ' + s.cash.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_card').innerText = 'Rs. ' + s.card.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_app_credit').innerText = 'Rs. ' + s.approved_credit.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_app_cheque').innerText = 'Rs. ' + s.approved_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_pend_credit').innerText = 'Rs. ' + s.pending_credit.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('card_pend_cheque').innerText = 'Rs. ' + s.pending_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_cash').innerText = '' + s.cash.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_card').innerText = '' + s.card.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_app_credit').innerText = '' + s.approved_credit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_app_cheque').innerText = '' + s.approved_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_pend_credit').innerText = '' + s.pending_credit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('card_pend_cheque').innerText = '' + s.pending_cheque.toLocaleString(undefined, {minimumFractionDigits: 2});
         }
 
         function renderPagination(pg) {
