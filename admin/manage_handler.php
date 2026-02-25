@@ -234,8 +234,9 @@ if ($action === 'update_product') {
         $barcode = $_POST['barcode'] ?? $old_data['barcode'];
 
         // 1. Update Product Details
-        $stmt = $pdo->prepare("UPDATE products SET barcode = ?, name = ?, brand = ?, vehicle_compatibility = ? WHERE id = ?");
-        $stmt->execute([$barcode, $name, $brand, $v_types, $id]);
+        $oil_type = $_POST['oil_type'] ?? $old_data['oil_type'];
+        $stmt = $pdo->prepare("UPDATE products SET barcode = ?, name = ?, brand = ?, vehicle_compatibility = ?, oil_type = ? WHERE id = ?");
+        $stmt->execute([$barcode, $name, $brand, $v_types, $oil_type, $id]);
 
         // 2. Update Batch Details (if prices/qty provided)
         $batch_details_updated = false;
@@ -268,6 +269,7 @@ if ($action === 'update_product') {
         if ($old_data['name'] != $name) $changes[] = "Name: ~~{$old_data['name']}~~ $name";
         if ($old_data['brand'] != $brand) $changes[] = "Brand: ~~{$old_data['brand']}~~ $brand";
         if ($old_data['vehicle_compatibility'] != $v_types) $changes[] = "Compatibility: ~~{$old_data['vehicle_compatibility']}~~ $v_types";
+        if ($old_data['oil_type'] != $oil_type) $changes[] = "Oil Type: ~~{$old_data['oil_type']}~~ $oil_type";
         
         if ($batch_details_updated) {
             if ($old_data['buying_price'] != $b_price) $changes[] = "Buying Price: ~~" . number_format($old_data['buying_price'], 0) . "~~ " . number_format($b_price, 0);

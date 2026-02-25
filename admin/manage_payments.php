@@ -235,7 +235,6 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
             
             <div class="flex flex-wrap lg:flex-nowrap items-center gap-3 w-full lg:flex-grow">
                 <input type="date" id="hist_date" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer">
-                <input type="month" id="hist_month" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer">
                 <select id="hist_year" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer">
                     <option value="">Year</option>
                     <?php for($y=date('Y'); $y>=2020; $y--): ?>
@@ -246,11 +245,6 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                     <option value="all">Mode</option>
                     <option value="cheque">Cheque</option>
                     <option value="credit">Credit</option>
-                </select>
-                <select id="hist_status" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer">
-                    <option value="all">Status</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
                 </select>
                 <button onclick="clearHistoryFilters()" class="flex items-center gap-2 p-3 bg-blue-600 border border-slate-200 rounded-xl text-white font-black hover:bg-blue-800 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -268,7 +262,6 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                             <th>Strategy</th>
                             <th>Fiscal Volume</th>
                             <th class="text-center">Officer</th>
-                            <th class="text-center">State</th>
                             <th class="text-right">Settled At</th>
                         </tr>
                     </thead>
@@ -289,8 +282,17 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
 
         document.addEventListener('DOMContentLoaded', () => {
             loadPendingPayments();
+            initHistoryFilters();
             initHistoryAutosuggest();
         });
+
+        function initHistoryFilters() {
+            const histFilters = ['hist_date', 'hist_year', 'hist_method'];
+            histFilters.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', () => loadHistory(1));
+            });
+        }
 
         function switchMainTab(tab) {
             mainTab = tab;
@@ -438,23 +440,20 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
             const tbody = document.getElementById('historyBody');
             const search = document.getElementById('searchHistory').value;
             const date = document.getElementById('hist_date').value;
-            const month = document.getElementById('hist_month').value;
             const year = document.getElementById('hist_year').value;
             const method = document.getElementById('hist_method').value;
-            const status = document.getElementById('hist_status').value;
 
-            const res = await fetch(`payment_handler.php?action=fetch_payment_history&search=${search}&date=${date}&month=${month}&year=${year}&method=${method}&status=${status}&page=${page}`);
+            const res = await fetch(`payment_handler.php?action=fetch_payment_history&search=${search}&date=${date}&year=${year}&method=${method}&page=${page}`);
             const data = await res.json();
             tbody.innerHTML = '';
 
             if(data.sales.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-8 py-20 text-center opacity-30 italic font-black">No Audit Records Found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-8 py-20 text-center opacity-30 italic font-black">No Audit Records Found</td></tr>';
                 document.getElementById('paginationHistory').innerHTML = '';
                 return;
             }
 
             data.sales.forEach(sale => {
-                const statusClass = sale.payment_status === 'approved' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-rose-100 text-rose-800 border-rose-200';
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-all">
                         <td class="px-8 py-6"><span class="font-mono text-[10px] font-black text-blue-800 tracking-tighter uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">TRX-${sale.id}</span></td>
@@ -462,7 +461,6 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                         <td class="px-8 py-6"><span class="text-[10px] font-black uppercase text-blue-600 tracking-widest">${sale.payment_method}</span></td>
                         <td class="px-8 py-6 font-black text-slate-900 text-sm">Rs. ${parseFloat(sale.final_amount).toLocaleString()}</td>
                         <td class="px-8 py-6 text-center font-black text-slate-500 uppercase text-[10px]">${sale.cashier_name}</td>
-                        <td class="px-8 py-6 text-center"><span class="status-badge ${statusClass}">${sale.payment_status}</span></td>
                         <td class="px-8 py-6 text-right"><p class="font-bold text-slate-900 text-[11px]">${new Date(sale.created_at).toLocaleDateString()}</p><p class="text-[9px] text-slate-400 font-black">${new Date(sale.created_at).toLocaleTimeString()}</p></td>
                     </tr>`;
             });
@@ -493,8 +491,8 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
         }
 
         function clearHistoryFilters() {
-            ['searchHistory', 'hist_date', 'hist_month', 'hist_year'].forEach(id => document.getElementById(id).value = '');
-            ['hist_method', 'hist_status'].forEach(id => document.getElementById(id).value = 'all');
+            ['searchHistory', 'hist_date', 'hist_year'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('hist_method').value = 'all';
             loadHistory();
         }
 

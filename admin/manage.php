@@ -113,19 +113,20 @@ $is_admin = ($_SESSION['role'] === 'admin');
     <div class="colorful-overlay"></div>
     
     <nav class="glass-nav sticky top-0 z-30">
-        <div class="px-4 md:px-6 py-4 flex justify-between items-center mx-auto">
-            <div class="flex items-center gap-4">
+        <div class="px-4 md:px-6 py-4 flex flex-col sm:flex-row justify-between items-center mx-auto gap-4">
+            <div class="flex items-center gap-4 w-full sm:w-auto transition-all">
                 <a href="<?php echo $is_admin ? 'dashboard.php' : '../cashier/dashboard.php'; ?>" class="p-2 hover:bg-blue-50 rounded-xl transition-all text-blue-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Oil Registry</h1>
+                <h1 class="text-lg md:text-xl font-black text-slate-900 tracking-tight uppercase">Oil Registry</h1>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="manage_handler.php?action=export_inventory&type=oil" class="bg-white text-emerald-600 px-6 py-2.5 rounded-xl text-xs font-black hover:bg-emerald-50 transition-all uppercase tracking-widest border-2 border-emerald-100 flex items-center gap-2">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <a href="manage_handler.php?action=export_inventory&type=oil" class="flex-1 sm:flex-none bg-white text-emerald-600 px-4 md:px-6 py-2.5 rounded-xl text-[10px] md:text-xs font-black hover:bg-emerald-50 transition-all uppercase tracking-widest border-2 border-emerald-100 flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Export Excel
+                    <span class="hidden md:inline">Export to Excel</span>
+                    <span class="md:hidden hidden xs:inline">Export</span>
                 </a>
-                <button onclick="openNewProductModal()" class="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-2.5 rounded-xl text-xs font-black hover:shadow-lg hover:shadow-blue-500/30 transition-all uppercase tracking-widest border-2 border-white">+ Add Oil Product</button>
+                <button onclick="openNewProductModal()" class="flex-[2] sm:flex-none bg-gradient-to-r from-blue-600 to-blue-800 text-white px-4 md:px-6 py-2.5 rounded-xl text-[10px] md:text-xs font-black hover:shadow-lg hover:shadow-blue-500/30 transition-all uppercase tracking-widest border-2 border-white">+ Add Oil</button>
             </div>
         </div>
     </nav>
@@ -138,33 +139,34 @@ $is_admin = ($_SESSION['role'] === 'admin');
                 <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-80">Oil Inventory Total</p>
                 <h2 id="grand_inventory_value" class="text-2xl font-black tracking-tighter">Rs. 0.00</h2>
             </div>
-            <div class="md:col-span-3 glass-card p-6 rounded-[2rem] flex flex-col lg:flex-row gap-6 items-center border-2 border-white">
-                <div class="relative flex-grow w-full" id="searchOilWrapper">
+            <div class="md:col-span-3 glass-card p-4 md:p-6 rounded-[2rem] flex flex-col gap-4 items-center border-2 border-white overflow-hidden">
+                <div class="relative w-full" id="searchOilWrapper">
                     <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <input type="text" id="searchInventory" autocomplete="off" class="block w-full pl-14 pr-6 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 text-sm font-bold" placeholder="Find product by name or barcode...">
+                    <input type="text" id="searchInventory" autocomplete="off" class="block w-full pl-14 pr-6 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 text-sm font-bold shadow-inner" placeholder="Find product by name or barcode...">
                 </div>
 
-                <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-                    <select id="oilTypeFilter" class="flex-grow lg:flex-none px-4 md:px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200">
+                <div class="grid grid-cols-2 lg:flex items-center gap-3 w-full">
+                    <select id="oilTypeFilter" class="px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200 shadow-sm col-span-1">
                         <option value="all">All Types</option>
                         <option value="can">Can</option>
                         <option value="loose">Loose</option>
                     </select>
-                    <select id="statusFilter" class="flex-grow lg:flex-none px-4 md:px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200">
+                    <select id="statusFilter" class="px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200 shadow-sm col-span-1">
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
                         <option value="out_of_stock">Out of Stock</option>
                     </select>
-                    <select id="sortFilter" class="flex-grow lg:flex-none px-4 md:px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200">
+                    <select id="sortFilter" class="px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] outline-none transition-all hover:bg-slate-50 border-slate-200 shadow-sm col-span-2 lg:col-span-1 min-w-[180px]">
                         <option value="high_value">Value: High to Low</option>
                         <option value="low_value">Value: Low to High</option>
                         <option value="name_asc">Alphabetical (A-Z)</option>
                     </select>
-                    <button onclick="resetFilters()" title="Reset Filters" class="flex-grow lg:flex-none shrink-0 flex items-center justify-center gap-2 px-5 py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
+                    <button onclick="resetFilters()" title="Reset Filters" class="px-5 py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 col-span-2 lg:col-span-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        Reset
+                        <span class="lg:hidden">Reset Filters</span>
+                        <span class="hidden lg:inline">Reset</span>
                     </button>
                 </div>
             </div>
@@ -176,15 +178,15 @@ $is_admin = ($_SESSION['role'] === 'admin');
                 <table class="w-full text-left border-collapse min-w-[700px]">
                 <thead>
                     <tr>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em]">Product Details</th>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em]">Type</th>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Buying Price</th>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Labeled Price</th>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right text-blue-400">Estimated Selling Price</th>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Stock</th>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Total Value</th>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-center">Status</th>
-                        <th class="px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-center"></th>
+                        <th class="px-4 md:px-8 py-5 text-[10px] uppercase tracking-[0.2em]">Product Details</th>
+                        <th class="px-4 md:px-8 py-5 text-[10px] uppercase tracking-[0.2em] hidden md:table-cell">Type</th>
+                        <th class="px-4 md:px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right hidden lg:table-cell">Buying Price</th>
+                        <th class="px-4 md:px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right hidden sm:table-cell">Labeled Price</th>
+                        <th class="px-4 md:px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right text-blue-400">Est. Sell Price</th>
+                        <th class="px-4 md:px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right">Stock</th>
+                        <th class="px-4 md:px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-right hidden xl:table-cell">Total Value</th>
+                        <th class="px-4 md:px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-center">Status</th>
+                        <th class="px-4 md:px-8 py-5 text-[10px] uppercase tracking-[0.2em] text-center"></th>
                     </tr>
                 </thead>
                 <tbody id="inventoryBody" class="divide-y divide-white/5 cursor-pointer">
@@ -327,9 +329,18 @@ $is_admin = ($_SESSION['role'] === 'admin');
                         <input type="text" name="brand" id="edit_brand" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all placeholder:text-slate-300 font-bold border border-slate-200 text-sm" placeholder="Brand Name">
                     </div>
                     <div>
-                       <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Compatibility Profile</label>
-                       <input type="text" name="v_types" id="edit_v_types" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all placeholder:text-slate-300 font-bold border border-slate-200 text-sm" placeholder="Universal / Specific">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Oil Type</label>
+                        <div class="flex gap-2">
+                            <input type="hidden" name="oil_type" id="edit_oil_type" value="can">
+                            <button type="button" onclick="setEditOilType('can')" id="edit_btn_type_can" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border-2 border-blue-600 bg-blue-600 text-white shadow-lg">Can</button>
+                            <button type="button" onclick="setEditOilType('loose')" id="edit_btn_type_loose" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border-2 border-slate-100 bg-slate-50 text-slate-400">Loose</button>
+                        </div>
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Compatibility Profile</label>
+                    <input type="text" name="v_types" id="edit_v_types" class="w-full px-6 py-3.5 rounded-xl outline-none transition-all placeholder:text-slate-300 font-bold border border-slate-200 text-sm" placeholder="Universal / Specific">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
@@ -606,54 +617,55 @@ $is_admin = ($_SESSION['role'] === 'admin');
 
                 const row = `
                     <tr class="${rowClass} transition-all group cursor-pointer" onclick="openQuickBatchModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">
-                        <td class="px-8 py-5">
-                            <p class="font-black  text-sm tracking-tight text-red-950">${p.name}</p>
+                        <td class="px-4 md:px-8 py-5">
+                            <p class="font-black text-xs md:text-sm tracking-tight text-red-950">${p.name}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[11px] font-mono text-blue-800 font-bold uppercase tracking-tight">${p.p_barcode || p.barcode}</span>
-                              
+                                <span class="text-[10px] md:text-[11px] font-mono text-blue-800 font-bold uppercase tracking-tight">${p.p_barcode || p.barcode}</span>
+                                <span class="md:hidden px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[8px] font-black uppercase">${p.oil_type}</span>
                             </div>
                         </td>
-                        <td class="px-8 py-5">
+                        <td class="px-4 md:px-8 py-5 hidden md:table-cell">
                             ${p.type === 'oil' && p.oil_type === 'can' 
                                 ? '<span class="px-3 py-1 bg-amber-500/15 text-amber-800 border border-amber-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest">Can</span>' 
                                 : p.type === 'oil' && p.oil_type === 'loose'
                                     ? '<span class="px-3 py-1 bg-cyan-500/15 text-cyan-800 border border-cyan-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest">Loose</span>'
                                     : '<span class="text-slate-300">-</span>'}
                         </td>
-                        <td class="px-2 py-5 text-right font-mono font-black text-slate-800">
+                        <td class="px-2 md:px-4 py-5 text-right font-mono font-black text-slate-800 hidden lg:table-cell">
                             ${parseFloat(p.buying_price || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </td>
-                        <td class="px-2 py-5 text-right font-mono font-black text-slate-800">
+                        <td class="px-2 md:px-4 py-5 text-right font-mono font-black text-slate-800 hidden sm:table-cell">
                              ${parseFloat(p.selling_price || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </td>
-                        <td class="px-2 py-5 text-right font-mono font-black text-blue-600">
+                        <td class="px-2 md:px-4 py-5 text-right font-mono font-black text-blue-600">
+                             <span class="sm:hidden text-[9px] block opacity-50 font-black">EST.</span>
                              ${parseFloat(p.estimated_selling_price || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </td>
-                        <td class="px-2 py-5 text-right font-mono text-blue-800">
+                        <td class="px-2 md:px-4 py-5 text-right font-mono text-blue-800">
                             ${qtyDisplay}
                         </td>
-                        <td class="px-2 py-5 text-right font-mono font-black text-emerald-800">
+                        <td class="px-2 md:px-4 py-5 text-right font-mono font-black text-emerald-800 hidden xl:table-cell">
                              ${parseFloat(p.total_value || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </td>
                         <td class="px-3 py-5 text-center">
                             ${statusBadge}
                         </td>
-                        <td class="px-8 py-5 text-center flex justify-center items-center gap-2" onclick="event.stopPropagation()">
-                            <button onclick='showCompatibility(${JSON.stringify(p)})' class="p-2 text-blue-800 border border-transparent hover:border-blue-200 hover:bg-white rounded-lg transition-all" title="View Compatibility">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <td class="px-2 md:px-8 py-5 text-center flex justify-center items-center gap-1 md:gap-2" onclick="event.stopPropagation()">
+                            <button onclick='showCompatibility(${JSON.stringify(p)})' class="p-1.5 md:p-2 text-blue-800 border border-transparent hover:border-blue-200 hover:bg-white rounded-lg transition-all" title="View Compatibility">
+                                <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </button>
-                            <button onclick="printBarcode('${p.p_barcode || p.barcode}', '${p.name.replace(/'/g, "\\'")}', '${p.brand ? p.brand.replace(/'/g, "\\'") : ''}')" class="p-2 text-slate-400 hover:text-blue-600 rounded-lg transition-all" title="Print Barcode">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path></svg>
+                            <button onclick="printBarcode('${p.p_barcode || p.barcode}', '${p.name.replace(/'/g, "\\'")}', '${p.brand ? p.brand.replace(/'/g, "\\'") : ''}')" class="p-1.5 md:p-2 text-slate-400 hover:text-blue-600 rounded-lg transition-all hidden xs:block" title="Print Barcode">
+                                <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path></svg>
                             </button>
                             ${isAdmin ? `
-                            <button onclick='editProduct(${JSON.stringify(p)})' class="p-2 text-slate-400 hover:text-indigo-600 rounded-lg transition-all" title="Edit Info">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            <button onclick='editProduct(${JSON.stringify(p)})' class="p-1.5 md:p-2 text-slate-400 hover:text-indigo-600 rounded-lg transition-all" title="Edit Info">
+                                <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </button>
-                            <button onclick='deleteBatch(${p.id})' class="p-2 text-slate-400 hover:text-rose-600 rounded-lg transition-all" title="Delete Batch">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <button onclick='deleteBatch(${p.id})' class="p-1.5 md:p-2 text-slate-400 hover:text-rose-600 rounded-lg transition-all hidden sm:block" title="Delete Batch">
+                                <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                             ` : ''}
-                            ${statusBtn}
+                            <div class="hidden md:block">${statusBtn}</div>
                         </td>
                     </tr>
                 `;
@@ -741,11 +753,11 @@ $is_admin = ($_SESSION['role'] === 'admin');
             document.getElementById('qb_b_price').value = p.buying_price || '';
             document.getElementById('qb_s_price').value = p.selling_price || '';
             document.getElementById('qb_est_price').value = p.estimated_selling_price || '';
-            document.getElementById('quickBatchModal').classList.remove('hidden');
+            openModal('quickBatchModal');
         }
 
         function openNewProductModal() {
-            document.getElementById('newProductModal').classList.remove('hidden');
+            openModal('newProductModal');
             setOilType('can'); // Reset to default
             setTimeout(() => document.getElementById('np_barcode').focus(), 100);
         }
@@ -764,6 +776,10 @@ $is_admin = ($_SESSION['role'] === 'admin');
             }
         }
 
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
         function closeModal(id) {
             document.getElementById(id).classList.add('hidden');
         }
@@ -776,6 +792,9 @@ $is_admin = ($_SESSION['role'] === 'admin');
             document.getElementById('edit_brand').value = p.brand;
             document.getElementById('edit_v_types').value = p.vehicle_compatibility;
             
+            // Set Oil Type
+            setEditOilType(p.oil_type || 'can');
+            
             // New fields
             document.getElementById('edit_b_price').value = p.buying_price || 0;
             document.getElementById('edit_s_price').value = p.selling_price || 0;
@@ -783,7 +802,21 @@ $is_admin = ($_SESSION['role'] === 'admin');
             const isLoose = p.type === 'oil' && p.oil_type === 'loose';
             document.getElementById('edit_qty').value = isLoose ? (p.current_qty || 0) : (Math.round(p.current_qty) || 0);
             
-            document.getElementById('editModal').classList.remove('hidden');
+            openModal('editModal');
+        }
+
+        function setEditOilType(type) {
+            document.getElementById('edit_oil_type').value = type;
+            const canBtn = document.getElementById('edit_btn_type_can');
+            const looseBtn = document.getElementById('edit_btn_type_loose');
+            
+            if (type === 'can') {
+                canBtn.className = 'flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border-2 border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-500/20';
+                looseBtn.className = 'flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border-2 border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200';
+            } else {
+                looseBtn.className = 'flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border-2 border-emerald-600 bg-emerald-600 text-white shadow-lg shadow-emerald-500/20';
+                canBtn.className = 'flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border-2 border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200';
+            }
         }
 
         function generateBarcode(inputId) {

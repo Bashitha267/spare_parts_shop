@@ -149,19 +149,19 @@ check_auth('admin');
                 <h3 id="card_app_credit" class="text-2xl font-black text-blue-600 tracking-tight">Rs. 0.00</h3>
             </div>
             <!-- Approved Cheque -->
-            <div class="glass-card p-8 border-l-4 border-amber-500 shadow-xl shadow-amber-500/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-amber-500 transition-colors">Approved Cheque</p>
-                <h3 id="card_app_cheque" class="text-2xl font-black text-amber-600 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-6 border-l-4 border-amber-500 shadow-xl shadow-amber-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-amber-500 transition-colors">Approved Cheque</p>
+                <h3 id="card_app_cheque" class="text-xl font-black text-amber-600 tracking-tight">Rs. 0.00</h3>
             </div>
             <!-- Pending Credit -->
-            <div class="glass-card p-8 border-l-4 border-rose-400 shadow-xl shadow-rose-400/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-rose-500 transition-colors">Pending Credit</p>
-                <h3 id="card_pend_credit" class="text-2xl font-black text-rose-500 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-6 border-l-4 border-rose-400 shadow-xl shadow-rose-400/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-rose-500 transition-colors">Pending Credit</p>
+                <h3 id="card_pend_credit" class="text-xl font-black text-rose-500 tracking-tight">Rs. 0.00</h3>
             </div>
             <!-- Pending Cheque -->
-            <div class="glass-card p-8 border-l-4 border-orange-400 shadow-xl shadow-orange-400/10 hover:scale-105 transition-all cursor-default group">
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-orange-500 transition-colors">Pending Cheque</p>
-                <h3 id="card_pend_cheque" class="text-2xl font-black text-orange-500 tracking-tight">Rs. 0.00</h3>
+            <div class="glass-card p-6 border-l-4 border-orange-400 shadow-xl shadow-orange-400/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-orange-500 transition-colors">Pending Cheque</p>
+                <h3 id="card_pend_cheque" class="text-xl font-black text-orange-500 tracking-tight">Rs. 0.00</h3>
             </div>
         </div>
 
@@ -212,17 +212,17 @@ check_auth('admin');
             <div class="overflow-x-auto">
                 <table class="w-full text-left min-w-[800px] border-collapse">
                 <thead>
-                    <tr>
+                    <tr class="text-left text-[11px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100">
                         <th class="px-6 py-6">ID</th>
-                        <th class="px-8 py-6 min-w-[200px]">Customer</th>
-                        <th class="px-8 py-6">Contact Number</th>
-                        <th class="px-8 py-6">Issued By</th>
-                        <th class="px-8 py-6">Date & Time</th>
+                        <th class="px-8 py-6 min-w-[150px]">Customer</th>
+                        <th class="px-8 py-6 hidden lg:table-cell">Contact</th>
+                        <th class="px-8 py-6 hidden xl:table-cell">Issued By</th>
+                        <th class="px-8 py-6 hidden md:table-cell">Timestamp</th>
                         <th class="px-2 py-6">Payment</th>
-                        <th class="px-8 py-6 text-right">Discount (LKR)</th>
-                        <th class="px-8 py-6 text-right">Settlement (LKR)</th>
-                        <th class="px-8 py-6 text-center">Order Status</th>
-                        <th class="px-8 py-6 text-center">Payment Status</th>
+                        <th class="px-8 py-6 text-right hidden xl:table-cell">Discount</th>
+                        <th class="px-8 py-6 text-right">Settlement</th>
+                        <th class="px-8 py-6 text-center hidden lg:table-cell">Status</th>
+                        <th class="px-8 py-6 text-center">Auth Status</th>
                         <th class="px-8 py-6 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -437,24 +437,24 @@ check_auth('admin');
                                 <p class="font-black text-slate-800 text-sm tracking-tight">${sale.cust_name || 'Anonymous Guest'}</p>
                             </div>
                         </td>
-                        <td class="px-8 py-8">
+                        <td class="px-8 py-8 hidden lg:table-cell">
                             <div class="flex items-center gap-2">
                                 <svg class="w-3 h-3 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                                 <p class="text-[9px] text-slate-800 font-black uppercase tracking-wider">${sale.cust_contact || 'Private Line'}</p>
                             </div>
                         </td>
-                        <td class="px-8 py-8 text-slate-700">
+                        <td class="px-8 py-8 text-slate-700 hidden xl:table-cell">
                              <p class="font-black text-[11px] tracking-tight uppercase">${sale.officer_name || 'System'}</p>
                         </td>
-                        <td class="px-8 py-8 text-slate-600">
+                        <td class="px-8 py-8 text-slate-600 hidden md:table-cell">
                             <p class="font-bold text-[11px] tracking-widest">${new Date(sale.created_at).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                         </td>
                         <td class="px-2 py-8 text-left">
                             <span class="px-3 py-1 border rounded-lg text-[9px] font-black uppercase tracking-widest ${methodClass}">${sale.payment_method}</span>
                         </td>
-                        <td class="px-8 py-8 text-right font-black text-rose-600 tracking-widest text-sm">${parseFloat(sale.discount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="px-8 py-8 text-right font-black text-rose-600 tracking-widest text-sm hidden xl:table-cell">${parseFloat(sale.discount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                         <td class="px-8 py-8 text-right font-black text-blue-800 tracking-widest text-sm">${parseFloat(sale.final_amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                        <td class="px-8 py-8 text-center text-nowrap">
+                        <td class="px-8 py-8 text-center text-nowrap hidden lg:table-cell">
                             <span class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-600 border border-slate-200 bg-white shadow-sm">${sale.status === 'pending' ? 'DRAFTED' : 'COMPLETED'}</span>
                         </td>
                         <td class="px-8 py-8 text-center text-nowrap">
@@ -525,20 +525,22 @@ check_auth('admin');
             if(!data.success) return;
 
             let html = `
-                <div class="overflow-x-auto mt-4 px-2 text-left">
-                    <table class="w-full text-[11px] border-collapse">
+                <div class="overflow-x-auto mt-4 px-1 text-left">
+                    <table class="w-full min-w-[500px] text-[10px] sm:text-[11px] border-collapse">
                         <thead>
                             <tr class="text-blue-300/50 uppercase tracking-widest border-b border-white/10 italic">
                                 <th class="py-2">Item</th>
                                 <th class="py-2 text-center">Qty</th>
-                                <th class="py-2 text-right">Price</th>
-                                <th class="py-2 text-right">Total</th>
+                                <th class="py-3 text-right">Net Price</th>
+                                <th class="py-3 text-right">Discount</th>
+                                <th class="py-3 text-right">Total</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-white/5">
             `;
 
             data.items.forEach(item => {
+                const soldPrice = parseFloat(item.total_price) / parseFloat(item.qty);
                 html += `
                     <tr>
                         <td class="py-3">
@@ -546,7 +548,8 @@ check_auth('admin');
                             <p class="text-[9px] opacity-80">${item.barcode}</p>
                         </td>
                         <td class="py-3 text-center font-bold">${item.qty}</td>
-                        <td class="py-3 text-right font-mono text-blue-800">${parseFloat(item.unit_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="py-3 text-right font-mono text-blue-800">${soldPrice.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="py-3 text-right font-mono text-rose-500">-${parseFloat(item.discount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                         <td class="py-3 text-right font-mono text-emerald-800">${parseFloat(item.total_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                     </tr>
                 `;

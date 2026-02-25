@@ -129,6 +129,10 @@ check_auth('cashier');
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <span class="hidden xs:inline text-[10px] font-black uppercase tracking-widest text-white">Drafts</span>
                     </button>
+                    <button onclick="window.location.reload()" class="flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 transition-colors border border-emerald-500 shadow-sm" title="Start New Sale">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                        <span class="hidden xs:inline text-[10px] font-black uppercase tracking-widest text-white">New Sale</span>
+                    </button>
                     <div class="flex items-center gap-2 px-2.5 py-1.5 bg-white/10 rounded-lg">
                         <span id="draft_saving_indicator" class="w-2 h-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50"></span>
                         <span id="draft_status_text" class="font-bold uppercase tracking-widest text-[9px] text-white/90">Online</span>
