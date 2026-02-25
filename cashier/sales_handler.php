@@ -189,24 +189,25 @@ if ($action === 'discard_draft') {
 
 if ($action === 'get_today_total') {
     $user_id = $_SESSION['id'];
-    $date = $_GET['date'] ?? date('Y-m-d');
+    $date_today = date('Y-m-d');
+    $from = $_GET['from'] ?? $date_today;
+    $to = $_GET['to'] ?? $date_today;
     
+    // --- Range Summaries (for the cards) ---
     $summaries = [
-        'cash' => 0,
-        'card' => 0,
-        'approved_credit' => 0,
+        'cash' => 0, 'card' => 0,
         'approved_cheque' => 0,
-        'pending_credit' => 0,
-        'pending_cheque' => 0
+        'total_credit' => 0,
+        'pending_credit' => 0, 'pending_cheque' => 0
     ];
 
-    $query = "SELECT payment_method, payment_status, SUM(final_amount) as total 
-              FROM sales 
-              WHERE user_id = ? AND DATE(created_at) = ? AND status = 'completed'
-              GROUP BY payment_method, payment_status";
+    $q_range = "SELECT payment_method, payment_status, SUM(final_amount) as total 
+                FROM sales 
+                WHERE user_id = ? AND DATE(created_at) BETWEEN ? AND ? AND status = 'completed'
+                GROUP BY payment_method, payment_status";
     
-    $stmt = $pdo->prepare($query);
-    $stmt->execute([$user_id, $date]);
+    $stmt = $pdo->prepare($q_range);
+    $stmt->execute([$user_id, $from, $to]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($results as $row) {
@@ -217,33 +218,36 @@ if ($action === 'get_today_total') {
         if ($method === 'cash') $summaries['cash'] += $total;
         elseif ($method === 'card') $summaries['card'] += $total;
         elseif ($method === 'credit') {
-            if ($status === 'approved') $summaries['approved_credit'] += $total;
-            elseif ($status === 'pending') $summaries['pending_credit'] += $total;
+            $summaries['total_credit'] += $total;
+            if ($status !== 'approved') $summaries['pending_credit'] += $total;
         }
         elseif ($method === 'cheque') {
             if ($status === 'approved') $summaries['approved_cheque'] += $total;
-            elseif ($status === 'pending') $summaries['pending_cheque'] += $total;
+            else $summaries['pending_cheque'] += $total;
         }
     }
 
+    // --- Strictly Today's Stats (for the top navbar) ---
     $stmt_tot = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND status = 'completed'");
-    $stmt_tot->execute([$user_id, $date]);
+    $stmt_tot->execute([$user_id, $date_today]);
     $grand_total = $stmt_tot->fetchColumn() ?: 0;
 
     $stmt_app = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'approved' AND status = 'completed'");
-    $stmt_app->execute([$user_id, $date]);
+    $stmt_app->execute([$user_id, $date_today]);
     $total_approved = $stmt_app->fetchColumn() ?: 0;
 
     $stmt_pend = $pdo->prepare("SELECT SUM(final_amount) FROM sales WHERE user_id = ? AND DATE(created_at) = ? AND payment_status = 'pending' AND status = 'completed'");
-    $stmt_pend->execute([$user_id, $date]);
+    $stmt_pend->execute([$user_id, $date_today]);
     $total_pending = $stmt_pend->fetchColumn() ?: 0;
 
     echo json_encode([
         'success' => true, 
         'summaries' => $summaries,
-        'total' => number_format($grand_total, 2),
-        'approved' => number_format($total_approved, 2),
-        'pending' => number_format($total_pending, 2)
+        'today' => [
+            'total' => number_format($grand_total, 2),
+            'approved' => number_format($total_approved, 2),
+            'pending' => number_format($total_pending, 2)
+        ]
     ]);
     exit;
 }

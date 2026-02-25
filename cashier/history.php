@@ -194,32 +194,32 @@ check_auth('cashier');
         <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-8">
             <!-- Cash -->
             <div class="glass-card p-4 sm:p-6 border-l-4 border-emerald-500 shadow-xl shadow-emerald-500/10 hover:scale-[1.02] transition-all cursor-default group">
-                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-emerald-500 transition-colors">Cash</p>
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-emerald-500 transition-colors">Total Cash</p>
                 <h3 id="card_cash" class="text-base sm:text-xl font-black text-emerald-600 tracking-tighter">Rs. 0.00</h3>
             </div>
             <!-- Card -->
             <div class="glass-card p-4 sm:p-6 border-l-4 border-indigo-500 shadow-xl shadow-indigo-500/10 hover:scale-[1.02] transition-all cursor-default group">
-                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-indigo-500 transition-colors">Card</p>
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-indigo-500 transition-colors">Total Card</p>
                 <h3 id="card_card" class="text-base sm:text-xl font-black text-indigo-600 tracking-tighter">Rs. 0.00</h3>
-            </div>
-            <!-- Approved Credit -->
-            <div class="glass-card p-4 sm:p-6 border-l-4 border-blue-500 shadow-xl shadow-blue-500/10 hover:scale-[1.02] transition-all cursor-default group">
-                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-blue-500 transition-colors">App. Credit</p>
-                <h3 id="card_app_credit" class="text-base sm:text-xl font-black text-blue-600 tracking-tighter">Rs. 0.00</h3>
             </div>
             <!-- Approved Cheque -->
             <div class="glass-card p-4 sm:p-6 border-l-4 border-amber-500 shadow-xl shadow-amber-500/10 hover:scale-[1.02] transition-all cursor-default group">
-                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-amber-500 transition-colors">App. Cheque</p>
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-amber-500 transition-colors">Tot. App. Cheque</p>
                 <h3 id="card_app_cheque" class="text-base sm:text-xl font-black text-amber-600 tracking-tighter">Rs. 0.00</h3>
+            </div>
+            <!-- Total Credit -->
+            <div class="glass-card p-4 sm:p-6 border-l-4 border-blue-500 shadow-xl shadow-blue-500/10 hover:scale-[1.02] transition-all cursor-default group">
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-blue-500 transition-colors">Total Credit</p>
+                <h3 id="card_app_credit" class="text-base sm:text-xl font-black text-blue-600 tracking-tighter">Rs. 0.00</h3>
             </div>
             <!-- Pending Credit -->
             <div class="glass-card p-4 sm:p-6 border-l-4 border-rose-400 shadow-xl shadow-rose-400/10 hover:scale-[1.02] transition-all cursor-default group">
-                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-rose-500 transition-colors">Pend. Credit</p>
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-rose-500 transition-colors">Pending Credit</p>
                 <h3 id="card_pend_credit" class="text-base sm:text-xl font-black text-rose-500 tracking-tighter">Rs. 0.00</h3>
             </div>
             <!-- Pending Cheque -->
             <div class="glass-card p-4 sm:p-6 border-l-4 border-orange-400 shadow-xl shadow-orange-400/10 hover:scale-[1.02] transition-all cursor-default group">
-                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-orange-500 transition-colors">Pend. Cheque</p>
+                <p class="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-orange-500 transition-colors">Pending Cheque</p>
                 <h3 id="card_pend_cheque" class="text-base sm:text-xl font-black text-orange-500 tracking-tighter">Rs. 0.00</h3>
             </div>
         </div>
@@ -400,30 +400,38 @@ check_auth('cashier');
 
     <script>
         async function updateTodayTotal() {
-            const fromDate = document.getElementById('dateFrom').value || new Date().toISOString().split('T')[0];
-            const res = await fetch(`sales_handler.php?action=get_today_total&date=${fromDate}`);
+            const from = document.getElementById('dateFrom').value || getTodayDate();
+            const to = document.getElementById('dateTo').value || getTodayDate();
+            const res = await fetch(`sales_handler.php?action=get_today_total&from=${from}&to=${to}`);
             const data = await res.json();
             
-            document.getElementById('today_total').innerText = 'Rs. ' + data.total;
-            document.getElementById('today_approved').innerText = 'Rs. ' + data.approved;
-            document.getElementById('today_pending').innerText = 'Rs. ' + data.pending;
+            if(data.today) {
+                document.getElementById('today_total').innerText = 'Rs. ' + data.today.total;
+                document.getElementById('today_approved').innerText = 'Rs. ' + data.today.approved;
+                document.getElementById('today_pending').innerText = 'Rs. ' + data.today.pending;
+            }
             
             // Populate summary cards
             if(data.summaries) {
                 const s = data.summaries;
                 document.getElementById('card_cash').innerText = 'Rs. ' + numberFormat(s.cash);
                 document.getElementById('card_card').innerText = 'Rs. ' + numberFormat(s.card);
-                document.getElementById('card_app_credit').innerText = 'Rs. ' + numberFormat(s.approved_credit);
+                document.getElementById('card_app_credit').innerText = 'Rs. ' + numberFormat(s.total_credit);
                 document.getElementById('card_app_cheque').innerText = 'Rs. ' + numberFormat(s.approved_cheque);
                 document.getElementById('card_pend_credit').innerText = 'Rs. ' + numberFormat(s.pending_credit);
                 document.getElementById('card_pend_cheque').innerText = 'Rs. ' + numberFormat(s.pending_cheque);
             }
         }
 
+        function getTodayDate() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
         let currentPage = 1;
         document.addEventListener('DOMContentLoaded', () => {
             // Set default dates to today
-            const today = new Date().toISOString().split('T')[0];
+            const today = getTodayDate();
             document.getElementById('dateFrom').value = today;
             document.getElementById('dateTo').value = today;
 
@@ -436,7 +444,7 @@ check_auth('cashier');
             let activeIdx = -1;
 
             window.resetFilters = function() {
-                const today = new Date().toISOString().split('T')[0];
+                const today = getTodayDate();
                 searchInput.value = '';
                 document.getElementById('dateFrom').value = today;
                 document.getElementById('dateTo').value = today;
@@ -576,7 +584,7 @@ check_auth('cashier');
                         </td>
                         <td class="text-right">
                             <p class="text-lg font-black text-blue-800 tracking-tight">Rs. ${numberFormat(row.final_amount)}</p>
-                            ${row.discount > 0 ? `<p class="text-xs text-rose-500 font-bold mt-0.5">Saved Rs. ${numberFormat(row.discount)}</p>` : ''}
+                            ${row.discount > 0 ? `<p class="text-xs text-rose-500 font-bold mt-0.5">Discount Rs. ${numberFormat(row.discount)}</p>` : ''}
                         </td>
                         <td class="text-center">
                             <button onclick="viewDetails(${row.id})" class="p-2.5 text-white bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 transition-all active:scale-95">
@@ -637,7 +645,7 @@ check_auth('cashier');
                             <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg text-xs font-black">${item.qty}</span>
                         </td>
                         <td class="py-3.5 text-right font-bold text-slate-500">Rs. ${numberFormat(item.unit_price)}</td>
-                        <td class="py-3.5 text-right font-bold text-rose-500">-Rs. ${numberFormat(item.discount)}</td>
+                        <td class="py-3.5 text-right font-bold text-rose-500">Rs. ${numberFormat(item.discount)}</td>
                         <td class="py-3.5 text-right font-black text-slate-800">Rs. ${numberFormat(item.total_price)}</td>
                     </tr>
                 `;
