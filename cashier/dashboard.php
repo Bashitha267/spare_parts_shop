@@ -82,32 +82,35 @@ $draft_count = $draft_stmt->fetchColumn() ?: 0;
     <div class="colorful-overlay"></div>
     
     <!-- Hub Header -->
-    <nav class="glass-nav fixed w-full z-30 top-0 text-slate-900 font-black">
-        <div class="px-4 md:px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-500/20">V</div>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">Cashier Hub</h1>
-            </div>
+    <nav class="glass-nav fixed w-full z-40 top-0 text-slate-900 font-black transition-all duration-300">
+        <div class="px-3 md:px-6 py-2.5 md:py-4 flex justify-between items-center max-w-7xl mx-auto gap-3">
+            <h1 class="text-xs md:text-xl font-black text-slate-900 tracking-tight uppercase flex-shrink-0">Cashier</h1>
             
-            <div class="flex items-center gap-4 md:gap-8">
-                <!-- Metrics Badges (Enabled on tablets) -->
-                <div class="hidden sm:flex items-center gap-3">
-                    <div class="px-3 sm:px-5 py-2 bg-indigo-50 border-2 border-indigo-200 rounded-2xl flex flex-col items-end shadow-sm">
-                        <span class="text-[7px] sm:text-[8px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-1">Stock Value</span>
-                        <span class="text-[10px] sm:text-xs font-black text-indigo-800 leading-none">Rs. <?php echo number_format($total_inventory, 0); ?></span>
+            <div class="flex items-center gap-2 md:gap-3 overflow-x-auto no-scrollbar scroll-smooth flex-grow justify-end">
+                <!-- Today Sales Metric (Focus) -->
+                <div class="flex items-center gap-1.5 md:gap-3 flex-nowrap">
+                    <div class="px-2 md:px-5 py-1.5 md:py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg md:rounded-2xl flex flex-col items-end shadow-sm flex-shrink-0">
+                        <span class="text-[6px] md:text-[8px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-0.5 md:mb-1 whitespace-nowrap">Today Sales</span>
+                        <span class="text-[9px] md:text-sm font-black text-emerald-800 leading-none whitespace-nowrap">Rs. <?php echo number_format($today_sales, 0); ?></span>
                     </div>
-                    <div class="px-3 sm:px-5 py-2 bg-emerald-50 border-2 border-emerald-200 rounded-2xl flex flex-col items-end shadow-sm">
-                        <span class="text-[7px] sm:text-[8px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1">Today</span>
-                        <span class="text-[10px] sm:text-xs font-black text-emerald-800 leading-none">Rs. <?php echo number_format($today_sales, 0); ?></span>
+                    <!-- Secondary metric if hidden on mobile or shown as value -->
+                    <div class="hidden sm:flex px-2 md:px-5 py-1.5 md:py-2.5 bg-indigo-50 border border-indigo-200 rounded-lg md:rounded-2xl flex flex-col items-end shadow-sm flex-shrink-0">
+                        <span class="text-[6px] md:text-[8px] font-black text-indigo-400 uppercase tracking-widest leading-none mb-0.5 md:mb-1 whitespace-nowrap">Stock Value</span>
+                        <span class="text-[9px] md:text-sm font-black text-indigo-800 leading-none whitespace-nowrap">Rs. <?php echo number_format($total_inventory, 0); ?></span>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4 border-l border-slate-200 pl-4 sm:pl-8">
-                    <div class="hidden md:block text-right">
+                <div class="flex items-center gap-2 md:gap-4 border-l border-slate-200 pl-2 md:pl-6 flex-shrink-0">
+                    <div class="hidden lg:block text-right">
                         <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none mb-1">Operator</p>
-                        <p class="text-xs font-bold text-slate-900"><?php echo $_SESSION['full_name']; ?></p>
+                        <p class="text-xs font-bold text-slate-900"><?php echo explode(' ', $_SESSION['full_name'])[0]; ?></p>
                     </div>
-                    <a href="../logout.php" class="text-[10px] font-black text-white bg-red-600 border-2 border-white px-4 sm:px-5 py-2.5 rounded-xl hover:bg-red-700 hover:shadow-lg transition-all uppercase tracking-wider">Logout</a>
+                    <a href="../logout.php" class="flex items-center justify-center text-white bg-red-600 border-2 border-white p-2.5 md:px-5 md:py-2.5 rounded-xl hover:bg-red-700 hover:shadow-lg transition-all uppercase tracking-wider group" title="Logout">
+                        <span class="hidden md:inline text-[10px] font-black">Logout</span>
+                        <svg class="w-4 h-4 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                    </a>
                 </div>
             </div>
         </div>

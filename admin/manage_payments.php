@@ -156,7 +156,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-white uppercase tracking-widest mb-1">Total Pending</p>
-                    <h3 class="text-2xl font-black text-white"><?php echo $counts['total']; ?> <span class="text-xs font-bold text-white/40 tracking-normal ml-1">TRX</span></h3>
+                    <h3 id="count_total" class="text-2xl font-black text-white"><?php echo $counts['total']; ?> <span class="text-xs font-bold text-white/40 tracking-normal ml-1">TRX</span></h3>
                 </div>
             </div>
             <div class="blue-gradient-card p-6 rounded-[2.5rem] flex items-center gap-5">
@@ -165,7 +165,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-1">Cheque Validation</p>
-                    <h3 class="text-2xl font-black text-white"><?php echo $counts['cheques']; ?> <span class="text-xs font-bold text-white/30 tracking-normal ml-1">items</span></h3>
+                    <h3 id="count_cheques" class="text-2xl font-black text-white"><?php echo $counts['cheques']; ?> <span class="text-xs font-bold text-white/30 tracking-normal ml-1">items</span></h3>
                 </div>
             </div>
             <div class="blue-gradient-card p-6 rounded-[2.5rem] flex items-center gap-5">
@@ -174,7 +174,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Credit Clearance</p>
-                    <h3 class="text-2xl font-black text-white"><?php echo $counts['credits']; ?> <span class="text-xs font-bold text-white/40 tracking-normal ml-1">items</span></h3>
+                    <h3 id="count_credits" class="text-2xl font-black text-white"><?php echo $counts['credits']; ?> <span class="text-xs font-bold text-white/40 tracking-normal ml-1">items</span></h3>
                 </div>
             </div>
         </div>
@@ -335,6 +335,14 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
             
             const res = await fetch(`payment_handler.php?action=fetch_pending_payments&method=${currentMethod}&search=${search}&date=${date}&page=${page}`);
             const data = await res.json();
+            
+            // Update metrics dynamically
+            if (data.counts) {
+                document.getElementById('count_total').innerHTML = `${data.counts.total} <span class="text-xs font-bold text-white/40 tracking-normal ml-1">TRX</span>`;
+                document.getElementById('count_cheques').innerHTML = `${data.counts.cheques || 0} <span class="text-xs font-bold text-white/30 tracking-normal ml-1">items</span>`;
+                document.getElementById('count_credits').innerHTML = `${data.counts.credits || 0} <span class="text-xs font-bold text-white/40 tracking-normal ml-1">items</span>`;
+            }
+
             tbody.innerHTML = '';
 
             if (data.sales.length === 0) {
@@ -459,7 +467,7 @@ $counts = $count_stmt->fetch(PDO::FETCH_ASSOC);
                         <td class="px-8 py-6"><span class="font-mono text-[10px] font-black text-blue-800 tracking-tighter uppercase px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">TRX-${sale.id}</span></td>
                         <td class="px-8 py-6"><p class="font-black text-slate-900 leading-tight text-sm">${sale.cust_name || 'Walk-in'}</p></td>
                         <td class="px-8 py-6"><span class="text-[10px] font-black uppercase text-blue-600 tracking-widest">${sale.payment_method}</span></td>
-                        <td class="px-8 py-6 font-black text-slate-900 text-sm">Rs. ${parseFloat(sale.final_amount).toLocaleString()}</td>
+                        <td class="px-8 py-6 font-black text-slate-900 text-sm">Rs. ${numberFormat(sale.final_amount)}</td>
                         <td class="px-8 py-6 text-center font-black text-slate-500 uppercase text-[10px]">${sale.cashier_name}</td>
                         <td class="px-8 py-6 text-right"><p class="font-bold text-slate-900 text-[11px]">${new Date(sale.created_at).toLocaleDateString()}</p><p class="text-[9px] text-slate-400 font-black">${new Date(sale.created_at).toLocaleTimeString()}</p></td>
                     </tr>`;
