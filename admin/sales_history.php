@@ -688,7 +688,7 @@ check_auth('admin');
                         <td class="py-3 text-right font-mono text-blue-800">${soldPrice.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                         <td class="py-3 text-center">
                             ${remaining > 0 ? 
-                                `<button onclick="processSingleItemReturn(${item.id}, ${remaining})" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all">Return</button>` : 
+                                `<button onclick="processSingleItemReturn(${item.id}, ${remaining}, ${soldPrice})" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all">Return</button>` : 
                                 `<span class="text-rose-500 font-bold uppercase text-[9px]">Fully Returned</span>`
                             }
                         </td>
@@ -712,18 +712,28 @@ check_auth('admin');
             });
         }
 
-        async function processSingleItemReturn(itemId, maxQty) {
+        async function processSingleItemReturn(itemId, maxQty, unitPrice) {
             const { value: formValues } = await Swal.fire({
                 title: 'Process Return',
                 html:
                     `<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest text-left mb-2">Quantity to Return (Max ${maxQty})</label>` +
-                    `<input id="swal-input-qty" type="number" step="0.01" min="0.01" max="${maxQty}" value="${maxQty}" class="w-full px-4 py-3 rounded-xl text-sm font-bold border border-slate-200 mb-4">` +
+                    `<input id="swal-input-qty" type="number" step="0.01" min="0.01" max="${maxQty}" value="${maxQty}" class="w-full px-4 py-3 rounded-xl text-sm font-bold border border-slate-200 mb-2">` +
+                    `<div id="swal-refund-preview" class="text-[11px] font-black text-amber-600 tracking-wider text-left mb-4 uppercase">Est. Refund: Rs. ${(maxQty * unitPrice).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>` +
                     `<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest text-left mb-2">Reason for Return (Optional)</label>` +
                     `<textarea id="swal-input-reason" placeholder="Enter return reason..." class="w-full px-4 py-3 rounded-xl text-sm font-bold border border-slate-200 min-h-[80px] resize-none"></textarea>`,
                 focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonColor: '#f59e0b',
                 confirmButtonText: 'Confirm Return',
+                didOpen: () => {
+                    const qtyInput = document.getElementById('swal-input-qty');
+                    const preview = document.getElementById('swal-refund-preview');
+                    qtyInput.addEventListener('input', () => {
+                        const val = parseFloat(qtyInput.value) || 0;
+                        const total = val * unitPrice;
+                        preview.innerText = 'Est. Refund: Rs. ' + total.toLocaleString(undefined, {minimumFractionDigits: 2});
+                    });
+                },
                 preConfirm: () => {
                     const qtyVal = parseFloat(document.getElementById('swal-input-qty').value);
                     const reasonVal = document.getElementById('swal-input-reason').value;
