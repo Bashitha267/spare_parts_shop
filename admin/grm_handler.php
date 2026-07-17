@@ -8,8 +8,8 @@
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 
-// Enforce admin access
-check_auth('admin');
+// Enforce admin/cashier access
+check_auth(['admin', 'cashier']);
 
 header('Content-Type: application/json');
 

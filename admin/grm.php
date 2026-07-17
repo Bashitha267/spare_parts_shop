@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
-check_auth('admin');
+check_auth(['admin', 'cashier']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,7 +99,7 @@ check_auth('admin');
 <nav class="glass-nav sticky top-0 z-40">
     <div class="px-4 md:px-6 py-3.5 flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto gap-3">
         <div class="flex items-center gap-3 w-full sm:w-auto">
-            <a href="dashboard.php" class="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all">
+            <a href="<?php echo $_SESSION['role'] === 'admin' ? 'dashboard.php' : '../cashier/dashboard.php'; ?>" class="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
             <div>

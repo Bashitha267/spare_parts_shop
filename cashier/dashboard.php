@@ -177,6 +177,14 @@ $draft_count = $draft_stmt->fetchColumn() ?: 0;
                 </div>
                 <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">Arrivals</h3>
             </a>
+
+            <!-- GRM - Goods Receipt Management -->
+            <a href="../admin/grm.php" class="p-6 sm:p-10 blue-gradient-card rounded-[2rem] sm:rounded-[2.5rem] group relative overflow-hidden text-center">
+                <div class="mb-4 sm:mb-5 group-hover:rotate-12 transition-transform relative z-10">
+                    <svg class="w-10 h-10 sm:w-14 sm:h-14 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                </div>
+                <h3 class="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.2em] relative z-10">GRM</h3>
+            </a>
         </div>
     </main>
 
