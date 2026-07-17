@@ -521,6 +521,11 @@ check_auth('admin');
                                 <button onclick="viewSaleItems(${sale.id})" class="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95" title="View Manifest">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                 </button>
+                                ${isDraft ? '' : `
+                                <button onclick="openReturnModal(${sale.id})" class="p-3 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm active:scale-95" title="Return Items">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                </button>
+                                `}
                                 <button onclick='openEditModal(${JSON.stringify(sale)})' class="p-3 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-95" title="Modify Record">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                 </button>
@@ -592,7 +597,7 @@ check_auth('admin');
 
             let html = `
                 <div class="overflow-x-auto mt-4 px-1 text-left">
-                    <table class="w-full min-w-[500px] text-[10px] sm:text-[11px] border-collapse">
+                    <table class="w-full min-w-[700px] text-[10px] sm:text-[11px] border-collapse">
                         <thead>
                             <tr class="text-blue-300/50 uppercase tracking-widest border-b border-white/10 italic">
                                 <th class="py-2">Item</th>
@@ -607,10 +612,21 @@ check_auth('admin');
 
             data.items.forEach(item => {
                 const soldPrice = parseFloat(item.total_price) / parseFloat(item.qty);
+                const retQty = parseFloat(item.returned_qty || 0);
+                const isFullyReturned = retQty >= parseFloat(item.qty);
+                const returnBadge = retQty > 0 ? 
+                    (isFullyReturned ? 
+                        `<span class="ml-2 px-2 py-0.5 bg-rose-100 text-rose-700 rounded text-[8px] font-black uppercase">Returned</span>` : 
+                        `<span class="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-[8px] font-black uppercase">Partially Returned (${retQty})</span>`
+                    ) : '';
+
                 html += `
                     <tr>
                         <td class="py-3">
-                            <p class="font-black text-slate-800">${item.name}</p>
+                            <div class="flex items-center">
+                                <p class="font-black text-slate-800">${item.name}</p>
+                                ${returnBadge}
+                            </div>
                             <p class="text-[9px] opacity-80">${item.barcode}</p>
                         </td>
                         <td class="py-3 text-center font-bold">${item.qty}</td>
@@ -626,7 +642,7 @@ check_auth('admin');
             Swal.fire({
                 title: '<span class="text-xl font-black uppercase tracking-tighter text-blue-400">Transaction Manifest</span>',
                 html: html,
-                width: '600px',
+                width: '800px',
                 confirmButtonText: 'Done',
                 confirmButtonColor: '#3b82f6',
                 customClass: { 
@@ -634,6 +650,118 @@ check_auth('admin');
                     confirmButton: 'rounded-xl font-black uppercase text-[10px] px-8 py-3 tracking-widest w-full bg-blue-600 text-white'
                 }
             });
+        }
+
+        async function openReturnModal(id) {
+            const res = await fetch(`sales_history_handler.php?action=fetch_items&id=${id}`);
+            const data = await res.json();
+            
+            if(!data.success) return;
+
+            let html = `
+                <div class="overflow-x-auto mt-4 px-1 text-left">
+                    <table class="w-full min-w-[700px] text-[10px] sm:text-[11px] border-collapse">
+                        <thead>
+                            <tr class="text-blue-300/50 uppercase tracking-widest border-b border-white/10 italic">
+                                <th class="py-2">Item</th>
+                                <th class="py-2 text-center">Purchased</th>
+                                <th class="py-2 text-center">Remaining</th>
+                                <th class="py-3 text-right">Net Price</th>
+                                <th class="py-3 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+            `;
+
+            data.items.forEach(item => {
+                const remaining = parseFloat(item.qty) - parseFloat(item.returned_qty || 0);
+                const soldPrice = parseFloat(item.total_price) / parseFloat(item.qty);
+
+                html += `
+                    <tr>
+                        <td class="py-3">
+                            <p class="font-black text-slate-800">${item.name}</p>
+                            <p class="text-[9px] opacity-80">${item.barcode}</p>
+                        </td>
+                        <td class="py-3 text-center font-bold">${item.qty}</td>
+                        <td class="py-3 text-center font-bold text-blue-600">${remaining}</td>
+                        <td class="py-3 text-right font-mono text-blue-800">${soldPrice.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="py-3 text-center">
+                            ${remaining > 0 ? 
+                                `<button onclick="processSingleItemReturn(${item.id}, ${remaining})" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all">Return</button>` : 
+                                `<span class="text-rose-500 font-bold uppercase text-[9px]">Fully Returned</span>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table></div>`;
+
+            Swal.fire({
+                title: '<span class="text-xl font-black uppercase tracking-tighter text-amber-500">Return Items (TRX-' + id + ')</span>',
+                html: html,
+                width: '800px',
+                showCancelButton: true,
+                cancelButtonText: 'Close',
+                showConfirmButton: false,
+                customClass: { 
+                    popup: 'rounded-[2rem] bg-white text-slate-800 shadow-2xl border border-slate-100 px-4',
+                    cancelButton: 'rounded-xl font-black uppercase text-[10px] px-8 py-3 tracking-widest bg-slate-100 text-slate-600'
+                }
+            });
+        }
+
+        async function processSingleItemReturn(itemId, maxQty) {
+            const { value: formValues } = await Swal.fire({
+                title: 'Process Return',
+                html:
+                    `<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest text-left mb-2">Quantity to Return (Max ${maxQty})</label>` +
+                    `<input id="swal-input-qty" type="number" step="0.01" min="0.01" max="${maxQty}" value="${maxQty}" class="w-full px-4 py-3 rounded-xl text-sm font-bold border border-slate-200 mb-4">` +
+                    `<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest text-left mb-2">Reason for Return (Optional)</label>` +
+                    `<textarea id="swal-input-reason" placeholder="Enter return reason..." class="w-full px-4 py-3 rounded-xl text-sm font-bold border border-slate-200 min-h-[80px] resize-none"></textarea>`,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonColor: '#f59e0b',
+                confirmButtonText: 'Confirm Return',
+                preConfirm: () => {
+                    const qtyVal = parseFloat(document.getElementById('swal-input-qty').value);
+                    const reasonVal = document.getElementById('swal-input-reason').value;
+                    if (isNaN(qtyVal) || qtyVal <= 0 || qtyVal > maxQty) {
+                        Swal.showValidationMessage(`Please enter a valid quantity between 0.01 and ${maxQty}`);
+                        return false;
+                    }
+                    return { qty: qtyVal, reason: reasonVal };
+                },
+                customClass: {
+                    popup: 'rounded-[1.5rem] bg-white text-slate-800 shadow-xl border border-slate-100',
+                    confirmButton: 'rounded-xl font-black uppercase text-[10px] px-8 py-3 tracking-widest bg-amber-500 text-white',
+                    cancelButton: 'rounded-xl font-black uppercase text-[10px] px-8 py-3 tracking-widest bg-slate-100 text-slate-600'
+                }
+            });
+
+            if (formValues) {
+                const fd = new FormData();
+                fd.append('action', 'return_item');
+                fd.append('sale_item_id', itemId);
+                fd.append('qty', formValues.qty);
+                fd.append('reason', formValues.reason);
+
+                const res = await fetch('sales_history_handler.php', { method: 'POST', body: fd });
+                const data = await res.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Return Completed',
+                        text: data.message,
+                        icon: 'success',
+                        customClass: { popup: 'rounded-[1.5rem] bg-white text-slate-800' }
+                    });
+                    loadHistory(currentPage);
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to process return', 'error');
+                }
+            }
         }
 
         function openEditModal(sale) {

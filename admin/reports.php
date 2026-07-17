@@ -33,7 +33,7 @@ if(isset($_GET['export']) && $_GET['export'] === 'csv') {
 
     // Calculate monthly cost for profit
     $stmt_profit = $pdo->prepare("
-        SELECT SUM(si.qty * b.buying_price) as cost 
+        SELECT SUM((si.qty - si.returned_qty) * b.buying_price) as cost 
         FROM sale_items si 
         JOIN sales s ON si.sale_id = s.id 
         JOIN batches b ON si.batch_id = b.id 
@@ -112,7 +112,7 @@ $total_credit = $credit_stmt->fetchColumn() ?: 0;
 
 // Net Profit Calculation for Range
 $profit_stmt = $pdo->prepare("
-    SELECT SUM(si.qty * b.buying_price) as cost 
+    SELECT SUM((si.qty - si.returned_qty) * b.buying_price) as cost 
     FROM sale_items si 
     JOIN sales s ON si.sale_id = s.id 
     JOIN batches b ON si.batch_id = b.id 
@@ -142,7 +142,7 @@ while($row = $sales_q->fetch()) {
 }
 
 // Fetch Profit (Revenue - Cost)
-$profit_q = $pdo->prepare("SELECT MONTH(s.created_at) as month, SUM(si.qty * b.buying_price) as cost 
+$profit_q = $pdo->prepare("SELECT MONTH(s.created_at) as month, SUM((si.qty - si.returned_qty) * b.buying_price) as cost 
                            FROM sale_items si 
                            JOIN sales s ON si.sale_id = s.id 
                            JOIN batches b ON si.batch_id = b.id 

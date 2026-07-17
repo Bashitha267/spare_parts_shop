@@ -198,6 +198,88 @@ if ($action === 'fetch_summaries') {
     exit;
 }
 
+if ($action === 'return_item') {
+    $sale_item_id = $_POST['sale_item_id'] ?? null;
+    $qty = floatval($_POST['qty'] ?? 0);
+    $reason = trim($_POST['reason'] ?? '');
+    $admin_id = $_SESSION['id'];
+
+    if (!$sale_item_id || $qty <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid parameters.']);
+        exit;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Fetch sale item detail
+        $stmt = $pdo->prepare("SELECT si.*, s.final_amount, s.payment_status FROM sale_items si JOIN sales s ON si.sale_id = s.id WHERE si.id = ?");
+        $stmt->execute([$sale_item_id]);
+        $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$item) {
+            throw new Exception("Sale item not found.");
+        }
+
+        $remaining_qty = $item['qty'] - $item['returned_qty'];
+        if ($qty > $remaining_qty) {
+            throw new Exception("Return quantity ($qty) exceeds remaining quantity ($remaining_qty).");
+        }
+
+        // Calculate refund amount for this returned quantity
+        // unit price after discount is total_price / qty
+        $unit_price_after_discount = floatval($item['total_price']) / floatval($item['qty']);
+        $refund_amount = $qty * $unit_price_after_discount;
+
+        // Calculate original unit price and discount proportion
+        $orig_unit_price = floatval($item['unit_price']);
+        $disc_per_unit = floatval($item['discount']) / floatval($item['qty']);
+        $returned_total_amount = $qty * $orig_unit_price;
+        $returned_discount_amount = $qty * $disc_per_unit;
+
+        // 2. Insert into returns table
+        $stmt = $pdo->prepare("INSERT INTO `returns` (sale_id, sale_item_id, product_id, batch_id, qty, refund_amount, reason) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$item['sale_id'], $sale_item_id, $item['product_id'], $item['batch_id'], $qty, $refund_amount, $reason]);
+        $return_id = $pdo->lastInsertId();
+
+        // 3. Update sale_items: set returned_qty
+        $stmt = $pdo->prepare("UPDATE sale_items SET returned_qty = returned_qty + ? WHERE id = ?");
+        $stmt->execute([$qty, $sale_item_id]);
+
+        // 4. Update sales: adjust total_amount, discount, final_amount
+        $stmt = $pdo->prepare("UPDATE sales SET total_amount = total_amount - ?, discount = discount - ?, final_amount = final_amount - ? WHERE id = ?");
+        $stmt->execute([$returned_total_amount, $returned_discount_amount, $refund_amount, $item['sale_id']]);
+
+        // 5. Update batches: add returned quantity back to stock
+        $stmt = $pdo->prepare("UPDATE batches SET current_qty = current_qty + ?, is_active = 1 WHERE id = ?");
+        $stmt->execute([$qty, $item['batch_id']]);
+
+        // 6. Ensure product is active
+        $stmt = $pdo->prepare("UPDATE products SET is_active = 1 WHERE id = ?");
+        $stmt->execute([$item['product_id']]);
+
+        // 7. Audit log & System log
+        $stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, action_type, table_name, record_id, reason, old_data, new_data) 
+                                VALUES (?, 'edit', 'returns', ?, ?, ?, ?)");
+        $stmt->execute([
+            $admin_id, 
+            $return_id, 
+            "Item Return: " . $reason, 
+            json_encode($item), 
+            json_encode(['returned_qty_added' => $qty, 'refund_amount' => $refund_amount])
+        ]);
+
+        log_action("Item Return", "Returned $qty of item ID {$item['product_id']} from Sale TRX-{$item['sale_id']}. Refund: Rs. " . number_format($refund_amount, 2));
+
+        $pdo->commit();
+        echo json_encode(['success' => true, 'message' => 'Return processed successfully.']);
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
 if ($action === 'edit') {
     $sale_id = $_POST['sale_id'];
     $amount = $_POST['total_amount'];
