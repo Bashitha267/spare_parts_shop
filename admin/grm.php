@@ -267,7 +267,11 @@ check_auth('admin');
                 </div>
             </div>
 
-            <div class="flex justify-end gap-3 pt-2">
+            <div class="flex justify-between items-center pt-2">
+                <button id="deleteGrmBtn" onclick="deleteGrmInvoice()" class="px-4 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-red-600 hover:text-white transition-all flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Delete Invoice
+                </button>
                 <button onclick="closeDetailsModal()" class="px-5 py-2.5 bg-slate-100 text-slate-500 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-slate-200 transition-all">Close Window</button>
             </div>
         </div>
@@ -278,6 +282,7 @@ check_auth('admin');
 <script>
 let currentPage = 1;
 let debounceTimer;
+let activeGrmId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadGRMs(1);
@@ -372,6 +377,7 @@ function renderTable(rows) {
 
 // ─── DETAILS MODAL ───────────────────────────────────
 async function showGrmDetails(id) {
+    activeGrmId = id;
     document.getElementById('grmDetailsModal').style.display = 'flex';
     document.getElementById('detailSupplier').textContent = 'Loading...';
     document.getElementById('detailInvoiceNo').textContent = 'Loading...';
@@ -431,7 +437,47 @@ async function showGrmDetails(id) {
     }
 }
 
+async function deleteGrmInvoice() {
+    if (!activeGrmId) return;
+
+    Swal.fire({
+        title: 'Delete GRM Receipt?',
+        text: 'Are you sure you want to delete this invoice? This will remove all items and deduct the stock quantities adjusted by this receipt!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, Delete it',
+        customClass: { popup: 'rounded-[2rem]' }
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`grm_handler.php?action=delete_grm&id=${activeGrmId}`, { method: 'POST' });
+                const d = await res.json();
+                if (d.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: d.message || 'Invoice has been deleted.',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: { popup: 'rounded-[2rem]' }
+                    });
+                    closeDetailsModal();
+                    loadGRMs(currentPage); // Reload active list
+                    loadStats(); // Reload stats dashboard values
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: d.message || 'Could not delete invoice', customClass: { popup: 'rounded-[2rem]' } });
+                }
+            } catch(e) {
+                Swal.fire({ icon: 'error', title: 'Network Error', text: 'Server is unreachable', customClass: { popup: 'rounded-[2rem]' } });
+            }
+        }
+    });
+}
+
 function closeDetailsModal() {
+    activeGrmId = null;
     document.getElementById('grmDetailsModal').style.display = 'none';
 }
 

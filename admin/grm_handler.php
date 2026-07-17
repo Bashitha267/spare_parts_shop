@@ -26,6 +26,7 @@ switch ($action) {
     case 'get_grm_detail':  handle_get_grm_detail();  break;
     case 'save_grm':        handle_save_grm();        break;
     case 'get_stats':       handle_get_stats();       break;
+    case 'delete_grm':      handle_delete_grm();      break;
     default:
         echo json_encode(['success' => false, 'message' => 'Unknown action.']);
         break;
@@ -593,4 +594,78 @@ function handle_get_stats() {
         'value_month'      => (float) $grm_row['value_month'],
         'total_suppliers'  => $total_suppliers,
     ]);
+}
+
+// ---------------------------------------------------------------------------
+// 8. delete_grm (POST)
+//    Param: id
+//    Returns: {success: true|false, message}
+// ---------------------------------------------------------------------------
+function handle_delete_grm() {
+    global $pdo;
+
+    $id = (int) ($_GET['id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid GRM Invoice ID.']);
+        return;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // Fetch invoice details first to verify it exists and get invoice number
+        $stmt = $pdo->prepare("SELECT invoice_no FROM invoices WHERE id = ? AND invoice_no LIKE 'GRM-%'");
+        $stmt->execute([$id]);
+        $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$invoice) {
+            echo json_encode(['success' => false, 'message' => 'GRM Invoice not found.']);
+            $pdo->rollBack();
+            return;
+        }
+
+        // Fetch items associated with the invoice to adjust batch quantities
+        $items_stmt = $pdo->prepare("SELECT batch_id, qty FROM grm_items WHERE invoice_id = ?");
+        $items_stmt->execute([$id]);
+        $items = $items_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($items as $item) {
+            if ($item['batch_id']) {
+                // Deduct the quantity added by this invoice from the batch
+                // If current_qty drops to 0, mark the batch inactive
+                $adjust_stmt = $pdo->prepare("
+                    UPDATE batches 
+                    SET 
+                        current_qty = GREATEST(0, current_qty - :qty),
+                        original_qty = GREATEST(0, original_qty - :qty),
+                        is_active = CASE WHEN GREATEST(0, current_qty - :qty) <= 0 THEN 0 ELSE is_active END
+                    WHERE id = :batch_id
+                ");
+                $adjust_stmt->execute([
+                    ':qty' => $item['qty'],
+                    ':batch_id' => $item['batch_id']
+                ]);
+            }
+        }
+
+        // Delete the items
+        $del_items = $pdo->prepare("DELETE FROM grm_items WHERE invoice_id = ?");
+        $del_items->execute([$id]);
+
+        // Delete the invoice itself
+        $del_invoice = $pdo->prepare("DELETE FROM invoices WHERE id = ?");
+        $del_invoice->execute([$id]);
+
+        // Commit transaction
+        $pdo->commit();
+
+        // Log the deletion action
+        log_action('GRM Delete', 'Deleted GRM Invoice: ' . $invoice['invoice_no'] . ' (ID: ' . $id . ')');
+
+        echo json_encode(['success' => true, 'message' => 'GRM Invoice deleted successfully.']);
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
 }
