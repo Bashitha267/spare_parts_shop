@@ -145,7 +145,7 @@ $today_pending = $pending_stmt->fetchColumn() ?: 0;
                     <div class="mb-3 md:mb-5 group-hover:rotate-12 transition-transform relative z-10">
                         <svg class="w-8 h-8 md:w-12 md:h-12 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                     </div>
-                    <span class="text-[9px] md:text-xs font-black text-white uppercase tracking-[0.1em] md:tracking-[0.2em] text-center relative z-10">Goods Receipt</span>
+                    <span class="text-[9px] md:text-xs font-black text-white uppercase tracking-[0.1em] md:tracking-[0.2em] text-center relative z-10">GRM</span>
                 </a>
 
                 <!-- Manage Spare Parts Inventory -->
