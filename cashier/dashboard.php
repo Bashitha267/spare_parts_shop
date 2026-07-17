@@ -101,8 +101,13 @@ $draft_count = $draft_stmt->fetchColumn() ?: 0;
                 </div>
 
                 <div class="flex items-center gap-2 md:gap-4 border-l border-slate-200 pl-2 md:pl-6 flex-shrink-0">
+                    <?php if ($_SESSION['role'] === 'superadmin'): ?>
+                        <a href="../admin/dashboard.php" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                            Admin Panel
+                        </a>
+                    <?php endif; ?>
                     <div class="hidden lg:block text-right">
-                        <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none mb-1">Operator</p>
+                        <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none mb-1"><?php echo ucfirst($_SESSION['role']); ?></p>
                         <p class="text-xs font-bold text-slate-900"><?php echo explode(' ', $_SESSION['full_name'])[0]; ?></p>
                     </div>
                     <a href="../logout.php" class="flex items-center justify-center text-white bg-red-600 border-2 border-white p-2.5 md:px-5 md:py-2.5 rounded-xl hover:bg-red-700 hover:shadow-lg transition-all uppercase tracking-wider group" title="Logout">

@@ -105,8 +105,13 @@ $today_pending = $pending_stmt->fetchColumn() ?: 0;
                 </div>
 
                 <div class="flex items-center gap-2 md:gap-4 border-l border-slate-200 pl-2 md:pl-6 flex-shrink-0">
+                    <?php if ($_SESSION['role'] === 'superadmin'): ?>
+                        <a href="../cashier/dashboard.php" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                            Cashier Hub
+                        </a>
+                    <?php endif; ?>
                     <div class="hidden lg:block text-right">
-                        <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none mb-1">Admin</p>
+                        <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest leading-none mb-1"><?php echo ucfirst($_SESSION['role']); ?></p>
                         <p class="text-xs font-bold text-slate-900"><?php echo explode(' ', $_SESSION['full_name'])[0]; ?></p>
                     </div>
                     <a href="../logout.php" class="flex items-center justify-center text-white bg-red-600 border-2 border-white p-2.5 md:px-5 md:py-2.5 rounded-xl hover:bg-red-700 hover:shadow-lg transition-all uppercase tracking-wider group" title="Logout">
@@ -133,6 +138,14 @@ $today_pending = $pending_stmt->fetchColumn() ?: 0;
                         <svg class="w-8 h-8 md:w-12 md:h-12 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                     </div>
                     <span class="text-[9px] md:text-xs font-black text-white uppercase tracking-[0.1em] md:tracking-[0.2em] text-center relative z-10">Oil Inventory</span>
+                </a>
+
+                <!-- GRM - Goods Receipt Management -->
+                <a href="grm.php" class="p-5 md:p-8 blue-gradient-card rounded-2xl md:rounded-[2.5rem] group relative overflow-hidden">
+                    <div class="mb-3 md:mb-5 group-hover:rotate-12 transition-transform relative z-10">
+                        <svg class="w-8 h-8 md:w-12 md:h-12 icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    </div>
+                    <span class="text-[9px] md:text-xs font-black text-white uppercase tracking-[0.1em] md:tracking-[0.2em] text-center relative z-10">Goods Receipt</span>
                 </a>
 
                 <!-- Manage Spare Parts Inventory -->

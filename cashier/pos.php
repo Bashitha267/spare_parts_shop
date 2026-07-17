@@ -1041,34 +1041,33 @@ check_auth('cashier');
                         <p class="text-[13px] font-black text-slate-800">${numberFormat(item.est_selling_price)}</p>
                     </div>
 
-                    <!-- Middle Controls (Discount & Qty) -->
-                    <div class="col-span-1 lg:col-span-4 flex items-center justify-between lg:justify-end gap-3 lg:gap-8">
-                        <!-- Discount Input -->
-                        <div class="flex-1 lg:flex-none">
-                            <div class="relative w-full lg:w-[100px]">
-                                <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-red-500 pointer-events-none">Rs.</span>
-                                <input type="number" step="0.01" value="${item.per_item_discount.toFixed(2)}" onchange="updateRowDiscount(${index}, this.value)" class="w-full text-right px-2 py-1.5 pl-7 bg-white border border-slate-200 rounded-lg text-[12px] font-black outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 text-red-600 transition-all">
-                                <span class="lg:hidden absolute -top-4 left-1 text-[8px] font-black text-slate-400 uppercase tracking-widest">Discount / Item</span>
-                            </div>
-                        </div>
-
-                        <!-- Quantity -->
-                        <div class="flex-1 lg:flex-none flex flex-col items-center">
-                            <div class="flex items-center bg-slate-100/50 rounded-lg p-0.5 border border-slate-200">
-                                <button onclick="updateQty(${index}, -1)" class="w-7 h-7 flex items-center justify-center bg-white text-slate-600 rounded-md shadow-sm border border-slate-200 hover:bg-slate-50 transition-all">-</button>
-                                <input type="number" value="${item.qty}" min="1" max="${item.max_qty}" onchange="setQty(${index}, this.value)" class="w-10 text-center font-black text-blue-600 bg-transparent border-none focus:ring-0 text-[14px]">
-                                <button onclick="updateQty(${index}, 1)" class="w-7 h-7 flex items-center justify-center bg-white text-slate-600 rounded-md shadow-sm border border-slate-200 hover:bg-slate-50 transition-all">+</button>
-                            </div>
-                            <span class="lg:hidden text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Qty (${typeLabel})</span>
+                    <!-- Discount Input -->
+                    <div class="col-span-1 lg:col-span-1 flex items-center justify-end relative">
+                        <div class="relative w-full lg:w-[85px]">
+                            <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-red-500 pointer-events-none">Rs.</span>
+                            <input type="number" step="0.01" value="${item.per_item_discount.toFixed(2)}" onchange="updateRowDiscount(${index}, this.value)" class="w-full text-right px-2 py-1.5 pl-6 bg-white border border-slate-200 rounded-lg text-[11px] font-black outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 text-red-600 transition-all">
+                            <span class="lg:hidden absolute -top-4 left-1 text-[8px] font-black text-slate-400 uppercase tracking-widest">Discount / Item</span>
                         </div>
                     </div>
 
-                    <!-- Line Total & Delete -->
-                    <div class="col-span-1 lg:col-span-2 flex items-center justify-between lg:justify-end gap-4">
-                        <div class="text-right">
-                             <p class="text-[17px] font-black text-blue-700 tracking-tighter leading-none">${numberFormat(item.total_price)}</p>
-                             <p class="lg:hidden text-[8px] font-bold text-slate-400 uppercase text-right mt-1">Total Payable</p>
+                    <!-- Quantity -->
+                    <div class="col-span-1 lg:col-span-2 flex flex-col items-center justify-center">
+                        <div class="flex items-center bg-slate-100/50 rounded-lg p-0.5 border border-slate-200">
+                            <button onclick="updateQty(${index}, -1)" class="w-7 h-7 flex items-center justify-center bg-white text-slate-600 rounded-md shadow-sm border border-slate-200 hover:bg-slate-50 transition-all text-xs font-black">-</button>
+                            <input type="number" value="${item.qty}" min="1" max="${item.max_qty}" onchange="setQty(${index}, this.value)" class="w-10 text-center font-black text-blue-600 bg-transparent border-none focus:ring-0 text-[13px] py-0">
+                            <button onclick="updateQty(${index}, 1)" class="w-7 h-7 flex items-center justify-center bg-white text-slate-600 rounded-md shadow-sm border border-slate-200 hover:bg-slate-50 transition-all text-xs font-black">+</button>
                         </div>
+                        <span class="lg:hidden text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Qty (${typeLabel})</span>
+                    </div>
+
+                    <!-- Line Total -->
+                    <div class="col-span-1 lg:col-span-2 text-right">
+                        <p class="text-[16px] font-black text-blue-700 tracking-tighter leading-none">${numberFormat(item.total_price)}</p>
+                        <p class="lg:hidden text-[8px] font-bold text-slate-400 uppercase text-right mt-1">Total Payable</p>
+                    </div>
+
+                    <!-- Action -->
+                    <div class="col-span-1 lg:col-span-1 flex items-center justify-center">
                         <button onclick="removeFromCart(${index})" class="w-9 h-9 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500 rounded-xl transition-all border border-red-50 hover:border-red-500">
                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>

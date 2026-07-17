@@ -10,13 +10,18 @@ function check_auth($role = null) {
     }
 
     if ($role) {
+        $currentRole = $_SESSION["role"] ?? '';
+        // If superadmin, allow it to pass for both admin and superadmin roles
+        if ($currentRole === 'superadmin') {
+            return;
+        }
         if (is_array($role)) {
-            if (!in_array($_SESSION["role"], $role)) {
+            if (!in_array($currentRole, $role)) {
                 header("location: ../login.php");
                 exit;
             }
         } else {
-            if ($_SESSION["role"] !== $role) {
+            if ($currentRole !== $role) {
                 header("location: ../login.php");
                 exit;
             }

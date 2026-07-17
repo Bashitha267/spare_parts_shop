@@ -14,7 +14,7 @@ $action = $_REQUEST['action'] ?? '';
 
 if ($action === 'fetch_cashiers') {
     try {
-        $stmt = $pdo->query("SELECT id, emp_id, full_name, username, role, created_at FROM users ORDER BY created_at DESC");
+        $stmt = $pdo->query("SELECT id, emp_id, full_name, username, role, created_at FROM users WHERE role != 'superadmin' ORDER BY created_at DESC");
         $cashiers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(['success' => true, 'cashiers' => $cashiers]);
     } catch (PDOException $e) {
@@ -36,6 +36,12 @@ if ($action === 'add_staff') {
 
     if (!in_array($role, ['admin', 'cashier'])) {
         echo json_encode(['success' => false, 'message' => 'Invalid role']);
+        exit;
+    }
+
+    // Block registering another superadmin username or using 'superadmin' username
+    if ($username === 'superadmin') {
+        echo json_encode(['success' => false, 'message' => 'Username already taken']);
         exit;
     }
 
@@ -76,6 +82,11 @@ if ($action === 'delete_cashier') {
         $user_stmt = $pdo->prepare("SELECT full_name, username, role FROM users WHERE id = ?");
         $user_stmt->execute([$id]);
         $user_to_delete = $user_stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user_to_delete && $user_to_delete['role'] === 'superadmin') {
+            echo json_encode(['success' => false, 'message' => 'Access Denied']);
+            exit;
+        }
 
         $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
         if ($stmt->execute([$id])) {
